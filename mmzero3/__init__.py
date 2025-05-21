@@ -7,6 +7,8 @@ from .Items import MMZero3Item, item_data_table, item_table
 from .Locations import MMZero3Location, location_data_table, location_table, locked_locations
 from .Options import MMZero3Options
 from .Regions import region_data_table
+from .Rom import Rom
+from .Client import MMZero3Client
 
 class MMZero3WebWorld(WebWorld):
     theme = "ice"
@@ -80,3 +82,7 @@ class MMZero3World(World):
         
         from Utils import visualize_regions
         visualize_regions(self.multiworld.get_region("Menu", self.player), "my_world.puml")
+
+    def generate_output(self, output_directory: str) -> None:
+        rom = Rom(self.multiworld, self.player)
+        rom.close(output_directory)
