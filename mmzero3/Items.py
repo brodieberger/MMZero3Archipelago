@@ -15,35 +15,26 @@ class MMZero3ItemData(NamedTuple):
 
 item_data_table: Dict[str, MMZero3ItemData] = {
     "Z Saber": MMZero3ItemData(
-        code=1,
+        code=999,
         type=ItemClassification.progression,
     ),
-    "Cyber Elf 1": MMZero3ItemData(
-        code=2,
-        type=ItemClassification.useful,
-    ),
-    "Cyber Elf 2": MMZero3ItemData(
-        code=3,
-        type=ItemClassification.useful,
-    ),
-    "Cyber Elf 3": MMZero3ItemData(
-        code=4,
-        type=ItemClassification.useful,
-    ),
-    "Cyber Elf 4": MMZero3ItemData(
-        code=5,
-        type=ItemClassification.useful,
-    ),
+    **{
+        f"Secret Disk {i}": MMZero3ItemData(
+            code=i,
+            type=ItemClassification.useful,
+        )
+        for i in range(1, 181)
+    },
     "Boss Key": MMZero3ItemData(
-        code=6,
+        code=181,
         type=ItemClassification.progression,
     ),
     "Victory": MMZero3ItemData(
-        code=7,
+        code=182,
         type=ItemClassification.progression,
     ),
     "100 Energy Crystals": MMZero3ItemData(
-        code=8,
+        code=183,
         can_create=lambda world: False  # Only created from `get_filler_item_name`.
     ),
 }

@@ -21,32 +21,23 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Z Saber": MMZero3LocationData(
         region="Opening Stage",
         locked_item="Z Saber",
-        address=1,
+        address=999,
     ),
-    "Get Cyber Elf 1": MMZero3LocationData(
-        region="Level 1",
-        address=2,
-    ),
-    "Get Cyber Elf 2": MMZero3LocationData(
-        region="Level 1",
-        address=3,
-    ),
-    "Get Cyber Elf 3": MMZero3LocationData(
-        region="Level 1",
-        address=4,
-    ),
-    "Get Cyber Elf 4": MMZero3LocationData(
-        region="Level 1",
-        address=5,
-    ),
+    **{
+        f"Get Secret Disk {i}": MMZero3LocationData(
+            region="Level 1",
+            address=i,
+        )
+        for i in range(1, 181)
+    },
     "Kill Boss 1": MMZero3LocationData(
         region="Level 1",
-        address=6,
+        address=181,
     ),
     "Kill Omega": MMZero3LocationData(
         region="Boss Stage",
         locked_item="Victory",
-        address=7,
+        address=182,
     ),
 }
 
