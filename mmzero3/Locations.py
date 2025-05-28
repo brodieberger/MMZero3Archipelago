@@ -17,6 +17,9 @@ class MMZero3LocationData(NamedTuple):
     locked_item: Optional[str] = None
 
 
+# Exclude these items. They are all of the files that can be found in the Hub area
+# These are excluded to due issues with the memory manipulation I am using, hopefully only a temp fix.
+exclude = [23, 44, 58, 92, 99, 106, 107, 116, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176]
 location_data_table: Dict[str, MMZero3LocationData] = {
     "Z Saber": MMZero3LocationData(
         region="Opening Stage",
@@ -28,7 +31,7 @@ location_data_table: Dict[str, MMZero3LocationData] = {
             region="Level 1",
             address=i,
         )
-        for i in range(1, 181)
+        for i in range(1, 181) if i not in exclude
     },
     "Kill Boss 1": MMZero3LocationData(
         region="Level 1",

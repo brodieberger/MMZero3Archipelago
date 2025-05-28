@@ -13,6 +13,10 @@ class MMZero3ItemData(NamedTuple):
     type: ItemClassification = ItemClassification.filler
     can_create: Callable[["MMZero3World"], bool] = lambda world: True
 
+
+# Exclude these items. They are all of the files that can be found in the Hub area
+# These are excluded to due issues with the memory manipulation I am using, hopefully only a temp fix.
+exclude = [23, 44, 58, 92, 99, 106, 107, 116, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176]
 item_data_table: Dict[str, MMZero3ItemData] = {
     "Z Saber": MMZero3ItemData(
         code=999,
@@ -23,7 +27,7 @@ item_data_table: Dict[str, MMZero3ItemData] = {
             code=i,
             type=ItemClassification.useful,
         )
-        for i in range(1, 181)
+        for i in range(1, 181) if i not in exclude
     },
     "Boss Key": MMZero3ItemData(
         code=181,
