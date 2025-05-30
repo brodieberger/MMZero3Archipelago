@@ -34,13 +34,25 @@ class MMZero3World(World):
 
     def create_items(self) -> None:
         item_pool: List[MMZero3Item] = []
+        
         # Exclude locked items from the item pool
         locked_item_names = {data.locked_item for data in locked_locations.values() if data.locked_item}
+        
         for name, item in item_data_table.items():
             if item.code and item.can_create(self) and name not in locked_item_names:
                 item_pool.append(self.create_item(name))
 
+        # Add the items to the pool
         self.multiworld.itempool += item_pool
+
+        # Calculate how many filler items are needed
+        total_locations = len([loc for loc in location_data_table.values() if loc.can_create(self)])
+        total_items = len(item_pool) + len(locked_item_names)
+        filler_count = total_locations - total_items
+
+        # Fill extra locations with filler items if needed
+        for _ in range(filler_count):
+            self.multiworld.itempool.append(self.create_item(self.get_filler_item_name()))
 
     def create_regions(self) -> None:
         # Create regions.
@@ -73,15 +85,15 @@ class MMZero3World(World):
         set_rule(self.multiworld.get_entrance("To Boss Stage", self.player),
                     lambda state: state.has("Boss Key", self.player))
         
-        set_rule(self.multiworld.get_location("Kill Omega", self.player),
+        set_rule(self.multiworld.get_location("Complete Abandoned Research Laboratory", self.player),
                     lambda state: state.can_reach_region("Boss Stage", self.player))
         
         # Completion condition
         self.multiworld.completion_condition[self.player] = \
             lambda state: state.has("Victory", self.player)
         
-        from Utils import visualize_regions
-        visualize_regions(self.multiworld.get_region("Menu", self.player), "my_world.puml")
+        #from Utils import visualize_regions
+        #visualize_regions(self.multiworld.get_region("Menu", self.player), "my_world.puml")
 
     def generate_output(self, output_directory: str) -> None:
         rom = Rom(self.multiworld, self.player)
