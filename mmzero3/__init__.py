@@ -1,4 +1,4 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any, ClassVar
 
 from BaseClasses import Region, Tutorial
 from worlds.AutoWorld import WebWorld, World
@@ -7,8 +7,13 @@ from .Items import MMZero3Item, item_data_table, item_table
 from .Locations import MMZero3Location, location_data_table, location_table, locked_locations
 from .Options import MMZero3Options
 from .Regions import region_data_table
-from .Rom import Rom
+from .Rom import MMZero3ProcedurePatch, MMZero3Settings
 from .Client import MMZero3Client
+
+import pkgutil
+import hashlib
+import os
+from worlds.Files import APProcedurePatch
 
 class MMZero3WebWorld(WebWorld):
     theme = "ice"
@@ -26,6 +31,10 @@ class MMZero3World(World):
     location_name_to_id = location_table
 
     web = MMZero3WebWorld()
+    
+    settings_key = "MMZero3_settings"
+    settings: ClassVar[Rom.MMZero3Settings]
+
     options_dataclass = MMZero3Options
     options: MMZero3Options
 
@@ -96,5 +105,7 @@ class MMZero3World(World):
         #visualize_regions(self.multiworld.get_region("Menu", self.player), "my_world.puml")
 
     def generate_output(self, output_directory: str) -> None:
-        rom = Rom(self.multiworld, self.player)
-        rom.close(output_directory)
+        patch = Rom.MMZero3ProcedurePatch(player=self.player, player_name=self.player_name)
+        patch.write_file("mmz3-ap.bsdiff4", pkgutil.get_data(__name__, "mmz3-ap.bsdiff4"))
+        out_file_name = self.multiworld.get_out_file_name_base(self.player)
+        patch.write(os.path.join(output_directory, f"{out_file_name}{patch.patch_file_ending}"))
