@@ -88,24 +88,53 @@ class MMZero3World(World):
             self.get_location(location_name).place_locked_item(locked_item)
 
     def get_filler_item_name(self) -> str:
-        return "100 Energy Crystals"
+        # TODO: implement energy crystal
+        return "100 Energy Crystals (Unimplemented)"
     
     def set_rules(self) -> None:
-        set_rule(self.multiworld.get_entrance("To Boss Stage", self.player),
+        set_rule(self.multiworld.get_entrance("To Abandoned Research Laboratory", self.player),
                     lambda state: state.has("Boss Key", self.player))
-        
+                
         set_rule(self.multiworld.get_location("Complete Abandoned Research Laboratory", self.player),
-                    lambda state: state.can_reach_region("Boss Stage", self.player))
+                    lambda state: state.can_reach_region("Abandoned Research Laboratory", self.player))
         
+        set_rule(
+        self.multiworld.get_location("Complete Missile Factory", self.player),
+        lambda state: all(state.can_reach(location_name, "Location", self.player) for location_name in [
+            "Complete Aegis Volcano Base",
+            "Complete Oceanic Highway Ruins",
+            "Complete Weapons Repair Factory",
+            "Complete Old Residential"
+        ]))
+
+        set_rule(
+        self.multiworld.get_location("Complete Area X-2", self.player),
+        lambda state: all(state.can_reach(location_name, "Location", self.player) for location_name in [
+            "Complete Twilight Desert",
+            "Complete Frontline Ice Base",
+            "Complete Forest of Anatre",
+        ]))
+
+        set_rule(
+        self.multiworld.get_location("Complete Sub Arcadia", self.player),
+        lambda state: all(state.can_reach(location_name, "Location", self.player) for location_name in [
+            "Complete Energy Facility",
+            "Complete Snowy Plains",
+            "Complete Sunken Library",
+            "Complete Giant Elevator",
+        ]))
+
+
         # Completion condition
         self.multiworld.completion_condition[self.player] = \
             lambda state: state.has("Victory", self.player)
         
-        #from Utils import visualize_regions
-        #visualize_regions(self.multiworld.get_region("Menu", self.player), "my_world.puml")
-
+        
     def generate_output(self, output_directory: str) -> None:
         patch = Rom.MMZero3ProcedurePatch(player=self.player, player_name=self.player_name)
         patch.write_file("mmz3-ap.bsdiff4", pkgutil.get_data(__name__, "mmz3-ap.bsdiff4"))
         out_file_name = self.multiworld.get_out_file_name_base(self.player)
         patch.write(os.path.join(output_directory, f"{out_file_name}{patch.patch_file_ending}"))
+
+        from Utils import visualize_regions
+        visualize_regions(self.multiworld.get_region("Menu", self.player), "my_world.puml")

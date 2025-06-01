@@ -25,6 +25,8 @@ item_data_table: Dict[str, MMZero3ItemData] = {
     **{
         f"Secret Disk {i}": MMZero3ItemData(
             code=i,
+            # TODO: Not every item is useful. Map these out.
+            # lore files < crystals < cyber elves < suit upgrades
             type=ItemClassification.useful,
         )
         for i in range(1, 181) if i not in exclude
@@ -37,7 +39,7 @@ item_data_table: Dict[str, MMZero3ItemData] = {
         code=182,
         type=ItemClassification.progression,
     ),
-    "100 Energy Crystals": MMZero3ItemData(
+    "100 Energy Crystals (Unimplemented)": MMZero3ItemData(
         code=183,
         can_create=lambda world: False  # Only created from `get_filler_item_name`.
     ),
