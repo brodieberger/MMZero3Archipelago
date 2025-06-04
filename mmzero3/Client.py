@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 from NetUtils import ClientStatus
 
 import worlds._bizhawk as bizhawk
+from .Options import MMZero3Options
 from worlds._bizhawk.client import BizHawkClient
 
 if TYPE_CHECKING:
@@ -20,7 +21,9 @@ class MMZero3Client(BizHawkClient):
     real_inventory = bytearray(45)
     empty_inventory = bytearray([0xFF] * 45)
     received_index = 0
+    collected_disks = 0
 
+    
 
     async def validate_rom(self, ctx: "BizHawkClientContext") -> bool:
         try:
@@ -160,9 +163,14 @@ class MMZero3Client(BizHawkClient):
                             "cmd": "LocationChecks",
                             "locations": [location_id]
                         }])
-                    
+
+                    # If the level that was finished was the last level
+                    if level_data == b'\x10':
+                        await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
+                        ctx.finished_game = True
+
                     # Fill player inventory so that player cant open items in result screen
-                    print("Inventory Emptied")
+                    #print("Inventory Emptied")
                     await bizhawk.write(
                         ctx.bizhawk_ctx,
                         [(0x0371B8, list(self.empty_inventory), "Combined WRAM")]
@@ -176,7 +184,7 @@ class MMZero3Client(BizHawkClient):
 
                 # Sync to real inventory once on entering hub
                 if not self.synced_hub:
-                    print("Entering hub, syncing inventory")
+                    #print("Entering hub, syncing inventory")
                     await bizhawk.write(
                         ctx.bizhawk_ctx,
                         [(0x0371B8, list(self.real_inventory), "Combined WRAM")]
@@ -197,6 +205,7 @@ class MMZero3Client(BizHawkClient):
 
                     # Update real inventory
                     self.real_inventory[byte_index] |= (1 << bit_position)
+                    self.collected_disks += 1
 
                     # Only update the memory if the player is in the hub
                     if is_in_hub:
@@ -204,8 +213,8 @@ class MMZero3Client(BizHawkClient):
                             ctx.bizhawk_ctx,
                             [(0x0371B8, list(self.real_inventory), "Combined WRAM")]
                         )
-
             self.received_index = len(ctx.items_received)
+
 
         except bizhawk.RequestFailedError:
             pass
