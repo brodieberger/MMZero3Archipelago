@@ -11,8 +11,6 @@ Welcome to my project. Things are still under heavy development, but here you wi
 
 - You *should* be able to use savestates throughout the game without anything breaking.
 
-- Included in the releases page is a completed save file of the game. Starting a new game with the save file loaded will allow you to skip cutscenes.
-
 ## Options
 
 - `goal`:  
