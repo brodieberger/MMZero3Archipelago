@@ -14,6 +14,15 @@ class MMZero3ItemData(NamedTuple):
     can_create: Callable[["MMZero3World"], bool] = lambda world: True
 
 
+# Stage names as they appear in game order
+stage_names = [
+    "Derelict Spacecraft", "Aegis Volcano Base", "Oceanic Highway Ruins",
+    "Weapons Repair Factory", "Old Residential", "Missile Factory",
+    "Twilight Desert", "Frontline Ice Base", "Forest of Anatre",
+    "Area X-2", "Energy Facility", "Snowy Plains",
+    "Sunken Library", "Giant Elevator", "Sub Arcadia"
+]
+
 # Exclude these items. They are all of the files that can be found in the Hub area
 # These are excluded to due issues with the memory manipulation I am using, hopefully only a temp fix.
 exclude = [23, 44, 58, 92, 99, 106, 107, 116, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176]
@@ -31,16 +40,19 @@ item_data_table: Dict[str, MMZero3ItemData] = {
         )
         for i in range(1, 181) if i not in exclude
     },
-    "Boss Key": MMZero3ItemData(
-        code=181,
-        type=ItemClassification.progression,
-    ),
+    **{
+        f"{stage} Cleared": MMZero3ItemData(
+            code=180 + idx + 1,
+            type=ItemClassification.progression,
+        )
+        for idx, stage in enumerate(stage_names)
+    },
     "Victory": MMZero3ItemData(
-        code=182,
+        code=300,
         type=ItemClassification.progression,
     ),
     "100 Energy Crystals (Unimplemented)": MMZero3ItemData(
-        code=183,
+        code=301,
         can_create=lambda world: False  # Only created from `get_filler_item_name`.
     ),
 }

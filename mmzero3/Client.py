@@ -8,7 +8,7 @@ from worlds._bizhawk.client import BizHawkClient
 
 if TYPE_CHECKING:
     from worlds._bizhawk.context import BizHawkClientContext
-
+    from . import MMZero3World
 
 class MMZero3Client(BizHawkClient):
     game = "Mega Man Zero 3"
@@ -17,9 +17,17 @@ class MMZero3Client(BizHawkClient):
 
     synced_in_game = False
     synced_hub = False
+    player_warned = False
+    
     in_game_inventory = bytearray(45)
     real_inventory = bytearray(45)
     empty_inventory = bytearray([0xFF] * 45)
+
+    required_disks = 80 # Will be overwritten from settings
+    goal_type = 0 # will also be overwritten. 0 is for default (kill boss with enough disks), 1 is vanilla (just kill the boss)
+    easy_ex_skill = 0
+    
+    options_set = False
     received_index = 0
     collected_disks = 0
 
@@ -40,8 +48,19 @@ class MMZero3Client(BizHawkClient):
 
         return True
 
+    # TODO: This function could probably be split/optimized
     async def game_watcher(self, ctx: "BizHawkClientContext") -> None:
         try:
+            # Set the required amount of secret disks
+            if ctx.slot_data and not self.options_set:
+                self.required_disks = ctx.slot_data.get("required_secret_disks", 80)
+                self.goal_type = ctx.slot_data.get("goal", 0)
+                self.easy_ex_skill = ctx.slot_data.get("easy_ex_skill", 0)
+                #print(f"Required secret disks: {self.required_disks}")
+                #print(f"Goal Type Set: {self.goal_type}")
+                #print(self.easy_ex_skill)
+                self.options_set = True
+            
             # Read save data
             save_data = (await bizhawk.read(
                 ctx.bizhawk_ctx,
@@ -71,10 +90,10 @@ class MMZero3Client(BizHawkClient):
 
                 # Sync in-game inventory once on entering a level
                 if not self.synced_in_game:
-                    print("Entering Level, Starting Inventory Sync.")
-                    print(f"Real Inventory :{self.real_inventory}")
-                    print(f"In-Game Inventory :{self.in_game_inventory}")
-                    print(f"RAM Inventory :{save_data}")
+                    #print("Entering Level, Starting Inventory Sync.")
+                    #print(f"Real Inventory :{self.real_inventory}")
+                    #print(f"In-Game Inventory :{self.in_game_inventory}")
+                    #print(f"RAM Inventory :{save_data}")
                     
                     # Sync in game inventory inventory once on entering level
                     await bizhawk.write(
@@ -88,6 +107,13 @@ class MMZero3Client(BizHawkClient):
                         [(0x0371B8, 45, "Combined WRAM")])
                     )[0]
 
+                    # If easy EX skill is enabled, give player S rank
+                    if self.easy_ex_skill == 1:
+                        await bizhawk.write(
+                            ctx.bizhawk_ctx,
+                            [(0x0372B1, [0x06], "Combined WRAM")]
+                        )
+
                     self.synced_in_game = True
 
                     # Unlocks Z Saber, just a temp thing here cause of my AP rules that I don't feel like changing ATM
@@ -96,10 +122,10 @@ class MMZero3Client(BizHawkClient):
                         "locations": [999]
                     }])
 
-                    print("Level Write Complete.")
-                    print(f"Real Inventory :{self.real_inventory}")
-                    print(f"In-Game Inventory :{self.in_game_inventory}")
-                    print(f"RAM Inventory :{save_data}")
+                    #print("Level Write Complete.")
+                    #print(f"Real Inventory :{self.real_inventory}")
+                    #print(f"In-Game Inventory :{self.in_game_inventory}")
+                    #print(f"RAM Inventory :{save_data}")
 
                 # Check if an item was picked up in a level
                 if save_data != self.in_game_inventory and results_screen == b'\x00':
@@ -164,11 +190,32 @@ class MMZero3Client(BizHawkClient):
                             "locations": [location_id]
                         }])
 
+                    # Completion condition
                     # If the level that was finished was the last level
-                    if level_data == b'\x10':
-                        await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
-                        ctx.finished_game = True
-
+                    # Logic for Default game goal
+                    if self.goal_type == 0:
+                        if level_data == b'\x10' and self.collected_disks >= self.required_disks and not ctx.finished_game:
+                            await ctx.send_msgs([{
+                                "cmd": "Say", "text": f"Final stage cleared! You had {self.collected_disks} Disks, which was {self.collected_disks - self.required_disks} more disks than needed!"
+                             }])
+                            await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
+                            ctx.finished_game = True
+                        elif level_data == b'\x10' and self.collected_disks < self.required_disks and not self.player_warned and not ctx.finished_game:
+                            await ctx.send_msgs([
+                                {"cmd": "Say", "text": f"Final stage cleared! You still need {self.required_disks - self.collected_disks} more disks."},
+                                {"cmd": "Say", "text": "Load a previous save and collect more disks."},
+                                {"cmd": "Say", "text": "Do NOT save over your file after the credits!"}
+                            ])
+                            self.player_warned = True
+                    # Logic for Vanilla
+                    elif self.goal_type == 1:
+                         if level_data == b'\x10' and ctx.finished_game == False:
+                            await ctx.send_msgs([{
+                                "cmd": "Say", "text": "Final Stage Cleared! Game completed!"
+                             }])
+                            await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
+                            ctx.finished_game = True
+                        
                     # Fill player inventory so that player cant open items in result screen
                     #print("Inventory Emptied")
                     await bizhawk.write(
@@ -214,6 +261,14 @@ class MMZero3Client(BizHawkClient):
                             [(0x0371B8, list(self.real_inventory), "Combined WRAM")]
                         )
             self.received_index = len(ctx.items_received)
+
+            # Additional check to see if the player collected enough disks AFTER beating final stage. Only used in default game goal
+            if self.player_warned == True and self.collected_disks >= self.required_disks and ctx.finished_game == False:
+                await ctx.send_msgs([{
+                    "cmd": "Say", "text": f"{self.required_disks} Disks collected! Game completed!"
+                }])
+                await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
+                ctx.finished_game = True
 
 
         except bizhawk.RequestFailedError:

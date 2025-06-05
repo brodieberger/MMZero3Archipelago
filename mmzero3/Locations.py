@@ -69,7 +69,7 @@ stage_names = [
     "Weapons Repair Factory", "Old Residential", "Missile Factory",
     "Twilight Desert", "Frontline Ice Base", "Forest of Anatre",
     "Area X-2", "Energy Facility", "Snowy Plains",
-    "Sunken Library", "Giant Elevator"
+    "Sunken Library", "Giant Elevator", "Sub Arcadia"
 ]
 
 
@@ -84,16 +84,11 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     **{
         f"Complete {stage}": MMZero3LocationData(
             region=f"{stage}",
+            locked_item=f"{stage} Cleared",
             address=180 + idx + 1,
         )
         for idx, stage in enumerate(stage_names)
     },
-
-    "Complete Sub Arcadia": MMZero3LocationData(
-        region="Sub Arcadia",
-        locked_item="Boss Key",
-        address=195,
-    ),
 
     "Complete Abandoned Research Laboratory": MMZero3LocationData(
         region="Abandoned Research Laboratory",

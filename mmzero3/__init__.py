@@ -1,3 +1,4 @@
+import math
 from typing import List, Dict, Any, ClassVar
 
 from BaseClasses import Region, Tutorial
@@ -26,10 +27,6 @@ class MMZero3World(World):
     """
 
     game = "Mega Man Zero 3"
-
-    item_name_to_id = item_table
-    location_name_to_id = location_table
-
     web = MMZero3WebWorld()
     
     settings_key = "MMZero3_settings"
@@ -37,6 +34,9 @@ class MMZero3World(World):
 
     options_dataclass = MMZero3Options
     options: MMZero3Options
+
+    item_name_to_id = item_table
+    location_name_to_id = location_table
 
     def create_item(self, name: str) -> MMZero3Item:
         return MMZero3Item(name, item_data_table[name].type, item_data_table[name].code, self.player)
@@ -91,44 +91,51 @@ class MMZero3World(World):
         # TODO: implement energy crystal
         return "100 Energy Crystals (Unimplemented)"
     
+    def fill_slot_data(self) -> Dict[str, Any]:
+        return {
+            "required_secret_disks": self.options.required_secret_disks.value,
+            "goal": self.options.goal.value,
+            "easy_ex_skill": self.options.easy_ex_skill.value
+        }
+
     def set_rules(self) -> None:
         set_rule(self.multiworld.get_entrance("To Abandoned Research Laboratory", self.player),
-                    lambda state: state.has("Boss Key", self.player))
-                
+                    lambda state: state.has("Sub Arcadia Cleared", self.player))
+        
+        set_rule(
+            self.multiworld.get_entrance("To Missile Factory", self.player),
+            lambda state: all(state.has(item, self.player) for item in [
+                "Aegis Volcano Base Cleared",
+                "Oceanic Highway Ruins Cleared",
+                "Weapons Repair Factory Cleared",
+                "Old Residential Cleared",
+            ])
+        )
+
+        set_rule(
+            self.multiworld.get_entrance("To Area X-2", self.player),
+            lambda state: all(state.has(item, self.player) for item in [
+                "Forest of Anatre Cleared",
+                "Frontline Ice Base Cleared",
+                "Twilight Desert Cleared",
+            ])
+        )
+
+        set_rule(
+            self.multiworld.get_entrance("To Sub Arcadia", self.player),
+            lambda state: all(state.has(item, self.player) for item in [
+                "Giant Elevator Cleared",
+                "Sunken Library Cleared",
+                "Snowy Plains Cleared",
+                "Energy Facility Cleared"
+            ])
+        )
+                        
         set_rule(self.multiworld.get_location("Complete Abandoned Research Laboratory", self.player),
                     lambda state: state.can_reach_region("Abandoned Research Laboratory", self.player))
-        
-        set_rule(
-        self.multiworld.get_location("Complete Missile Factory", self.player),
-        lambda state: all(state.can_reach(location_name, "Location", self.player) for location_name in [
-            "Complete Aegis Volcano Base",
-            "Complete Oceanic Highway Ruins",
-            "Complete Weapons Repair Factory",
-            "Complete Old Residential"
-        ]))
-
-        set_rule(
-        self.multiworld.get_location("Complete Area X-2", self.player),
-        lambda state: all(state.can_reach(location_name, "Location", self.player) for location_name in [
-            "Complete Twilight Desert",
-            "Complete Frontline Ice Base",
-            "Complete Forest of Anatre",
-        ]))
-
-        set_rule(
-        self.multiworld.get_location("Complete Sub Arcadia", self.player),
-        lambda state: all(state.can_reach(location_name, "Location", self.player) for location_name in [
-            "Complete Energy Facility",
-            "Complete Snowy Plains",
-            "Complete Sunken Library",
-            "Complete Giant Elevator",
-        ]))
-
 
         # Completion condition
-        self.multiworld.completion_condition[self.player] = \
-            lambda state: state.has("Victory", self.player)
-        
+        self.multiworld.completion_condition[self.player] = lambda state: state.has("Victory", self.player)
         
     def generate_output(self, output_directory: str) -> None:
         patch = Rom.MMZero3ProcedurePatch(player=self.player, player_name=self.player_name)
