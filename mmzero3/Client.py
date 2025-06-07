@@ -168,8 +168,8 @@ class MMZero3Client(BizHawkClient):
                     0x05: 185,  # old residential
                     0x06: 186,  # omega missile
                     0x07: 187,  # twighlight desert
-                    0x08: 188,  # ice base
-                    0x09: 189,  # forest
+                    0x08: 188,  # forest
+                    0x09: 189,  # ice base
                     0x0A: 190,  # area x2
                     0x0B: 191,  # energy facility
                     0x0C: 192,  # snowy plaiuns
@@ -188,7 +188,7 @@ class MMZero3Client(BizHawkClient):
                         await ctx.send_msgs([{
                             "cmd": "LocationChecks",
                             "locations": [location_id]
-                        }])
+                        }]) 
 
                     # Completion condition
                     # If the level that was finished was the last level

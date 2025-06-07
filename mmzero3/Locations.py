@@ -67,7 +67,7 @@ region_to_disks = {
 stage_names = [
     "Derelict Spacecraft", "Aegis Volcano Base", "Oceanic Highway Ruins",
     "Weapons Repair Factory", "Old Residential", "Missile Factory",
-    "Twilight Desert", "Frontline Ice Base", "Forest of Anatre",
+    "Twilight Desert", "Forest of Anatre", "Frontline Ice Base",
     "Area X-2", "Energy Facility", "Snowy Plains",
     "Sunken Library", "Giant Elevator", "Sub Arcadia"
 ]
