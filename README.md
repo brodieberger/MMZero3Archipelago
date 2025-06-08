@@ -24,15 +24,12 @@ Welcome to my project. Things are still under heavy development, but here you wi
   Gives you S-Rank at the end of every stage, guaranteeing EX Skill rewards. Will make some bosses harder.
 
 ## Known Bugs
-- Opening a disk then loading a level will cause the disk to be unloaded the next time the hub is revisited. This one is pretty egregious and will be fixed asap.
 
 - There are only 160 Secret Disks, the 20 disks that appear in the hub areas are currently not implemented in AP due to how I have the memory reading set up. They are still collectable in game, but they are just not going to be items or location checks.
 
 - Save states have the possibility to screw things up, but I am not sure where.
 
 - Theres probably some more bugs especially with world generation; I haven't really tested this too much. Seriously please help out.
-
-
 
 ## Planned Features
 - The primary planned feature is more routing changes. 

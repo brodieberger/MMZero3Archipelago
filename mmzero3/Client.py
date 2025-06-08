@@ -17,6 +17,7 @@ class MMZero3Client(BizHawkClient):
 
     synced_in_game = False
     synced_hub = False
+    in_results_screen = False
     player_warned = False
     
     in_game_inventory = bytearray(45)
@@ -90,6 +91,7 @@ class MMZero3Client(BizHawkClient):
 
                 # Sync in-game inventory once on entering a level
                 if not self.synced_in_game:
+                    self.in_results_screen = False
                     #print("Entering Level, Starting Inventory Sync.")
                     #print(f"Real Inventory :{self.real_inventory}")
                     #print(f"In-Game Inventory :{self.in_game_inventory}")
@@ -134,7 +136,7 @@ class MMZero3Client(BizHawkClient):
                     # Find item that you picked up and send the location check for that item, then update the in game inventory (not ram data)
                     new_locations = []
                     for i in range(len(save_data)):
-                        # Only look at the lower nibble (0x0F mask I think)
+                        # Only look at the lower nibble (0x0F mask)
                         old_bits = self.in_game_inventory[i] & 0x0F
                         new_bits = save_data[i] & 0x0F
 
@@ -180,7 +182,7 @@ class MMZero3Client(BizHawkClient):
                 }
 
                 # Check if the player has completed a level
-                if results_screen != b'\x00':
+                if results_screen != b'\x00' and not self.in_results_screen:
                     current_level = int.from_bytes(level_data, byteorder='little')
                     location_id = level_to_location.get(current_level)
 
@@ -217,26 +219,43 @@ class MMZero3Client(BizHawkClient):
                             ctx.finished_game = True
                         
                     # Fill player inventory so that player cant open items in result screen
-                    #print("Inventory Emptied")
                     await bizhawk.write(
                         ctx.bizhawk_ctx,
                         [(0x0371B8, list(self.empty_inventory), "Combined WRAM")]
                     )
+                    self.in_results_screen = True
 
-
-            #IF THE PLAYER IS NOT IN A LEVEL
+            #IF THE PLAYER IS NOT IN A LEVEL (hub)
             else:
                 # Reset level sync flag
                 self.synced_in_game = False
+                self.in_results_screen = False
 
                 # Sync to real inventory once on entering hub
                 if not self.synced_hub:
-                    #print("Entering hub, syncing inventory")
                     await bizhawk.write(
                         ctx.bizhawk_ctx,
                         [(0x0371B8, list(self.real_inventory), "Combined WRAM")]
                     )
+
+                    # Read save data again after writing it
+                    save_data = (await bizhawk.read(
+                        ctx.bizhawk_ctx,
+                        [(0x0371B8, 45, "Combined WRAM")])
+                    )[0]
                     self.synced_hub = True
+
+                # Check if an item was picked up or opened while in the hub.
+                if save_data != self.real_inventory:
+                    for i in range(len(save_data)):
+                        real_byte = self.real_inventory[i]
+                        save_byte = save_data[i]
+
+                        # Identify new bits that are ON in save_data but OFF in real_inventory
+                        new_bits = save_byte & (~real_byte)
+
+                        if new_bits:
+                            self.real_inventory[i] |= new_bits  # Only add bits, never remove
 
             # receive an item from AP and add it to ram.
             # If in hub, add it to real inventory AND insert into memory, else just real inventory
