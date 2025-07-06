@@ -22,7 +22,8 @@ class MMZero3Client(BizHawkClient):
     
     in_game_inventory = bytearray(45)
     real_inventory = bytearray(45)
-    empty_inventory = bytearray([0xFF] * 45)
+    full_inventory = bytearray([0xFF] * 45)
+    empty_inventory = bytearray(45)
 
     required_disks = 80 # Will be overwritten from settings
     goal_type = 0 # will also be overwritten. 0 is for default (kill boss with enough disks), 1 is vanilla (just kill the boss)
@@ -32,7 +33,24 @@ class MMZero3Client(BizHawkClient):
     received_index = 0
     collected_disks = 0
 
-    
+    level_to_location = {
+        0x01: 181,  # spacecraft
+        0x02: 182,  # volcano base
+        0x03: 183,  # highway
+        0x04: 184,  # weapons repair factory
+        0x05: 185,  # old residential
+        0x06: 186,  # omega missile
+        0x07: 187,  # twighlight desert
+        0x08: 188,  # forest
+        0x09: 189,  # ice base
+        0x0A: 190,  # area x2
+        0x0B: 191,  # energy facility
+        0x0C: 192,  # snowy plaiuns
+        0x0D: 193,  # sunken library
+        0x0E: 194,  # giant elevator
+        0x0F: 195,  # sub arcadia
+        0x10: 196,  # final level
+    }
 
     async def validate_rom(self, ctx: "BizHawkClientContext") -> bool:
         try:
@@ -77,10 +95,17 @@ class MMZero3Client(BizHawkClient):
                 [(0x030165, 1, "Combined WRAM")] 
             ))[0]
 
-            # Read if player is in game over screen
-            game_over = (await bizhawk.read(
+            # Read if player is in demo screen
+            demo_screen = (await bizhawk.read(
                 ctx.bizhawk_ctx,
-                [(0x030EA1, 1, "Combined WRAM")] 
+                [(0x042AE2, 1, "Combined WRAM")] 
+            ))[0]
+            
+            # Reads if the player is in mission start. 
+            # Not super needed. Could be removed if it strains performance too much.
+            mission_start_screen = (await bizhawk.read(
+                ctx.bizhawk_ctx,
+                [(0x042ED2, 1, "Combined WRAM")] 
             ))[0]
             
             # When the player loads into the hub or a level, it should sync the inventory
@@ -89,43 +114,18 @@ class MMZero3Client(BizHawkClient):
 
             # IF THE PLAYER IS IN A LEVEL
             if not is_in_hub:
-                # Reset hub sync flag
-                self.synced_hub = False
 
-                # Sync in-game inventory once on entering a level
+                # If the inventory is not synced, sync inventory and update
                 if not self.synced_in_game:
-                    self.in_results_screen = False
-                    
-                    # Sync in game inventory inventory once on entering level
-                    await bizhawk.write(
-                        ctx.bizhawk_ctx,
-                        [(0x0371B8, list(self.in_game_inventory), "Combined WRAM")]
-                    )
+                    save_data = await self.sync_in_game_inventory(ctx, save_data)
 
-                    # Read save data again after writing it
-                    save_data = (await bizhawk.read(
-                        ctx.bizhawk_ctx,
-                        [(0x0371B8, 45, "Combined WRAM")])
-                    )[0]
-
-                    # If easy EX skill is enabled, give player S rank
-                    if self.easy_ex_skill == 1:
-                        await bizhawk.write(
-                            ctx.bizhawk_ctx,
-                            [(0x0372B1, [0x06], "Combined WRAM")]
-                        )
-
-                    self.synced_in_game = True
-
-                    # Unlocks Z Saber, just a temp thing here cause of my AP rules that I don't feel like changing ATM
-                    await ctx.send_msgs([{
-                        "cmd": "LocationChecks",
-                        "locations": [999]
-                    }])
+                # Sync inventory again if on mission start screen. (In case of game over)
+                if mission_start_screen == b'\xC8':
+                    save_data = await self.sync_in_game_inventory(ctx, save_data)
 
                 # Check if an item was picked up in a level
-                if save_data != self.in_game_inventory and results_screen == b'\x00' and save_data != self.empty_inventory:
-
+                # TODO: find a better way of doing this. This if statement is insane.
+                if save_data != self.in_game_inventory and results_screen == b'\x00' and save_data != self.full_inventory and demo_screen != b'\x00':
                     # Find item that you picked up and send the location check for that item, then update the in game inventory (not ram data)
                     new_locations = []
                     for i in range(len(save_data)):
@@ -146,36 +146,16 @@ class MMZero3Client(BizHawkClient):
                         }])
                     
                     # Update in game inventory to have the new item so it doesn't show again.
-                    # TODO, this should be removed and replaced with logic that scans the
-                    # AP inventory, then updates the in game inventory to match. That would make
-                    # things less prone to breaking when the player uses save staes.
-                    self.in_game_inventory = bytearray(save_data)
-
-                # TODO, this should probably be in the locations.py file, or at least not written every cycle.
-                level_to_location = {
-                    0x01: 181,  # spacecraft
-                    0x02: 182,  # volcano base
-                    0x03: 183,  # highway
-                    0x04: 184,  # weapons repair factory
-                    0x05: 185,  # old residential
-                    0x06: 186,  # omega missile
-                    0x07: 187,  # twighlight desert
-                    0x08: 188,  # forest
-                    0x09: 189,  # ice base
-                    0x0A: 190,  # area x2
-                    0x0B: 191,  # energy facility
-                    0x0C: 192,  # snowy plaiuns
-                    0x0D: 193,  # sunken library
-                    0x0E: 194,  # giant elevator
-                    0x0F: 195,  # sub arcadia
-                    0x10: 196,  # final level
-                }
+                    self.in_game_inventory = self.update_in_game_inventory(ctx)
+                    await bizhawk.write(
+                        ctx.bizhawk_ctx,
+                        [(0x0371E8, list(self.in_game_inventory), "Combined WRAM")]
+                    )
 
                 # Check if the player has completed a level
                 if results_screen != b'\x00' and not self.in_results_screen:
-                    await bizhawk.lock(ctx)
                     current_level = int.from_bytes(level_data, byteorder='little')
-                    location_id = level_to_location.get(current_level)
+                    location_id = self.level_to_location.get(current_level)
 
                     if location_id:
                         await ctx.send_msgs([{
@@ -213,11 +193,12 @@ class MMZero3Client(BizHawkClient):
                     # TODO Lock this until the whole thing is done.
                     await bizhawk.write(
                         ctx.bizhawk_ctx,
-                        [(0x0371B8, list(self.empty_inventory), "Combined WRAM")]
+                        [(0x0371B8, list(self.full_inventory), "Combined WRAM")]
                     )
                     self.in_results_screen = True
 
-            #IF THE PLAYER IS NOT IN A LEVEL (hub)
+
+            # IF THE PLAYER IS NOT IN A LEVEL (hub)
             else:
                 # Reset level sync flag
                 self.synced_in_game = False
@@ -249,7 +230,7 @@ class MMZero3Client(BizHawkClient):
                         if new_bits:
                             self.real_inventory[i] |= new_bits  # Only add bits, never remove
 
-            # receive an item from AP and add it to ram.
+            # Receive an item from AP
             # If in hub, add it to real inventory AND insert into memory, else just real inventory
             for i in range(self.received_index, len(ctx.items_received)):
                 item = ctx.items_received[i]
@@ -284,4 +265,68 @@ class MMZero3Client(BizHawkClient):
         except bizhawk.RequestFailedError:
             pass
 
+    def update_in_game_inventory(self, ctx) -> bytearray:
+        # Updates in_game_inventory based on ctx.checked_locations.
+        # Only lower nibble (found state) is updated. Upper nibble (opened state) is untouched.
+        inventory = bytearray(45)
 
+        for location_id in ctx.checked_locations:
+            if 1 <= location_id <= 180:
+                item_index = location_id - 1
+                byte_index = item_index // 4
+                bit_position = item_index % 4
+
+                # Only set the lower nibble bit (bit positions 0–3)
+                inventory[byte_index] |= (1 << bit_position)
+
+        return inventory
+        
+
+    async def sync_in_game_inventory(self, ctx, save_data):
+        
+        #self.debug_print_inventory(save_data)
+        self.in_game_inventory = self.update_in_game_inventory(ctx)
+        self.synced_hub = False
+        self.in_results_screen = False
+
+        # Sync in-game inventory to RAM
+        await bizhawk.write(
+            ctx.bizhawk_ctx,
+            [(0x0371B8, list(self.in_game_inventory), "Combined WRAM")]
+        )
+
+        # Also write to this portion. It is right after the inventory. 
+        # It acts as a restore point for when you get a game over and get your collected items reset.
+        await bizhawk.write(
+            ctx.bizhawk_ctx,
+            [(0x0371E8, list(self.in_game_inventory), "Combined WRAM")]
+        )
+
+        # Read save data again after writing it
+        save_data = (await bizhawk.read(
+            ctx.bizhawk_ctx,
+            [(0x0371B8, 45, "Combined WRAM")]
+        ))[0]
+
+        # If easy EX skill is enabled, give player S rank
+        if self.easy_ex_skill == 1:
+            await bizhawk.write(
+                ctx.bizhawk_ctx,
+                [(0x0372B1, [0x06], "Combined WRAM")]
+            )
+
+        # Unlocks Z Saber, just a temp thing here cause of my AP rules that I don't feel like changing ATM
+        await ctx.send_msgs([{
+            "cmd": "LocationChecks",
+            "locations": [999]
+        }])
+
+        self.synced_in_game = True
+
+        return save_data  
+
+
+    def debug_print_inventory(self, save_data) -> None:
+        print(f"In Game Inventory: {self.in_game_inventory}")
+        print(f"Real Inventory: {self.in_game_inventory}")
+        print(f"Ram Inventory: {save_data}")
