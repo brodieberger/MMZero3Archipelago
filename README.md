@@ -27,10 +27,6 @@ Welcome to my project. Things are still under heavy development, but here you wi
 
 - There are only 160 Secret Disks, the 20 disks that appear in the hub areas are currently not implemented in AP due to how I have the memory reading set up. They are still collectable in game, but they are just not going to be items or location checks.
 
-- Leaving the game on title will cause a demo to play, if Zero collects disks during the demo, they will actually be counted. If you are still setting things up, you can get around this by just pressing start once. Then, the demo will no longer play, but you will stay on the title screen.
-
-- Getting a game over will send over random items whenever you enter that screen. Unfortunately, you'll have to get around this with an infinite lives code for the time being.
-
 - Occasionally, the client will send over all locked AP items upon completing a level.
 
 - Theres probably some more bugs especially with world generation; I haven't really tested this too much. Seriously please help out.
