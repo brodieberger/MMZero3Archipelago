@@ -9,7 +9,7 @@ Welcome to my project. Things are still under heavy development, but here you wi
 
 - There is another option to always give the player an S ranking. Remember that this will also give each boss a new attack, making the game harder.
 
-- You *should* be able to use savestates throughout the game without anything breaking.
+- You can leave every level at will (Except for the opening level and first intermission). By default you can only escape levels that you have beaten previously. This will be much more important later once the routing changes are implemented.
 
 ## Options
 
@@ -41,7 +41,6 @@ Welcome to my project. Things are still under heavy development, but here you wi
 - EX Skills as optional location checks.
 - Other collectables as location checks. Like static health pickups, extra lives, etc.
 - Have skippable cutscenes unlocked by default. Right now having a completed save game on your file allows you to skip most cutscenes, but this should likely be a Rom edit or something similar.
-- Let the player leave every level at will. By default you can only escape levels that you have beaten previously. This will be much more important later once the routing changes are implemented.
 
 ---
 If you have any questions, feel free to contact me on Discord: Stingrays110, though I'd prefer if you kept it to the Zero channel on the Archipelago Discord
