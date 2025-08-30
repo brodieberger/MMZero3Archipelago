@@ -131,16 +131,20 @@ item_data_table: Dict[str, MMZero3ItemData] = {
     "Secret Disk 108: 100 E-Crystals": MMZero3ItemData(code=108, type=ItemClassification.filler),
     "Secret Disk 109: 100 E-Crystals": MMZero3ItemData(code=109, type=ItemClassification.filler),
     "Secret Disk 110: 100 E-Crystals": MMZero3ItemData(code=110, type=ItemClassification.filler),
+    # bitflags
     "Secret Disk 111: Potted Plants to Base": MMZero3ItemData(code=111, type=ItemClassification.filler),
     "Secret Disk 112: Change Nurse Elf Design": MMZero3ItemData(code=112, type=ItemClassification.filler),
     "Secret Disk 113: Reploid to Base Hall": MMZero3ItemData(code=113, type=ItemClassification.filler),
     "Secret Disk 114: Change Alouette Dress Design": MMZero3ItemData(code=114, type=ItemClassification.filler),
+
     "Secret Disk 115: Reploid to Room 02A": MMZero3ItemData(code=115, type=ItemClassification.filler),
+    #Secret Disk 116 found in base, excluded
     "Secret Disk 117: Orange Cats to Base": MMZero3ItemData(code=117, type=ItemClassification.filler),
     "Secret Disk 118: Phantom Cyber Elf to Base Roof": MMZero3ItemData(code=118, type=ItemClassification.filler),
     "Secret Disk 119: Posters to Base": MMZero3ItemData(code=119, type=ItemClassification.filler),
     "Secret Disk 120: New Room Near Andrew": MMZero3ItemData(code=120, type=ItemClassification.filler),
     "Secret Disk 121: Reploid to Room 1F-A": MMZero3ItemData(code=121, type=ItemClassification.filler),
+    
     "Secret Disk 122: Flowers to Base Roof": MMZero3ItemData(code=122, type=ItemClassification.filler),
     "Secret Disk 123: Change Animal Elf Design": MMZero3ItemData(code=123, type=ItemClassification.filler),
     "Secret Disk 124: Young Andrew": MMZero3ItemData(code=124, type=ItemClassification.filler),
@@ -148,19 +152,21 @@ item_data_table: Dict[str, MMZero3ItemData] = {
     "Secret Disk 126: Tabby Cats to Base": MMZero3ItemData(code=126, type=ItemClassification.filler),
     "Secret Disk 127: Grafitti to Base": MMZero3ItemData(code=127, type=ItemClassification.filler),
     "Secret Disk 128: Reploid to Room 02D": MMZero3ItemData(code=128, type=ItemClassification.filler),
-    "Secret Disk 129: Right Tower Reploid New Dialogue": MMZero3ItemData(code=129, type=ItemClassification.filler),
+    
+    "Secret Disk 129: Right Tower Reploid Added Dialogue": MMZero3ItemData(code=129, type=ItemClassification.filler),
     "Secret Disk 130: Reploid to Room 02B": MMZero3ItemData(code=130, type=ItemClassification.filler),
     "Secret Disk 131: Reploid to Room 02C": MMZero3ItemData(code=131, type=ItemClassification.filler),
     "Secret Disk 132: Reploid to Floor 2": MMZero3ItemData(code=132, type=ItemClassification.filler),
-    "Secret Disk 133: Elpzo Cyber Elf by Command Room": MMZero3ItemData(code=133, type=ItemClassification.filler),
-    "Secret Disk 134: Left Tower Reploid New Dialogue": MMZero3ItemData(code=134, type=ItemClassification.filler),
+    "Secret Disk 133: Elpizo Cyber Elf by Command Room": MMZero3ItemData(code=133, type=ItemClassification.filler),
+    "Secret Disk 134: Left Tower Reploid Added Dialogue": MMZero3ItemData(code=134, type=ItemClassification.filler),
+    
     "Secret Disk 135: Change Hacker Elf Design": MMZero3ItemData(code=135, type=ItemClassification.filler),
     "Secret Disk 136: Lilies to Base": MMZero3ItemData(code=136, type=ItemClassification.filler),
     "Secret Disk 137: Flying Fish to the Base Dock": MMZero3ItemData(code=137, type=ItemClassification.filler),
     "Secret Disk 138: Reploid to Room 03C": MMZero3ItemData(code=138, type=ItemClassification.filler),
     "Secret Disk 139: Reploid to Floor 3": MMZero3ItemData(code=139, type=ItemClassification.filler),
     "Secret Disk 140: Reploid to Room 03D": MMZero3ItemData(code=140, type=ItemClassification.filler),
-    #Bitflags
+    # non-bitflags
     "Secret Disk 141: Dialogue Window: Silver": MMZero3ItemData(code=141, type=ItemClassification.filler),
     "Secret Disk 142: Dialogue Window: Blue": MMZero3ItemData(code=142, type=ItemClassification.filler),
     "Secret Disk 143: Dialogue Window: Action": MMZero3ItemData(code=143, type=ItemClassification.filler),
