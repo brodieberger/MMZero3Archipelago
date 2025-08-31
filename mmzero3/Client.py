@@ -56,6 +56,9 @@ class MMZero3Client(BizHawkClient):
     # eReader content memory array
     eReader_bitflag_inventory = [0] * 12 
 
+    # eReader byte-map inventory (10 bytes covering IDs 141–180)
+    eReader_byte_map_inventory = [0] * 10
+
     # Bitflags for eReader content. AP Item ID -> (word_index, bit_position)
     bitflags = {
         111: (0, 1),
@@ -304,6 +307,16 @@ class MMZero3Client(BizHawkClient):
                     )[0]
                     self.synced_hub = True
 
+                    # Write eReader contents
+                    await bizhawk.write(
+                        ctx.bizhawk_ctx,
+                        [(0x02438, list(self.eReader_bitflag_inventory), "Combined WRAM")]
+                    )
+                    await bizhawk.write(
+                        ctx.bizhawk_ctx,
+                        [(0x02474, self.eReader_byte_map_inventory, "Combined WRAM")]
+                    )
+
                 # Check if an item was picked up or opened while in the hub.
                 if save_data != self.real_inventory:
                     for i in range(len(save_data)):
@@ -356,13 +369,14 @@ class MMZero3Client(BizHawkClient):
                         [(0x02438, list(self.eReader_bitflag_inventory), "Combined WRAM")]
                     )
 
-                # If the item is an eReader byte map item, insert into the RAM
+                # If the item is an eReader byte map item, insert into the RAM       
                 if item.item in self.byte_map:
                     addr, value = self.byte_map[item.item]
+                    self.eReader_byte_map_inventory[addr - 0x02474] = value
                     
                     await bizhawk.write(
                         ctx.bizhawk_ctx,
-                        [(addr, [value], "Combined WRAM")]
+                        [(0x02474, self.eReader_byte_map_inventory, "Combined WRAM")]
                     )
 
             self.received_index = len(ctx.items_received)
@@ -428,6 +442,16 @@ class MMZero3Client(BizHawkClient):
                 ctx.bizhawk_ctx,
                 [(0x0372B1, [0x06], "Combined WRAM")]
             )
+
+        # Write eReader contents
+        await bizhawk.write(
+            ctx.bizhawk_ctx,
+            [(0x02438, list(self.eReader_bitflag_inventory), "Combined WRAM")]
+        )
+        await bizhawk.write(
+            ctx.bizhawk_ctx,
+            [(0x02474, self.eReader_byte_map_inventory, "Combined WRAM")]
+        )
 
         # Unlocks Z Saber, just a temp thing here cause of my AP rules that I don't feel like changing ATM
         await ctx.send_msgs([{

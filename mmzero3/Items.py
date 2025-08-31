@@ -174,7 +174,7 @@ item_data_table: Dict[str, MMZero3ItemData] = {
     "Secret Disk 145: Dialogue Window: Rosebush": MMZero3ItemData(code=145, type=ItemClassification.filler),
     "Secret Disk 146: Dialogue Window: Command Line": MMZero3ItemData(code=146, type=ItemClassification.filler),
     "Secret Disk 147: Dialogue Window: Chains": MMZero3ItemData(code=147, type=ItemClassification.filler),
-    "Secret Disk 148: Dialogue Window: Explosion ": MMZero3ItemData(code=148, type=ItemClassification.filler),
+    "Secret Disk 148: Dialogue Window: Explosion": MMZero3ItemData(code=148, type=ItemClassification.filler),
     "Secret Disk 149: Title Screen: Alt 1": MMZero3ItemData(code=149, type=ItemClassification.filler),
     "Secret Disk 150: Title Screen: Alt 2": MMZero3ItemData(code=150, type=ItemClassification.filler),
     "Secret Disk 151: Title Screen: Alt 3": MMZero3ItemData(code=151, type=ItemClassification.filler),
