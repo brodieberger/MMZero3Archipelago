@@ -11,6 +11,8 @@ Welcome to my project. Things are still under heavy development, but here you wi
 
 - You can leave every level at will (Except for the opening level and first intermission). By default you can only escape levels that you have beaten previously. This will be much more important later once the routing changes are implemented.
 
+- Collecting certain lore related secret disks will simultaneously unlock a random e-Reader graphical change. A full list can be seen [here](https://tcrf.net/Mega_Man_Zero_3/e-Reader_Functions). 
+
 ## Options
 
 - `goal`:  
