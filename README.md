@@ -13,6 +13,8 @@ Welcome to my project. Things are still under heavy development, but here you wi
 
 - Collecting certain lore related secret disks will simultaneously unlock a random e-Reader graphical change. A full list can be seen [here](https://tcrf.net/Mega_Man_Zero_3/e-Reader_Functions). 
 
+- All skippable cutscenes are skippable by default.
+
 ## Options
 
 - `goal`:  
@@ -29,8 +31,6 @@ Welcome to my project. Things are still under heavy development, but here you wi
 
 - There are only 160 Secret Disks, the 20 disks that appear in the hub areas are currently not implemented in AP due to how I have the memory reading set up. They are still collectable in game, but they are just not going to be items or location checks.
 
-- Occasionally, the client will send over all locked AP items upon completing a level.
-
 - Theres probably some more bugs especially with world generation; I haven't really tested this too much. Seriously please help out.
 
 ## Planned Features
@@ -42,7 +42,6 @@ Welcome to my project. Things are still under heavy development, but here you wi
 - Filler items (Energy Crystals, Health, Extra Lives). These are in the item pool but are currently unimplemented.
 - EX Skills as optional location checks.
 - Other collectables as location checks. Like static health pickups, extra lives, etc.
-- Have skippable cutscenes unlocked by default. Right now having a completed save game on your file allows you to skip most cutscenes, but this should likely be a Rom edit or something similar.
 
 ---
 If you have any questions, feel free to contact me on Discord: Stingrays110, though I'd prefer if you kept it to the Zero channel on the Archipelago Discord
