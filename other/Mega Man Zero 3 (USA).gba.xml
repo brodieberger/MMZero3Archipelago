@@ -322,12 +322,13 @@
 
 ]>
 <PROGRAM NAME="Mega Man Zero 3 (USA).gba" EXE_PATH="/C:/Users/brodi/OneDrive/Desktop/archi/ZeroProject/Mega Man Zero 3 (USA).gba" EXE_FORMAT="Raw Binary" IMAGE_BASE="00000000">
-    <INFO_SOURCE USER="brodi" TOOL="Ghidra 11.4.1" TIMESTAMP="Wed Dec 31 18:49:32 EST 2025" />
+    <INFO_SOURCE USER="brodi" TOOL="Ghidra 11.4.1" TIMESTAMP="Thu Jan 01 23:38:34 EST 2026" />
     <PROCESSOR NAME="ARM" LANGUAGE_PROVIDER="ARM:LE:32:v4t:default" ENDIAN="little" />
-    <EQUATES>
-        <EQUATE_GROUP />
-    </EQUATES>
-    <COMMENTS />
+    <COMMENTS>
+        <COMMENT ADDRESS="080d93b8" TYPE="plate">runs at the end of most NPC dialogue. Can award items.</COMMENT>
+        <COMMENT ADDRESS="080e0c2c" TYPE="plate">Called whenever a disk is on screen</COMMENT>
+        <COMMENT ADDRESS="080f8884" TYPE="plate">Adds a disk to the inventory RAM</COMMENT>
+    </COMMENTS>
     <BOOKMARKS>
         <BOOKMARK ADDRESS="0800033d" TYPE="Analysis" CATEGORY="Found Code" DESCRIPTION="Found code from operand reference" />
         <BOOKMARK ADDRESS="08000409" TYPE="Analysis" CATEGORY="Found Code" DESCRIPTION="Found code from operand reference" />
@@ -2314,6 +2315,9 @@
         <BOOKMARK ADDRESS="080b0180" TYPE="Error" CATEGORY="Bad Instruction" DESCRIPTION="Unable to resolve constructor at 080b0180 (flow from 080b017c)" />
         <BOOKMARK ADDRESS="080b0b10" TYPE="Error" CATEGORY="Bad Instruction" DESCRIPTION="Unable to resolve constructor at 080b0b10 (flow from 080b0b0c)" />
         <BOOKMARK ADDRESS="080f5200" TYPE="Error" CATEGORY="Bad Instruction" DESCRIPTION="Failed to disassemble at 080f5200 due to conflicting data at 080f5200 (flow from 080f51fe)" />
+        <BOOKMARK ADDRESS="08100af4" TYPE="Error" CATEGORY="Bad Instruction" DESCRIPTION="Maximum run of repeated byte instructions exceeded (flow from 08100af2)" />
+        <BOOKMARK ADDRESS="08105dce" TYPE="Error" CATEGORY="Bad Instruction" DESCRIPTION="Maximum run of repeated byte instructions exceeded (flow from 08105dcc)" />
+        <BOOKMARK ADDRESS="08105df6" TYPE="Error" CATEGORY="Bad Instruction" DESCRIPTION="Maximum run of repeated byte instructions exceeded (flow from 08105df4)" />
         <BOOKMARK ADDRESS="0810612c" TYPE="Error" CATEGORY="Bad Instruction" DESCRIPTION="Maximum run of repeated byte instructions exceeded (flow from 0810612a)" />
         <BOOKMARK ADDRESS="0800471c" TYPE="Note" />
         <BOOKMARK ADDRESS="080f43dc" TYPE="Note" DESCRIPTION="cant_escape_func" />
@@ -2322,15 +2326,18 @@
     <PROGRAM_ENTRY_POINTS />
     <SYMBOL_TABLE>
         <SYMBOL ADDRESS="0800471c" NAME="play_audio" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
-        <SYMBOL ADDRESS="08009ac0" NAME="maybe_fall" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="08009ac0" NAME="someting_fall" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="080177f4" NAME="UpdateMotionGraphics" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="08026348" NAME="update_y_on_ground" NAMESPACE="FUN_08025ec4::" TYPE="local" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="0802b668" NAME="update_y_in_air_lab_1" NAMESPACE="FUN_0802b5e4::" TYPE="local" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="0802b69c" NAME="update_y_in_air" NAMESPACE="FUN_0802b5e4::" TYPE="local" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="080d93b8" NAME="end_dialogue" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="080e0a70" NAME="CreateMapDisk" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="080e0c2c" NAME="MapDisk_Update" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="080e0e60" NAME="diskOnCollision" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="080e9604" NAME="render_text" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="080ea1c8" NAME="load_text_box" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="080f1938" NAME="OverworldLoop_CervauTalk" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="080f43c0" NAME="begin_escape_check" NAMESPACE="FUN_080f4368::" TYPE="local" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="080f43cc" NAME="can_escape_start" NAMESPACE="FUN_080f4368::" TYPE="local" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="080f4494" NAME="location_after_escape_check" NAMESPACE="FUN_080f4368::" TYPE="local" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
@@ -2339,11 +2346,15 @@
         <SYMBOL ADDRESS="080f5366" NAME="calc_text_offest2" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="080f536c" NAME="start_render_escape_text" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="080f8884" NAME="getDiskInStageRun" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="080f889e" NAME="inventory_value_stored" NAMESPACE="getDiskInStageRun::" TYPE="local" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="080f88b4" NAME="gStageDiskManager" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="08105d50" NAME="custom_code_1_logic_audio" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="08105d5c" NAME="cant_escape_logic_audio_branch" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="08105d6c" NAME="custom_code_2_text" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="08105d7e" NAME="cant_escape_text_branch" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="08105d90" NAME="text_you_cant_escape_this_level" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="08105dae" NAME="custom_code_3_collected_npc_item" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="08105dc0" NAME="custom_code_4_collected_disk_item" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="08370c1b" NAME="text_abort_completed_missions" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="08370c52" NAME="text_you_cant_escape_now" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
     </SYMBOL_TABLE>
@@ -3691,7 +3702,7 @@
             <ADDRESS_RANGE START="08009ab8" END="08009abf" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="08009ac0" NAME="maybe_fall" LIBRARY_FUNCTION="n">
+        <FUNCTION ENTRY_POINT="08009ac0" NAME="someting_fall" LIBRARY_FUNCTION="n">
             <ADDRESS_RANGE START="08009ac0" END="08009b11" />
             <ADDRESS_RANGE START="08009b20" END="08009b27" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
@@ -22726,9 +22737,10 @@
             <ADDRESS_RANGE START="080d9078" END="080d90c5" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="080d93b8" NAME="FUN_080d93b8" LIBRARY_FUNCTION="n">
+        <FUNCTION ENTRY_POINT="080d93b8" NAME="end_dialogue" LIBRARY_FUNCTION="n">
             <ADDRESS_RANGE START="080d93b8" END="080d971f" />
             <ADDRESS_RANGE START="080d97a0" END="080d97a5" />
+            <REGULAR_CMT>runs at the end of most NPC dialogue. Can award items.</REGULAR_CMT>
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
         <FUNCTION ENTRY_POINT="080d985c" NAME="FUN_080d985c" LIBRARY_FUNCTION="n">
@@ -23462,6 +23474,7 @@
             <ADDRESS_RANGE START="080e0cc0" END="080e0d0d" />
             <ADDRESS_RANGE START="080e0d18" END="080e0d91" />
             <ADDRESS_RANGE START="080e0d9c" END="080e0e1d" />
+            <REGULAR_CMT>Called whenever a disk is on screen</REGULAR_CMT>
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
         <FUNCTION ENTRY_POINT="080e0e28" NAME="FUN_080e0e28" LIBRARY_FUNCTION="n">
@@ -24499,7 +24512,7 @@
             <ADDRESS_RANGE START="080ea1b8" END="080ea1c7" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="080ea1c8" NAME="FUN_080ea1c8" LIBRARY_FUNCTION="n">
+        <FUNCTION ENTRY_POINT="080ea1c8" NAME="load_text_box" LIBRARY_FUNCTION="n">
             <ADDRESS_RANGE START="080ea1c8" END="080ea209" />
             <ADDRESS_RANGE START="080ea218" END="080ea241" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
@@ -25374,6 +25387,7 @@
         </FUNCTION>
         <FUNCTION ENTRY_POINT="080f8884" NAME="getDiskInStageRun" LIBRARY_FUNCTION="n">
             <ADDRESS_RANGE START="080f8884" END="080f88b3" />
+            <REGULAR_CMT>Adds a disk to the inventory RAM</REGULAR_CMT>
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
         <FUNCTION ENTRY_POINT="080f8910" NAME="FUN_080f8910" LIBRARY_FUNCTION="n">
@@ -25954,6 +25968,22 @@
         </FUNCTION>
         <FUNCTION ENTRY_POINT="080fe5f8" NAME="FUN_080fe5f8" LIBRARY_FUNCTION="n">
             <ADDRESS_RANGE START="080fe5f8" END="080fe649" />
+            <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="08105d50" NAME="custom_code_1_logic_audio" LIBRARY_FUNCTION="n">
+            <ADDRESS_RANGE START="08105d50" END="08105d69" />
+            <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="08105d6c" NAME="custom_code_2_text" LIBRARY_FUNCTION="n">
+            <ADDRESS_RANGE START="08105d6c" END="08105d83" />
+            <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="08105dae" NAME="custom_code_3_collected_npc_item" LIBRARY_FUNCTION="n">
+            <ADDRESS_RANGE START="08105dae" END="08105db5" />
+            <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
+        </FUNCTION>
+        <FUNCTION ENTRY_POINT="08105dc0" NAME="custom_code_4_collected_disk_item" LIBRARY_FUNCTION="n">
+            <ADDRESS_RANGE START="08105dc0" END="08105dcd" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
     </FUNCTIONS>
