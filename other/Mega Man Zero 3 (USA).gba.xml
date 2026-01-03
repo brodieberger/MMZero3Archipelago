@@ -322,8 +322,11 @@
 
 ]>
 <PROGRAM NAME="Mega Man Zero 3 (USA).gba" EXE_PATH="/C:/Users/brodi/OneDrive/Desktop/archi/ZeroProject/Mega Man Zero 3 (USA).gba" EXE_FORMAT="Raw Binary" IMAGE_BASE="00000000">
-    <INFO_SOURCE USER="brodi" TOOL="Ghidra 11.4.1" TIMESTAMP="Thu Jan 01 23:38:34 EST 2026" />
+    <INFO_SOURCE USER="brodi" TOOL="Ghidra 11.4.1" TIMESTAMP="Fri Jan 02 23:34:29 EST 2026" />
     <PROCESSOR NAME="ARM" LANGUAGE_PROVIDER="ARM:LE:32:v4t:default" ENDIAN="little" />
+    <EQUATES>
+        <EQUATE_GROUP />
+    </EQUATES>
     <COMMENTS>
         <COMMENT ADDRESS="080d93b8" TYPE="plate">runs at the end of most NPC dialogue. Can award items.</COMMENT>
         <COMMENT ADDRESS="080e0c2c" TYPE="plate">Called whenever a disk is on screen</COMMENT>
@@ -2332,6 +2335,7 @@
         <SYMBOL ADDRESS="0802b668" NAME="update_y_in_air_lab_1" NAMESPACE="FUN_0802b5e4::" TYPE="local" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="0802b69c" NAME="update_y_in_air" NAMESPACE="FUN_0802b5e4::" TYPE="local" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="080d93b8" NAME="end_dialogue" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="080d94be" NAME="kid_dialogue" NAMESPACE="end_dialogue::" TYPE="local" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="080e0a70" NAME="CreateMapDisk" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="080e0c2c" NAME="MapDisk_Update" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="080e0e60" NAME="diskOnCollision" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
