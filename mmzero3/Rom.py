@@ -34,7 +34,16 @@ class MMZero3ProcedurePatch(APProcedurePatch, APTokenMixin):
         return base_rom_bytes
 
 def write_tokens(world: "MMZero3World", patch: MMZero3ProcedurePatch) -> None:
+    general_changes_patch(patch)
+    leave_level_patch(patch)
+    separate_inventory_patch(patch)
+    disk_collection_npc_patch(patch)
+    disk_collection_item_patch(patch)
+    disk_detection_loop(patch)
 
+    patch.write_file("token_data.bin", patch.get_token_binary())
+
+def general_changes_patch(patch: MMZero3ProcedurePatch) -> None:
     # Prevent disks from being opened in mission complete screen
     patch.write_token(
         APTokenTypes.WRITE,
@@ -42,8 +51,6 @@ def write_tokens(world: "MMZero3World", patch: MMZero3ProcedurePatch) -> None:
         bytes([0xE0]),
     )
     # Make disks show up greyed out in mission complete screen.
-    # TODO: 0xE78F6 does something that I did not document, 01 78 > 00 20
-    #  probably something related to text changes?
     patch.write_token(
         APTokenTypes.WRITE,
         0xE78D0,
@@ -57,7 +64,8 @@ def write_tokens(world: "MMZero3World", patch: MMZero3ProcedurePatch) -> None:
         bytes([0x00, 0x00]),
     )
 
-    # PATCH: CHECK IF PLAYER CAN LEAVE LEVEL ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+def leave_level_patch(patch: MMZero3ProcedurePatch) -> None:
+    """Check if player can leave level. Allow them do to so or play error sound. Display the proper text."""
     # Jump to custom code block 1 on level exit, which is written to a chunk of unused ROM.
     patch.write_token(
         APTokenTypes.WRITE,
@@ -108,9 +116,126 @@ def write_tokens(world: "MMZero3World", patch: MMZero3ProcedurePatch) -> None:
         0x370C63,
         bytes([0x2C, 0x29, 0x36, 0x29]),
     )
-    # PATCH OVER ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    patch.write_file("token_data.bin", patch.get_token_binary())
+def separate_inventory_patch(patch: MMZero3ProcedurePatch) -> None:
+    """Separates in game inventory (items collected by player) and Cervau inventory (items awarded by AP)"""
+    # Note: In RAM, there are two structs that store the players inventory. The first inventory is the disks the player has collected
+    # and what the player has opened using Cervau. After that block there is another struct that copies the first as a backup in case
+    # the player dies and needs to have their inventory wiped. This backup struct is overwritten here to be used for archipelago purposes.
+    
+    # Changes a pointer, makes Cervau check backup inventory.
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0xEE198,
+        bytes([0x48]),
+    )
+
+    # No Ops branch that saves current inventory to back up inventory.
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0x1A0F4,
+        bytes([0x00, 0x00]),
+    )
+
+def disk_collection_npc_patch(patch: MMZero3ProcedurePatch) -> None:
+    """When player collects disk from NPC, send collected item to memory location"""
+
+    # Reroutes all NPC dialogues to custom code
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0xD93DE,
+        bytes([0x2C, 0xF0, 0xE6, 0xFC]),
+    )
+
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0xD9420,
+        bytes([0x2C, 0xF0, 0xC5, 0xFC]),
+    )
+
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0xD945C,
+        bytes([0x2C, 0xF0, 0xA7, 0xFC]),
+    )
+
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0xD94DA,
+        bytes([0x2C, 0xF0, 0x87, 0xFC]),
+    )
+
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0xD950E,
+        bytes([0x2C, 0xF0, 0x4E, 0xFC]),
+    )
+
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0xD9540,
+        bytes([0x2C, 0xF0, 0x35, 0xFC]),
+    )
+
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0xD9580,
+        bytes([0x2C, 0xF0, 0x15, 0xFC]),
+    )
+
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0xD95B6,
+        bytes([0x2C, 0xF0, 0xFA, 0xFB]),
+    )
+
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0xD95E8,
+        bytes([0x2C, 0xF0, 0xE1, 0xFB]),
+    )
+
+    # Places AP item into the correct RAM location. Located right after the secret disk struct
+    # Contains the item number (1-4) and offset.
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0x105DAE,
+        bytes([0x08, 0xB5, 0x09, 0x4B, 0x18, 0x70, 0x10, 0x43, 0x08, 0x70, 0x59, 0x70, 0x00, 0x00, 0x08, 0xbc, 0x00, 0xbd]),
+    )
+
+def disk_collection_item_patch(patch: MMZero3ProcedurePatch) -> None:
+    """When player collects disk item, send collected item to memory location"""
+
+    # Reroutes to custom code on collecting disk
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0xF889C,
+        bytes([0x0D, 0xF0, 0x90, 0xFA]),
+    )
+
+    # Places AP item into the correct RAM location. Located right after the secret disk struct
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0x105DC0,
+        bytes([0x10, 0xB5, 0x05, 0x4C, 0x20, 0x70, 0x08, 0x43, 0x10, 0x70, 0x04, 0x49, 0x51, 0x1A, 0x61, 0x70, 0x00, 0x00, 0x10, 0xBC, 0x00, 0xBD, 0x70, 0x47, 0xE5, 0x71, 0x03, 0x02, 0xB8, 0x71, 0x03, 0x02]),
+    )
+
+def disk_detection_loop(patch: MMZero3ProcedurePatch) -> None:
+    """On AP item retreival, play sound and display info box"""
+
+    # Reroutes to custom code on AP item getting placed into memory by client.py
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0x4886,
+        bytes([0x01, 0xF1, 0xAC, 0xFA]),
+    )
+
+    # play sound and display info box
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0x105DE2,
+        bytes([0x00, 0xB5, 0x58, 0x68, 0x60, 0x61, 0x09, 0x4c, 0x20, 0x78, 0x00, 0x28, 0x00, 0xd1, 0x00, 0xbd, 0x00, 0x25, 0x25, 0x70, 0x05, 0x00, 0xad, 0x00, 0x46, 0x00, 0xad, 0x19, 0x06, 0x48, 0x40, 0x19, 0x04, 0x4d, 0x28, 0x60, 0x05, 0x48, 0xe5, 0x21, 0xe4, 0xf7, 0xdd, 0xf9, 0x00, 0xbd, 0x15, 0x72, 0x03, 0x02, 0xe4, 0x0b, 0x03, 0x02, 0x5E, 0x2D, 0x37, 0x08, 0x00, 0x01]),
+    )
 
 class MMZero3Settings(settings.Group):
     class MMZero3RomFile(settings.UserFilePath):
