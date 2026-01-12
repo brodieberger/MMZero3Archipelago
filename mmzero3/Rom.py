@@ -133,8 +133,8 @@ def separate_inventory_patch(patch: MMZero3ProcedurePatch) -> None:
     # No Ops branch that saves current inventory to back up inventory.
     patch.write_token(
         APTokenTypes.WRITE,
-        0x1A0F4,
-        bytes([0x00, 0x00]),
+        0x1A0F2,
+        bytes([0x00, 0x00, 0x00, 0x00]),
     )
 
 def disk_collection_npc_patch(patch: MMZero3ProcedurePatch) -> None:
@@ -161,8 +161,14 @@ def disk_collection_npc_patch(patch: MMZero3ProcedurePatch) -> None:
 
     patch.write_token(
         APTokenTypes.WRITE,
-        0xD94DA,
+        0xD949C,
         bytes([0x2C, 0xF0, 0x87, 0xFC]),
+    )
+
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0xD94DA,
+        bytes([0x2C, 0xF0, 0x68, 0xFC]),
     )
 
     patch.write_token(
