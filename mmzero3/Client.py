@@ -15,15 +15,11 @@ class MMZero3Client(BizHawkClient):
     system = "GBA"
     patch_suffix = ".apmmzero3"
 
-    synced_in_game = False
-    synced_hub = False
+    prev_level_value = None
     in_results_screen = False
     player_warned = False
     
-    in_game_inventory = bytearray(45)
-    real_inventory = bytearray(45)
-    full_inventory = bytearray([0xFF] * 45)
-    empty_inventory = bytearray(45)
+    cervau_inventory = bytearray(45)
 
     required_disks = 80 # Will be overwritten from settings
     goal_type = 0 # will also be overwritten. 0 is for default (kill boss with enough disks), 1 is vanilla (just kill the boss)
@@ -166,10 +162,11 @@ class MMZero3Client(BizHawkClient):
                 self.easy_ex_skill = ctx.slot_data.get("easy_ex_skill", 0)
                 self.options_set = True
             
-            # Read save data
-            save_data = (await bizhawk.read(
+            # Retrieves update from game
+            # First Byte: Bit representing item, Second Byte: Inventory Offset
+            item_update = (await bizhawk.read(
                 ctx.bizhawk_ctx,
-                [(0x0371B8, 45, "Combined WRAM")])
+                [(0x0371E5, 2, "Combined WRAM")])
             )[0]
             
             # Read current level
@@ -189,169 +186,121 @@ class MMZero3Client(BizHawkClient):
                 ctx.bizhawk_ctx,
                 [(0x042AE2, 1, "Combined WRAM")] 
             ))[0]
-            
-            # Reads if the player is in mission start. 
-            # Not super needed. Could be removed if it strains performance too much.
-            mission_start_screen = (await bizhawk.read(
-                ctx.bizhawk_ctx,
-                [(0x042ED2, 1, "Combined WRAM")] 
-            ))[0]
+
+            # Will be changed to true if the gamestate needs to be syncronised.
+            # Either on some update or the player changing stages.
+            needs_sync = False
             
             # When the player loads into the hub or a level, it should sync the inventory
-            # This value keeps track of that
             is_in_hub = level_data.hex() in ('11', '00')
+            if self.prev_level_value != is_in_hub:
+                needs_sync = True
 
-            # IF THE PLAYER IS IN A LEVEL
-            if not is_in_hub:
+            # Check if an item was picked up in a level
+            if item_update != b'\x00\x00' and demo_screen != b'\x00':
+                print(item_update)
+                needs_sync = True
 
-                # If the inventory is not synced, sync inventory and update
-                if not self.synced_in_game:
-                    save_data = await self.sync_in_game_inventory(ctx, save_data)
+                value = item_update[0]
+                ram_offset = item_update[1]
 
-                # Sync inventory again if on mission start screen. (In case of game over)
-                if mission_start_screen == b'\xC8':
-                    save_data = await self.sync_in_game_inventory(ctx, save_data)
+                if value == 0:
+                    return
 
-                # Check if an item was picked up in a level
-                # TODO: find a better way of doing this. This if statement is insane.
-                if save_data != self.in_game_inventory and results_screen == b'\x00' and save_data != self.full_inventory and demo_screen != b'\x00':
-                    # Find item that you picked up and send the location check for that item, then update the in game inventory (not ram data)
-                    new_locations = []
-                    for i in range(len(save_data)):
-                        # Only look at the lower nibble (0x0F mask)
-                        old_bits = self.in_game_inventory[i] & 0x0F
-                        new_bits = save_data[i] & 0x0F
+                byte_index = ram_offset - 0xB8
+                if byte_index < 0:
+                    return
 
-                        changed_bits = new_bits & (~old_bits)  # Bits that were 0 and are now 1
-                        for bit in range(4):
-                            if changed_bits & (1 << bit):
-                                location_id = i * 4 + bit + 1  # Items are 1-indexed
-                                new_locations.append(location_id)
+                base_disk = byte_index * 4
 
-                    if new_locations:
+                if value == 0x01:
+                    disk_number = base_disk + 1
+                elif value == 0x02:
+                    disk_number = base_disk + 2
+                elif value == 0x04:
+                    disk_number = base_disk + 3
+                elif value == 0x08:
+                    disk_number = base_disk + 4
+                else:
+                    return
+
+                location_id = disk_number
+                print(location_id)
+
+                await ctx.send_msgs([{
+                    "cmd": "LocationChecks",
+                    "locations": [location_id]
+                }])
+
+            # Clear update in memory now that it has been read
+            await bizhawk.write(
+                ctx.bizhawk_ctx,
+                [(0x0371E5, [0,0], "Combined WRAM")]
+            )
+
+            # Check if the player has completed a level
+            # TODO: Make this use a similar system as the one for checking items
+            if results_screen != b'\x00' and not self.in_results_screen:
+                current_level = int.from_bytes(level_data, byteorder='little')
+                location_id = self.level_to_location.get(current_level)
+
+                if location_id:
+                    await ctx.send_msgs([{
+                        "cmd": "LocationChecks",
+                        "locations": [location_id]
+                    }]) 
+
+                # Completion condition. Runs If the level that was finished was the last level
+                # Logic for Default game goal
+                if self.goal_type == 0:
+                    if level_data == b'\x10' and self.collected_disks >= self.required_disks and not ctx.finished_game:
                         await ctx.send_msgs([{
-                            "cmd": "LocationChecks",
-                            "locations": new_locations
-                        }])
-                    
-                    # Update in game inventory to have the new item so it doesn't show again.
-                    self.in_game_inventory = self.update_in_game_inventory(ctx)
-                    await bizhawk.write(
-                        ctx.bizhawk_ctx,
-                        [(0x0371E8, list(self.in_game_inventory), "Combined WRAM")]
-                    )
-
-                # Check if the player has completed a level
-                if results_screen != b'\x00' and not self.in_results_screen:
-                    current_level = int.from_bytes(level_data, byteorder='little')
-                    location_id = self.level_to_location.get(current_level)
-
-                    if location_id:
-                        await ctx.send_msgs([{
-                            "cmd": "LocationChecks",
-                            "locations": [location_id]
-                        }]) 
-
-                    # Completion condition
-                    # If the level that was finished was the last level
-                    # Logic for Default game goal
-                    if self.goal_type == 0:
-                        if level_data == b'\x10' and self.collected_disks >= self.required_disks and not ctx.finished_game:
-                            await ctx.send_msgs([{
-                                "cmd": "Say", "text": f"Final stage cleared! You had {self.collected_disks} Disks, which was {self.collected_disks - self.required_disks} more disks than needed!"
-                             }])
-                            await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
-                            ctx.finished_game = True
-                        elif level_data == b'\x10' and self.collected_disks < self.required_disks and not self.player_warned and not ctx.finished_game:
-                            await ctx.send_msgs([
-                                {"cmd": "Say", "text": f"Final stage cleared! You still need {self.required_disks - self.collected_disks} more disks."},
-                                {"cmd": "Say", "text": "Load a previous save and collect more disks."},
-                                {"cmd": "Say", "text": "Do NOT save over your file after the credits!"}
-                            ])
-                            self.player_warned = True
-                    # Logic for Vanilla
-                    elif self.goal_type == 1:
-                         if level_data == b'\x10' and ctx.finished_game == False:
+                            "cmd": "Say", "text": f"Final stage cleared! You had {self.collected_disks} Disks, which was {self.collected_disks - self.required_disks} more disks than needed!"
+                            }])
+                        await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
+                        ctx.finished_game = True
+                    elif level_data == b'\x10' and self.collected_disks < self.required_disks and not self.player_warned and not ctx.finished_game:
+                        await ctx.send_msgs([
+                            {"cmd": "Say", "text": f"Final stage cleared! You still need {self.required_disks - self.collected_disks} more disks."},
+                            {"cmd": "Say", "text": "Load a previous save and collect more disks."},
+                            {"cmd": "Say", "text": "Do NOT save over your file after the credits!"}
+                        ])
+                        self.player_warned = True
+                # Logic for Vanilla
+                elif self.goal_type == 1:
+                        if level_data == b'\x10' and ctx.finished_game == False:
                             await ctx.send_msgs([{
                                 "cmd": "Say", "text": "Final Stage Cleared! Game completed!"
-                             }])
+                                }])
                             await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
-                            ctx.finished_game = True
-                        
-                    # Fill player inventory so that player cant open items in result screen
-                    # TODO Lock this until the whole thing is done.
-                    await bizhawk.write(
-                        ctx.bizhawk_ctx,
-                        [(0x0371B8, list(self.full_inventory), "Combined WRAM")]
-                    )
-                    self.in_results_screen = True
+                        ctx.finished_game = True
+                    
+                self.in_results_screen = True
 
-
-            # IF THE PLAYER IS NOT IN A LEVEL (hub)
-            else:
-                # Reset level sync flag
-                self.synced_in_game = False
-                self.in_results_screen = False
-
-                # Sync to real inventory once on entering hub
-                if not self.synced_hub:
-                    await bizhawk.write(
-                        ctx.bizhawk_ctx,
-                        [(0x0371B8, list(self.real_inventory), "Combined WRAM")]
-                    )
-
-                    # Read save data again after writing it
-                    save_data = (await bizhawk.read(
-                        ctx.bizhawk_ctx,
-                        [(0x0371B8, 45, "Combined WRAM")])
-                    )[0]
-                    self.synced_hub = True
-
-                    # Write eReader contents
-                    await bizhawk.write(
-                        ctx.bizhawk_ctx,
-                        [(0x02438, list(self.eReader_bitflag_inventory), "Combined WRAM")]
-                    )
-                    await bizhawk.write(
-                        ctx.bizhawk_ctx,
-                        [(0x02474, self.eReader_byte_map_inventory, "Combined WRAM")]
-                    )
-
-                # Check if an item was picked up or opened while in the hub.
-                if save_data != self.real_inventory:
-                    for i in range(len(save_data)):
-                        real_byte = self.real_inventory[i]
-                        save_byte = save_data[i]
-
-                        # Identify new bits that are ON in save_data but OFF in real_inventory
-                        new_bits = save_byte & (~real_byte)
-
-                        if new_bits:
-                            self.real_inventory[i] |= new_bits  # Only add bits, never remove
+            # Additional check to see if the player collected enough disks AFTER beating final stage. Only used in default game goal
+            if self.player_warned == True and self.collected_disks >= self.required_disks and ctx.finished_game == False:
+                await ctx.send_msgs([{
+                    "cmd": "Say", "text": f"{self.required_disks} Disks collected! Game completed!"
+                }])
+                await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
+                ctx.finished_game = True
 
             # Receive an item from AP
-            # If in hub, add it to real inventory AND insert into memory, else just real inventory
             for i in range(self.received_index, len(ctx.items_received)):
+                needs_sync = True
                 item = ctx.items_received[i]
 
-                # If the item is a secret disk, add to real inventory
+                # If the item is a secret disk, add to cervau inventory
                 if item.item >= 1 and item.item <= 180: 
-                    item_index = item.item - 1  # Items are 1-indexed
+                    item_index = item.item - 1 
                     byte_index = item_index // 4
                     bit_position = item_index % 4
 
-                    # Update real inventory
-                    self.real_inventory[byte_index] |= (1 << bit_position)
+                    # Update cervau inventory
+                    self.cervau_inventory[byte_index] |= (1 << bit_position)
                     self.collected_disks += 1
-
-                    # Only update the memory if the player is in the hub
-                    if is_in_hub:
-                        await bizhawk.write(
-                            ctx.bizhawk_ctx,
-                            [(0x0371B8, list(self.real_inventory), "Combined WRAM")]
-                        )
             
-                # If the item is an eReader bitflag item, insert into the RAM
+                # If the item is an eReader bitflag item
                 if item.item >= 111 and item.item <= 140:
                     if item.item not in self.bitflags:
                         continue
@@ -364,37 +313,24 @@ class MMZero3Client(BizHawkClient):
                         self.eReader_bitflag_inventory[byte_index]     |= mask
                     else:
                         self.eReader_bitflag_inventory[byte_index + 1] |= (mask >> 8)
-                    await bizhawk.write(
-                        ctx.bizhawk_ctx,
-                        [(0x02438, list(self.eReader_bitflag_inventory), "Combined WRAM")]
-                    )
 
-                # If the item is an eReader byte map item, insert into the RAM       
+                # If the item is an eReader byte map item
                 if item.item in self.byte_map:
                     addr, value = self.byte_map[item.item]
                     self.eReader_byte_map_inventory[addr - 0x02474] = value
-                    
-                    await bizhawk.write(
-                        ctx.bizhawk_ctx,
-                        [(0x02474, self.eReader_byte_map_inventory, "Combined WRAM")]
-                    )
 
             self.received_index = len(ctx.items_received)
 
-            # Additional check to see if the player collected enough disks AFTER beating final stage. Only used in default game goal
-            if self.player_warned == True and self.collected_disks >= self.required_disks and ctx.finished_game == False:
-                await ctx.send_msgs([{
-                    "cmd": "Say", "text": f"{self.required_disks} Disks collected! Game completed!"
-                }])
-                await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
-                ctx.finished_game = True
+            if needs_sync:
+                await self.sync_game_state(ctx)
+            self.prev_level_value = is_in_hub
 
 
         except bizhawk.RequestFailedError:
             pass
 
-    def update_in_game_inventory(self, ctx) -> bytearray:
-        # Updates in_game_inventory based on ctx.checked_locations.
+    def get_items(self, ctx) -> bytearray:
+        """Updates items collected by Zero based on ctx.checked_locations. Used in case of player using savestates."""
         # Only lower nibble (found state) is updated. Upper nibble (opened state) is untouched.
         inventory = bytearray(45)
 
@@ -407,43 +343,33 @@ class MMZero3Client(BizHawkClient):
                 # Only set the lower nibble bit (bit positions 0–3)
                 inventory[byte_index] |= (1 << bit_position)
 
+        print(inventory)
         return inventory
         
 
-    async def sync_in_game_inventory(self, ctx, save_data):
+    async def sync_game_state(self, ctx):
+        """Syncronizes the player's collected items and inventory."""
         
-        #self.debug_print_inventory(save_data)
-        self.in_game_inventory = self.update_in_game_inventory(ctx)
+        print("syncing game state!")
         self.synced_hub = False
         self.in_results_screen = False
 
-        # Sync in-game inventory to RAM
-        await bizhawk.write(
-            ctx.bizhawk_ctx,
-            [(0x0371B8, list(self.in_game_inventory), "Combined WRAM")]
-        )
-
-        # Also write to this portion. It is right after the inventory. 
-        # It acts as a restore point for when you get a game over and get your collected items reset.
-        await bizhawk.write(
-            ctx.bizhawk_ctx,
-            [(0x0371E8, list(self.in_game_inventory), "Combined WRAM")]
-        )
-
-        # Read save data again after writing it
-        save_data = (await bizhawk.read(
-            ctx.bizhawk_ctx,
-            [(0x0371B8, 45, "Combined WRAM")]
-        ))[0]
-
-        # If easy EX skill is enabled, give player S rank
         if self.easy_ex_skill == 1:
             await bizhawk.write(
                 ctx.bizhawk_ctx,
                 [(0x0372B1, [0x06], "Combined WRAM")]
             )
 
-        # Write eReader contents
+        await bizhawk.write(
+            ctx.bizhawk_ctx,
+            [(0x0371E8, list(self.cervau_inventory), "Combined WRAM")]
+        )
+
+        await bizhawk.write(
+            ctx.bizhawk_ctx,
+            [(0x0371B8, list(self.get_items(ctx)), "Combined WRAM")]
+        )
+
         await bizhawk.write(
             ctx.bizhawk_ctx,
             [(0x02438, list(self.eReader_bitflag_inventory), "Combined WRAM")]
@@ -452,19 +378,3 @@ class MMZero3Client(BizHawkClient):
             ctx.bizhawk_ctx,
             [(0x02474, self.eReader_byte_map_inventory, "Combined WRAM")]
         )
-
-        # Unlocks Z Saber, just a temp thing here cause of my AP rules that I don't feel like changing ATM
-        await ctx.send_msgs([{
-            "cmd": "LocationChecks",
-            "locations": [999]
-        }])
-
-        self.synced_in_game = True
-
-        return save_data  
-
-
-    def debug_print_inventory(self, save_data) -> None:
-        print(f"In Game Inventory: {self.in_game_inventory}")
-        print(f"Real Inventory: {self.in_game_inventory}")
-        print(f"Ram Inventory: {save_data}")

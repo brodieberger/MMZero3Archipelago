@@ -123,17 +123,42 @@ def separate_inventory_patch(patch: MMZero3ProcedurePatch) -> None:
     # and what the player has opened using Cervau. After that block there is another struct that copies the first as a backup in case
     # the player dies and needs to have their inventory wiped. This backup struct is overwritten here to be used for archipelago purposes.
     
-    # Changes a pointer, makes Cervau check backup inventory.
+    # Changes pointers, makes Cervau check backup inventory.
     patch.write_token(
         APTokenTypes.WRITE,
         0xEE198,
         bytes([0x48]),
     )
 
-    # No Ops branch that saves current inventory to back up inventory.
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0xEE0F4,
+        bytes([0x48]),
+    )
+    # 283DF90???
+
+    # No Ops branches that saves current inventory to back up inventory.
     patch.write_token(
         APTokenTypes.WRITE,
         0x1A0F2,
+        bytes([0x00, 0x00, 0x00, 0x00]),
+    )
+
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0x1A100,
+        bytes([0x00, 0x00, 0x00, 0x00]),
+    )
+
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0xEF31E,
+        bytes([0x00, 0x00, 0x00, 0x00]),
+    )
+
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0xEF32C,
         bytes([0x00, 0x00, 0x00, 0x00]),
     )
 
@@ -223,7 +248,7 @@ def disk_collection_item_patch(patch: MMZero3ProcedurePatch) -> None:
     patch.write_token(
         APTokenTypes.WRITE,
         0x105DC0,
-        bytes([0x10, 0xB5, 0x05, 0x4C, 0x20, 0x70, 0x08, 0x43, 0x10, 0x70, 0x04, 0x49, 0x51, 0x1A, 0x61, 0x70, 0x00, 0x00, 0x10, 0xBC, 0x00, 0xBD, 0x70, 0x47, 0xE5, 0x71, 0x03, 0x02, 0xB8, 0x71, 0x03, 0x02]),
+        bytes([0x10, 0xB5, 0x05, 0x4C, 0x20, 0x70, 0x08, 0x43, 0x10, 0x70, 0x04, 0x49, 0x51, 0x1A, 0x62, 0x70, 0x00, 0x00, 0x10, 0xBC, 0x00, 0xBD, 0x70, 0x47, 0xE5, 0x71, 0x03, 0x02, 0xB8, 0x71, 0x03, 0x02]),
     )
 
 def disk_detection_loop(patch: MMZero3ProcedurePatch) -> None:

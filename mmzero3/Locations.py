@@ -29,7 +29,30 @@ stage_names = [
 
 location_data_table: Dict[str, MMZero3LocationData] = {
 
-    "Get Z Saber (Start Game)": MMZero3LocationData(region="Derelict Spacecraft", locked_item="Z Saber", address=999),
+    # Certain dialogue options are only availible in certain game states and are missable. This will be fixed later.
+    "Resistance Base 023: Room 02D - Mission Set 2": MMZero3LocationData(region="Resistance Base", address=23),
+    "Resistance Base 044: Talk to Rocinolle - Mission Set 4": MMZero3LocationData(region="Resistance Base", address=44),
+    "Resistance Base 058: Talk to Right Tower Soldier - Mission Set 1": MMZero3LocationData(region="Resistance Base", address=58),
+    "Resistance Base 092: Talk to Cerveau - Mission Set 1": MMZero3LocationData(region="Resistance Base", address=92),
+    "Resistance Base 099: Room 03D": MMZero3LocationData(region="Resistance Base", address=99),
+    "Resistance Base 106: Left Corner of Rooftop": MMZero3LocationData(region="Resistance Base", address=106),
+    "Resistance Base 107: Talk to Andrew - Mission Set 2": MMZero3LocationData(region="Resistance Base", address=107),
+    "Resistance Base 116: Talk to Alouette - Mission Set 2": MMZero3LocationData(region="Resistance Base", address=116),
+    "Resistance Base 107: Talk to Andrew - Mission Set 2": MMZero3LocationData(region="Resistance Base", address=107),
+    "Resistance Base 165: Near Alouette": MMZero3LocationData(region="Resistance Base", address=165),
+    "Resistance Base 166: Near Cerveau": MMZero3LocationData(region="Resistance Base", address=166),
+    "Resistance Base 167: Talk to Rocinolle - Mission Set 1/2": MMZero3LocationData(region="Resistance Base", address=167),
+    "Resistance Base 168: 2nd Floor Hall": MMZero3LocationData(region="Resistance Base", address=168),
+    "Resistance Base 169: Talk to Hibou - Mission Set 2/3/4": MMZero3LocationData(region="Resistance Base", address=169),
+    "Resistance Base 170: Near Rocinolle": MMZero3LocationData(region="Resistance Base", address=170),
+    "Resistance Base 171: Left Room on 1st Floor": MMZero3LocationData(region="Resistance Base", address=171),
+    "Resistance Base 172: Right Room on 1st Floor": MMZero3LocationData(region="Resistance Base", address=172),
+    "Resistance Base 173: Talk to Hirondelle - Mission Set 2": MMZero3LocationData(region="Resistance Base", address=173),
+    "Resistance Base 174: Talk to Doigt - Mission Set 2": MMZero3LocationData(region="Resistance Base", address=174),
+    "Resistance Base 175: Talk to Menart - Mission Set 1": MMZero3LocationData(region="Resistance Base", address=175),
+    "Resistance Base 176: Near Pic": MMZero3LocationData(region="Resistance Base", address=176),
+    "Resistance Base 177: Right Room on 1st Floor": MMZero3LocationData(region="Resistance Base", address=177),
+
     "Derelict Spacecraft 133: 5th Grand Cannon Kill": MMZero3LocationData(region="Derelict Spacecraft", address=133),
     "Derelict Spacecraft 140: 3rd Shrimpolin Kill": MMZero3LocationData(region="Derelict Spacecraft", address=140),
     "Derelict Spacecraft 158: 4th Shotcounter Kill": MMZero3LocationData(region="Derelict Spacecraft", address=158),
