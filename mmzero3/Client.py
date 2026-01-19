@@ -198,45 +198,8 @@ class MMZero3Client(BizHawkClient):
 
             # Check if an item was picked up in a level
             if item_update != b'\x00\x00' and demo_screen != b'\x00':
-                print(item_update)
+                await self.item_found(ctx, self.zero_inventory)
                 needs_sync = True
-
-                value = item_update[0]
-                ram_offset = item_update[1]
-
-                if value == 0:
-                    return
-
-                byte_index = ram_offset - 0xB8
-                if byte_index < 0:
-                    return
-
-                base_disk = byte_index * 4
-
-                if value == 0x01:
-                    disk_number = base_disk + 1
-                elif value == 0x02:
-                    disk_number = base_disk + 2
-                elif value == 0x04:
-                    disk_number = base_disk + 3
-                elif value == 0x08:
-                    disk_number = base_disk + 4
-                else:
-                    return
-
-                location_id = disk_number
-                print(location_id)
-
-                await ctx.send_msgs([{
-                    "cmd": "LocationChecks",
-                    "locations": [location_id]
-                }])
-
-            # Clear update in memory now that it has been read
-            await bizhawk.write(
-                ctx.bizhawk_ctx,
-                [(0x0371E5, [0,0], "Combined WRAM")]
-            )
 
             # Check if the player has completed a level
             # TODO: Make this use a similar system as the one for checking items
@@ -292,7 +255,7 @@ class MMZero3Client(BizHawkClient):
 
                 # If the item is a secret disk, add to cervau inventory
                 if item.item >= 1 and item.item <= 180: 
-                    item_index = item.item - 1 
+                    item_index = item.item - 1  # Items are 1-indexed
                     byte_index = item_index // 4
                     bit_position = item_index % 4
 
@@ -325,13 +288,19 @@ class MMZero3Client(BizHawkClient):
                 await self.sync_game_state(ctx)
             self.prev_level_value = is_in_hub
 
+            # Needs to be read last in order to compare new items
+            self.zero_inventory = (await bizhawk.read(
+                ctx.bizhawk_ctx,
+                [(0x0371B8, 45, "Combined WRAM")])
+            )[0]
+
 
         except bizhawk.RequestFailedError:
             pass
 
     def get_items(self, ctx) -> bytearray:
-        """Updates items collected by Zero based on ctx.checked_locations. Used in case of player using savestates."""
-        # Only lower nibble (found state) is updated. Upper nibble (opened state) is untouched.
+        """Updates items collected by Zero based on ctx.checked_locations. Used in case of player using savestates. 
+        Only lower nibble (found state) is updated. Upper nibble (opened state) is untouched."""
         inventory = bytearray(45)
 
         for location_id in ctx.checked_locations:
@@ -343,14 +312,49 @@ class MMZero3Client(BizHawkClient):
                 # Only set the lower nibble bit (bit positions 0–3)
                 inventory[byte_index] |= (1 << bit_position)
 
-        print(inventory)
         return inventory
         
+    async def item_found(self, ctx, zero_inventory):
+        """Find item that was picked up and send the location check for that item"""
+
+        print("item found!")
+        print(zero_inventory)
+
+        new_save_data = (await bizhawk.read(
+            ctx.bizhawk_ctx,
+            [(0x0371B8, 45, "Combined WRAM")])
+        )[0]
+        print(new_save_data)
+
+        new_locations = []
+        for i in range(len(new_save_data)):
+            # Only look at the lower nibble (0x0F mask)
+            old_bits = zero_inventory[i] & 0x0F
+            new_bits = new_save_data[i] & 0x0F
+
+            changed_bits = new_bits & (~old_bits)  # Bits that were 0 and are now 1
+            print(changed_bits)
+            for bit in range(4):
+                if changed_bits & (1 << bit):
+                    location_id = i * 4 + bit + 1  # Items are 1-indexed
+                    new_locations.append(location_id)
+
+        print(new_locations)
+        if new_locations:
+            await ctx.send_msgs([{
+                "cmd": "LocationChecks",
+                "locations": new_locations
+            }])
+
+        # Clear update in memory now that it has been read
+        await bizhawk.write(
+            ctx.bizhawk_ctx,
+            [(0x0371E5, [0,0], "Combined WRAM")]
+        )
 
     async def sync_game_state(self, ctx):
         """Syncronizes the player's collected items and inventory."""
         
-        print("syncing game state!")
         self.synced_hub = False
         self.in_results_screen = False
 

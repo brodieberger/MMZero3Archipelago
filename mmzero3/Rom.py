@@ -123,19 +123,51 @@ def separate_inventory_patch(patch: MMZero3ProcedurePatch) -> None:
     # and what the player has opened using Cervau. After that block there is another struct that copies the first as a backup in case
     # the player dies and needs to have their inventory wiped. This backup struct is overwritten here to be used for archipelago purposes.
     
-    # Changes pointers, makes Cervau check backup inventory.
+    # Changes pointers, makes Cervau use new inventory pointer which is stored in RAM.
     patch.write_token(
         APTokenTypes.WRITE,
-        0xEE198,
-        bytes([0x48]),
+        0xF80D4,
+        bytes([0x80]),
     )
 
     patch.write_token(
         APTokenTypes.WRITE,
-        0xEE0F4,
-        bytes([0x48]),
+        0xF7C98,
+        bytes([0x80]),
     )
-    # 283DF90???
+
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0xF8314,
+        bytes([0x80]),
+    )
+
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0xF8370,
+        bytes([0x80]),
+    )
+
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0xF86B4,
+        bytes([0x80]),
+    )
+
+    # Branches to custom code, to load the pointer
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0xF8776,
+        bytes([0x0D, 0xF0, 0x53, 0xFB]),
+    )
+
+    # Writes the new pointer to RAM
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0x105e20,
+        bytes([0x00, 0x25, 0x00, 0x95, 0x02, 0x48, 0x01, 0x4a, 0x10, 0x60, 0xf7, 0x46, 0x80, 0xdf, 0x03, 0x02, 0xe8, 0x71, 0x03, 0x02]),
+    )
+
 
     # No Ops branches that saves current inventory to back up inventory.
     patch.write_token(

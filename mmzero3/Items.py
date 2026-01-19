@@ -23,9 +23,6 @@ stage_names = [
     "Sunken Library", "Giant Elevator", "Sub Arcadia"
 ]
 
-# Exclude these items. They are all of the files that can be found in the Hub area
-# These are excluded to due issues with the memory manipulation I am using, hopefully only a temp fix.
-exclude = [23, 44, 58, 92, 99, 106, 107, 116, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176]
 item_data_table: Dict[str, MMZero3ItemData] = {
     "Secret Disk 001: Auto-Charge Head Chip": MMZero3ItemData(code=1, type=ItemClassification.useful),
     "Secret Disk 002: Auto-Recover Head Chip": MMZero3ItemData(code=2, type=ItemClassification.useful),
