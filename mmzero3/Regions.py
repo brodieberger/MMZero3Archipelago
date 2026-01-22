@@ -7,7 +7,8 @@ class MMZero3RegionData(NamedTuple):
 
 region_data_table: Dict[str, MMZero3RegionData] = {
     "Menu": MMZero3RegionData(["Derelict Spacecraft"]),
-    "Derelict Spacecraft": MMZero3RegionData(["Stage Group 1"]),
+    "Derelict Spacecraft": MMZero3RegionData(["Resistance Base"]),
+    "Resistance Base": MMZero3RegionData(["Stage Group 1"]),
 
     # First 4 selectable main stages
     "Stage Group 1": MMZero3RegionData(["Aegis Volcano Base", "Oceanic Highway Ruins", "Weapons Repair Factory", "Old Residential", "Missile Factory"]),
