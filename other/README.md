@@ -17,17 +17,19 @@ There are two analyses:
 
 ## How to Use
 
-1. Open Ghidra and create a new project
-2. Import the `.gba` file
-3. Use processor:
+1. Create a patched ROM file using Archipelago
+   - You should rename the file to `Mega Man Zero 3 (USA).gba`
+2. Open Ghidra and create a new project
+3. Import the `.gba` file
+4. Use processor:
    - ARMv4T
    - Little Endian
    - Default Compiler
-4. Let Ghidra finish analysis
-5. With the program open, go to:
+5. Let Ghidra finish analysis
+6. With the program open, go to:
    - `File → Import → XML`
-6. Import the matching XML file
+7. Import the matching XML file
 
-After importing, all documented functions, labels, and comments will appear automatically.
+After importing, all documented functions, labels, and comments will appear automatically. The added code should also be there if you used the patched gba file Archipelago generates.
 
 Check out this document if you want to learn more about reverse engineering: https://www.starcubelabs.com/reverse-engineering-gba
