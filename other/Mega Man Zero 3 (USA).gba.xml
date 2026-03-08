@@ -322,15 +322,8 @@
 
 ]>
 <PROGRAM NAME="Mega Man Zero 3 (USA).gba" EXE_PATH="/C:/Users/brodi/Desktop/General/archipelago/ZeroProject/ZeroArchipelago/output/Mega Man Zero 3 (USA).gba" EXE_FORMAT="GBA Loader" IMAGE_BASE="00000000">
-    <INFO_SOURCE USER="brodi" TOOL="Ghidra 12.0.2" TIMESTAMP="Fri Feb 20 02:32:26 EST 2026" />
+    <INFO_SOURCE USER="brodi" TOOL="Ghidra 12.0.2" TIMESTAMP="Sun Mar 08 16:31:04 EDT 2026" />
     <PROCESSOR NAME="ARM" LANGUAGE_PROVIDER="ARM:LE:32:v4t:default" ENDIAN="little" />
-    <EQUATES>
-        <EQUATE_GROUP>
-            <EQUATE NAME="TW_NORMAL" VALUE="0x0" />
-            <EQUATE NAME="TRUE" VALUE="0x1" />
-            <EQUATE NAME="FALSE" VALUE="0x0" />
-        </EQUATE_GROUP>
-    </EQUATES>
     <COMMENTS>
         <COMMENT ADDRESS="0202f5dc" TYPE="plate">timer of some kind</COMMENT>
         <COMMENT ADDRESS="04000000" TYPE="end-of-line">LCD Control</COMMENT>
@@ -435,13 +428,21 @@ Part at the end is for e reader guys. gives crystals</COMMENT>
         <COMMENT ADDRESS="080d97a8" TYPE="pre">jpn andrew_080d9cd8</COMMENT>
         <COMMENT ADDRESS="080e78f6" TYPE="plate">this one is changed too in archipelago but IDK what it is</COMMENT>
         <COMMENT ADDRESS="080f004c" TYPE="plate">seems to handle a timer at {@address 0x202F5DC}</COMMENT>
+        <COMMENT ADDRESS="080f7cb6" TYPE="pre">render disks description (that has red)?</COMMENT>
+        <COMMENT ADDRESS="080f7cd4" TYPE="pre">render disk description (that doenst have red)?</COMMENT>
+        <COMMENT ADDRESS="080f7dcc" TYPE="pre">render disk descirption for enemy and npc</COMMENT>
+        <COMMENT ADDRESS="080f7df8" TYPE="pre">render disk is unread</COMMENT>
+        <COMMENT ADDRESS="080f7e20" TYPE="pre">render no text?</COMMENT>
         <COMMENT ADDRESS="080f7f84" TYPE="pre">080f83ac in jpn
 </COMMENT>
         <COMMENT ADDRESS="080f7fe0" TYPE="pre">080f8408 in jpn
 </COMMENT>
-        <COMMENT ADDRESS="080f81b8" TYPE="pre">80f8e0 in jpn</COMMENT>
+        <COMMENT ADDRESS="080f81b8" TYPE="pre">80f85e0 in jpn</COMMENT>
+        <COMMENT ADDRESS="080f8314" TYPE="pre">e8 71 03 02</COMMENT>
         <COMMENT ADDRESS="080f8334" TYPE="pre">80f875c in jpn</COMMENT>
         <COMMENT ADDRESS="080f855c" TYPE="pre">80f8984 in jpn</COMMENT>
+        <COMMENT ADDRESS="080f867c" TYPE="pre">acceptable
+overwritten immediately</COMMENT>
         <COMMENT ADDRESS="080f8884" TYPE="plate">Adds a disk to the inventory RAM</COMMENT>
         <COMMENT ADDRESS="08105d90" TYPE="plate">You can&apos;t escape this level!</COMMENT>
         <COMMENT ADDRESS="08105de2" TYPE="plate">Checks for updates made by archipelago giving items. On received item, display it in a text box.</COMMENT>
@@ -3246,6 +3247,7 @@ and so on you get the idea</COMMENT>
         <BOOKMARK ADDRESS="087ff744" TYPE="Error" CATEGORY="Bad Instruction" DESCRIPTION="Could not follow disassembly flow into non-existing memory at 073bb014 (flow from 087ff744)" />
         <BOOKMARK ADDRESS="087ff758" TYPE="Error" CATEGORY="Bad Instruction" DESCRIPTION="Unable to resolve constructor at 087ff758 (flow from 087ff754)" />
         <BOOKMARK ADDRESS="087ff87c" TYPE="Error" CATEGORY="Bad Instruction" DESCRIPTION="Unable to resolve constructor at 087ff87c" />
+        <BOOKMARK ADDRESS="020370fe" TYPE="Note" DESCRIPTION="perhaps save data start" />
         <BOOKMARK ADDRESS="0800471c" TYPE="Note" />
         <BOOKMARK ADDRESS="080d93b8" TYPE="Note" />
         <BOOKMARK ADDRESS="080ea120" TYPE="Note" />
@@ -3273,9 +3275,12 @@ and so on you get the idea</COMMENT>
         <SYMBOL ADDRESS="0202f5dc" NAME="gEcrystalGainAmount" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="0202f600" NAME="gLifeRecoverAmount" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="0202f60c" NAME="gSubTankRecoverAmount" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="0202f810" NAME="wStaticMotionPalIDs" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="0202fa10" NAME="wStaticMGraphicTilenums" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="02030100" NAME="gCurStory" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="02030164" NAME="level_ram" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="020301a0" NAME="gStageRun" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="0203063c" NAME="gUnlockedElfPtr" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="02030640" NAME="gWidgetHeaderPtr" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="02030650" NAME="gTextPrinter" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="02030be4" NAME="disk_number_to_render_address" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
@@ -3286,9 +3291,11 @@ and so on you get the idea</COMMENT>
         <SYMBOL ADDRESS="020371e5" NAME="ap_item_sent_address" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="02037215" NAME="ap_item_received_address" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="02037fa0" NAME="gZero" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="0203be90" NAME="gWidgets" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="0203df90" NAME="gStageDiskManager" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="0203df94" NAME="disks_collected_in_level" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="0203df9e" NAME="total_disks_collected_in_level" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="03002ac0" NAME="gPaletteManager" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="04000000" NAME="DISPCNT" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="04000004" NAME="DISPSTAT" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="04000006" NAME="VCOUNT" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
@@ -3395,9 +3402,13 @@ and so on you get the idea</COMMENT>
         <SYMBOL ADDRESS="080026c2" NAME="default" NAMESPACE="switchD_08002628::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
         <SYMBOL ADDRESS="0800393c" NAME="LoadGraphic" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="08003e14" NAME="LoadPalette" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="080040a8" NAME="LoadBlink" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="0800471c" NAME="PlaySound" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="08004818" NAME="ResetPivot" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="0800484c" NAME="random_gameloop_function" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="08004898" NAME="after_custom_code_5" NAMESPACE="FUN_0800485c::" TYPE="local" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="08004f90" NAME="ResetTaskManager" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="08004fc8" NAME="SetTaskPivot" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="0800502c" NAME="RunAllTasks" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="0800507c" NAME="ClearTaskBuffer" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="08009ac0" NAME="someting_fall" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
@@ -7183,6 +7194,7 @@ and so on you get the idea</COMMENT>
         <SYMBOL ADDRESS="080e39d0" NAME="caseD_32" NAMESPACE="switchD_080e3868::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="n" />
         <SYMBOL ADDRESS="080e39d0" NAME="caseD_33" NAMESPACE="switchD_080e3868::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="n" />
         <SYMBOL ADDRESS="080e39d0" NAME="caseD_34" NAMESPACE="switchD_080e3868::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="n" />
+        <SYMBOL ADDRESS="080e5964" NAME="InitWidgetHeader" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="080e5b58" NAME="switchD" NAMESPACE="switchD_080e5b58::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
         <SYMBOL ADDRESS="080e5b60" NAME="switchdataD_080e5b60" NAMESPACE="switchD_080e5b58::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
         <SYMBOL ADDRESS="080e5b78" NAME="caseD_0" NAMESPACE="switchD_080e5b58::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
@@ -7192,6 +7204,7 @@ and so on you get the idea</COMMENT>
         <SYMBOL ADDRESS="080e5c4c" NAME="caseD_4" NAMESPACE="switchD_080e5b58::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
         <SYMBOL ADDRESS="080e5c94" NAME="caseD_5" NAMESPACE="switchD_080e5b58::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
         <SYMBOL ADDRESS="080e5d12" NAME="default" NAMESPACE="switchD_080e5b58::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
+        <SYMBOL ADDRESS="080e5f40" NAME="CreateMenuComp2" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="080e6aac" NAME="switchD" NAMESPACE="switchD_080e6aac::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
         <SYMBOL ADDRESS="080e6ab4" NAME="switchdataD_080e6ab4" NAMESPACE="switchD_080e6aac::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
         <SYMBOL ADDRESS="080e6ac8" NAME="caseD_0" NAMESPACE="switchD_080e6aac::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
@@ -7200,8 +7213,10 @@ and so on you get the idea</COMMENT>
         <SYMBOL ADDRESS="080e6b7c" NAME="caseD_3" NAMESPACE="switchD_080e6aac::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
         <SYMBOL ADDRESS="080e6bb4" NAME="caseD_4" NAMESPACE="switchD_080e6aac::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
         <SYMBOL ADDRESS="080e6bfa" NAME="default" NAMESPACE="switchD_080e6aac::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
+        <SYMBOL ADDRESS="080e7084" NAME="createMenuCursor" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="080e78d0" NAME="render_disk_as_collectable" NAMESPACE="FUN_080e7834::" TYPE="local" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="080e78f6" NAME="changed?" NAMESPACE="FUN_080e7834::" TYPE="local" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="080e7d24" NAME="createSecretDiskModalBorder" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="080e8416" NAME="switchD" NAMESPACE="switchD_080e8416::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
         <SYMBOL ADDRESS="080e8420" NAME="switchdataD_080e8420" NAMESPACE="switchD_080e8416::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
         <SYMBOL ADDRESS="080e8454" NAME="caseD_0" NAMESPACE="switchD_080e8416::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
@@ -7367,7 +7382,7 @@ and so on you get the idea</COMMENT>
         <SYMBOL ADDRESS="080e8f4a" NAME="caseD_d" NAMESPACE="switchD_080e8cb4::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
         <SYMBOL ADDRESS="080e8f62" NAME="caseD_e" NAMESPACE="switchD_080e8cb4::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
         <SYMBOL ADDRESS="080e8f9e" NAME="caseD_f" NAMESPACE="switchD_080e8cb4::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
-        <SYMBOL ADDRESS="080e9604" NAME="render_text" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="080e9604" NAME="PrintString" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="080ea120" NAME="ClearTextWindow" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="080ea1b8" NAME="PrintNormalMessage" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="080ea1c8" NAME="PrintTextWindow" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
@@ -7406,6 +7421,7 @@ and so on you get the idea</COMMENT>
         <SYMBOL ADDRESS="080eb384" NAME="caseD_5" NAMESPACE="switchD_080eb21c::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
         <SYMBOL ADDRESS="080eb3ce" NAME="caseD_6" NAMESPACE="switchD_080eb21c::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
         <SYMBOL ADDRESS="080eb3d2" NAME="default" NAMESPACE="switchD_080eb21c::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
+        <SYMBOL ADDRESS="080eb408" NAME="IntroLoop_CapcomInti" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="080eb41e" NAME="switchD" NAMESPACE="switchD_080eb41e::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
         <SYMBOL ADDRESS="080eb424" NAME="switchdataD_080eb424" NAMESPACE="switchD_080eb41e::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
         <SYMBOL ADDRESS="080eb440" NAME="caseD_0" NAMESPACE="switchD_080eb41e::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
@@ -7416,6 +7432,7 @@ and so on you get the idea</COMMENT>
         <SYMBOL ADDRESS="080eb590" NAME="caseD_5" NAMESPACE="switchD_080eb41e::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
         <SYMBOL ADDRESS="080eb5ae" NAME="caseD_6" NAMESPACE="switchD_080eb41e::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
         <SYMBOL ADDRESS="080eb5f2" NAME="default" NAMESPACE="switchD_080eb41e::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
+        <SYMBOL ADDRESS="080eb64c" NAME="initGameSavedata" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="080ebe8a" NAME="switchD" NAMESPACE="switchD_080ebe8a::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
         <SYMBOL ADDRESS="080ebe90" NAME="switchdataD_080ebe90" NAMESPACE="switchD_080ebe8a::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
         <SYMBOL ADDRESS="080ebec8" NAME="caseD_0" NAMESPACE="switchD_080ebe8a::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
@@ -7809,6 +7826,8 @@ and so on you get the idea</COMMENT>
         <SYMBOL ADDRESS="080fdfbc" NAME="caseD_11" NAMESPACE="switchD_080fdebc::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
         <SYMBOL ADDRESS="080fdfe2" NAME="default" NAMESPACE="switchD_080fdebc::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
         <SYMBOL ADDRESS="080fe2c0" NAME="_call_via_r1" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="080fe460" NAME="__udivsi3" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="080fe4d8" NAME="__umodsi3" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="08105d50" NAME="custom_code_1_logic_audio" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="08105d5c" NAME="cant_escape_logic_audio_branch" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="08105d6c" NAME="custom_code_2_text" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
@@ -7832,7 +7851,14 @@ and so on you get the idea</COMMENT>
         <SYMBOL ADDRESS="08373644" NAME="gTextOffsetTable" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="08373694" NAME="gTextTable" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="0837695a" NAME="text_you_got_the_[]_secret_disk" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="0838bbbc" NAME="DiskECrystalAmounts" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="085222a0" NAME="gBgMapOffsets" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="08547280" NAME="gGraphic_Capcom" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="0854728c" NAME="gPalette_Capcom" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="08547294" NAME="gGraphic_Inti" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
+        <SYMBOL ADDRESS="085472a0" NAME="gPalette_Inti" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="08560bc4" NAME="switchD" NAMESPACE="switchD_08560bc4::" TYPE="global" SOURCE_TYPE="ANALYSIS" PRIMARY="y" />
+        <SYMBOL ADDRESS="085d78f8" NAME="gStaticMotionGraphics" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="087fe0be" NAME="thunk_FUN_087fe752" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
         <SYMBOL ADDRESS="087fe198" NAME="thunk_FUN_087fdb60" NAMESPACE="" TYPE="global" SOURCE_TYPE="USER_DEFINED" PRIMARY="y" />
     </SYMBOL_TABLE>
@@ -8612,7 +8638,7 @@ and so on you get the idea</COMMENT>
             <ADDRESS_RANGE START="08004094" END="080040a5" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="080040a8" NAME="FUN_080040a8" LIBRARY_FUNCTION="n">
+        <FUNCTION ENTRY_POINT="080040a8" NAME="LoadBlink" LIBRARY_FUNCTION="n">
             <ADDRESS_RANGE START="080040a8" END="0800416f" />
             <ADDRESS_RANGE START="0800418c" END="080041d5" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
@@ -8747,7 +8773,7 @@ and so on you get the idea</COMMENT>
             <ADDRESS_RANGE START="080047d8" END="0800480b" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="08004818" NAME="FUN_08004818" LIBRARY_FUNCTION="n">
+        <FUNCTION ENTRY_POINT="08004818" NAME="ResetPivot" LIBRARY_FUNCTION="n">
             <ADDRESS_RANGE START="08004818" END="08004821" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
@@ -8836,13 +8862,13 @@ and so on you get the idea</COMMENT>
             <ADDRESS_RANGE START="08004efc" END="08004f81" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="08004f90" NAME="FUN_08004f90" LIBRARY_FUNCTION="n">
+        <FUNCTION ENTRY_POINT="08004f90" NAME="ResetTaskManager" LIBRARY_FUNCTION="n">
             <ADDRESS_RANGE START="08004f90" END="08004fc1" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x14" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0">
                 <STACK_VAR STACK_PTR_OFFSET="-0x14" NAME="local_14" DATATYPE="undefined4" DATATYPE_NAMESPACE="/" SIZE="0x4" />
             </STACK_FRAME>
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="08004fc8" NAME="FUN_08004fc8" LIBRARY_FUNCTION="n">
+        <FUNCTION ENTRY_POINT="08004fc8" NAME="SetTaskPivot" LIBRARY_FUNCTION="n">
             <ADDRESS_RANGE START="08004fc8" END="08004fd1" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
@@ -34119,7 +34145,7 @@ Part at the end is for e reader guys. gives crystals</REGULAR_CMT>
             <ADDRESS_RANGE START="080e5940" END="080e5961" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="080e5964" NAME="FUN_080e5964" LIBRARY_FUNCTION="n">
+        <FUNCTION ENTRY_POINT="080e5964" NAME="InitWidgetHeader" LIBRARY_FUNCTION="n">
             <ADDRESS_RANGE START="080e5964" END="080e596d" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x1c" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0">
                 <STACK_VAR STACK_PTR_OFFSET="-0x1c" NAME="local_1c" DATATYPE="undefined4" DATATYPE_NAMESPACE="/" SIZE="0x4" />
@@ -34164,7 +34190,7 @@ Part at the end is for e reader guys. gives crystals</REGULAR_CMT>
             <ADDRESS_RANGE START="080e5ed8" END="080e5f19" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="080e5f40" NAME="FUN_080e5f40" LIBRARY_FUNCTION="n">
+        <FUNCTION ENTRY_POINT="080e5f40" NAME="CreateMenuComp2" LIBRARY_FUNCTION="n">
             <ADDRESS_RANGE START="080e5f40" END="080e5f87" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
@@ -34290,7 +34316,7 @@ Part at the end is for e reader guys. gives crystals</REGULAR_CMT>
             <ADDRESS_RANGE START="080e6fc0" END="080e7069" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="080e7084" NAME="FUN_080e7084" LIBRARY_FUNCTION="n">
+        <FUNCTION ENTRY_POINT="080e7084" NAME="createMenuCursor" LIBRARY_FUNCTION="n">
             <ADDRESS_RANGE START="080e7084" END="080e70c7" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
@@ -34420,7 +34446,7 @@ Part at the end is for e reader guys. gives crystals</REGULAR_CMT>
             <ADDRESS_RANGE START="080e7cb0" END="080e7d09" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="080e7d24" NAME="FUN_080e7d24" LIBRARY_FUNCTION="n">
+        <FUNCTION ENTRY_POINT="080e7d24" NAME="createSecretDiskModalBorder" LIBRARY_FUNCTION="n">
             <ADDRESS_RANGE START="080e7d24" END="080e7d67" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
@@ -34561,9 +34587,14 @@ Part at the end is for e reader guys. gives crystals</REGULAR_CMT>
             <ADDRESS_RANGE START="080e95dc" END="080e9601" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="080e9604" NAME="render_text" LIBRARY_FUNCTION="n">
+        <FUNCTION ENTRY_POINT="080e9604" NAME="PrintString" LIBRARY_FUNCTION="n">
+            <RETURN_TYPE DATATYPE="void" DATATYPE_NAMESPACE="/" SIZE="0x0" />
             <ADDRESS_RANGE START="080e9604" END="080e9655" />
+            <TYPEINFO_CMT>void __stdcall PrintString(char_t * param_1, u32 param_2, u32 param_3)</TYPEINFO_CMT>
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
+            <REGISTER_VAR NAME="param_1" REGISTER="r0" DATATYPE="char_t *" DATATYPE_NAMESPACE="/types.h" />
+            <REGISTER_VAR NAME="param_2" REGISTER="r1" DATATYPE="u32" DATATYPE_NAMESPACE="/types.h" />
+            <REGISTER_VAR NAME="param_3" REGISTER="r2" DATATYPE="u32" DATATYPE_NAMESPACE="/types.h" />
         </FUNCTION>
         <FUNCTION ENTRY_POINT="080e9660" NAME="FUN_080e9660" LIBRARY_FUNCTION="n">
             <ADDRESS_RANGE START="080e9660" END="080e96bd" />
@@ -34766,18 +34797,21 @@ Part at the end is for e reader guys. gives crystals</REGULAR_CMT>
             <ADDRESS_RANGE START="080eb400" END="080eb407" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="080eb408" NAME="FUN_080eb408" LIBRARY_FUNCTION="n">
+        <FUNCTION ENTRY_POINT="080eb408" NAME="IntroLoop_CapcomInti" LIBRARY_FUNCTION="n">
+            <RETURN_TYPE DATATYPE="void" DATATYPE_NAMESPACE="/" SIZE="0x0" />
             <ADDRESS_RANGE START="080eb408" END="080eb41f" />
             <ADDRESS_RANGE START="080eb440" END="080eb5f9" />
+            <TYPEINFO_CMT>void __stdcall IntroLoop_CapcomInti(int param_1)</TYPEINFO_CMT>
             <STACK_FRAME LOCAL_VAR_SIZE="0x14" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0">
                 <STACK_VAR STACK_PTR_OFFSET="-0x14" NAME="local_14" DATATYPE="undefined4" DATATYPE_NAMESPACE="/" SIZE="0x4" />
             </STACK_FRAME>
+            <REGISTER_VAR NAME="param_1" REGISTER="r0" DATATYPE="int" DATATYPE_NAMESPACE="/" />
         </FUNCTION>
         <FUNCTION ENTRY_POINT="080eb634" NAME="FUN_080eb634" LIBRARY_FUNCTION="n">
             <ADDRESS_RANGE START="080eb634" END="080eb649" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="080eb64c" NAME="FUN_080eb64c" LIBRARY_FUNCTION="n">
+        <FUNCTION ENTRY_POINT="080eb64c" NAME="initGameSavedata" LIBRARY_FUNCTION="n">
             <ADDRESS_RANGE START="080eb64c" END="080eb683" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
@@ -35868,6 +35902,7 @@ Part at the end is for e reader guys. gives crystals</REGULAR_CMT>
             <REGISTER_VAR NAME="gamestate" REGISTER="r0" DATATYPE="GameState *" DATATYPE_NAMESPACE="/menu.h" />
         </FUNCTION>
         <FUNCTION ENTRY_POINT="080f7bf0" NAME="DiskLoop_Run" LIBRARY_FUNCTION="n">
+            <RETURN_TYPE DATATYPE="void" DATATYPE_NAMESPACE="/" SIZE="0x0" />
             <ADDRESS_RANGE START="080f7bf0" END="080f7c83" />
             <ADDRESS_RANGE START="080f7c9c" END="080f7d11" />
             <ADDRESS_RANGE START="080f7d1c" END="080f7d9f" />
@@ -35875,7 +35910,7 @@ Part at the end is for e reader guys. gives crystals</REGULAR_CMT>
             <ADDRESS_RANGE START="080f7dec" END="080f7e0f" />
             <ADDRESS_RANGE START="080f7e14" END="080f7e81" />
             <ADDRESS_RANGE START="080f7e94" END="080f7ec5" />
-            <TYPEINFO_CMT>undefined __stdcall DiskLoop_Run(GameState * gamestate)</TYPEINFO_CMT>
+            <TYPEINFO_CMT>void __stdcall DiskLoop_Run(GameState * gamestate)</TYPEINFO_CMT>
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
             <REGISTER_VAR NAME="gamestate" REGISTER="r0" DATATYPE="GameState *" DATATYPE_NAMESPACE="/menu.h" />
         </FUNCTION>
@@ -35905,33 +35940,44 @@ Part at the end is for e reader guys. gives crystals</REGULAR_CMT>
             <ADDRESS_RANGE START="080f8034" END="080f80cf" />
             <ADDRESS_RANGE START="080f80ec" END="080f8139" />
             <ADDRESS_RANGE START="080f8144" END="080f81b1" />
+            <TYPEINFO_CMT>undefined __stdcall setSecretDiskPalette(GameState * gamestate)</TYPEINFO_CMT>
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
+            <REGISTER_VAR NAME="gamestate" REGISTER="r0" DATATYPE="GameState *" DATATYPE_NAMESPACE="/menu.h" />
         </FUNCTION>
         <FUNCTION ENTRY_POINT="080f81b8" NAME="sd_analysis_080f81b8" LIBRARY_FUNCTION="n">
+            <RETURN_TYPE DATATYPE="void" DATATYPE_NAMESPACE="/" SIZE="0x0" />
             <ADDRESS_RANGE START="080f81b8" END="080f820b" />
             <ADDRESS_RANGE START="080f8210" END="080f8229" />
             <ADDRESS_RANGE START="080f8234" END="080f828b" />
             <ADDRESS_RANGE START="080f8290" END="080f830b" />
             <ADDRESS_RANGE START="080f8318" END="080f8331" />
+            <TYPEINFO_CMT>void __stdcall sd_analysis_080f81b8(GameState * gamestate)</TYPEINFO_CMT>
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
+            <REGISTER_VAR NAME="gamestate" REGISTER="r0" DATATYPE="GameState *" DATATYPE_NAMESPACE="/menu.h" />
         </FUNCTION>
         <FUNCTION ENTRY_POINT="080f8334" NAME="sd_analysis_80f8334" LIBRARY_FUNCTION="n">
+            <RETURN_TYPE DATATYPE="void" DATATYPE_NAMESPACE="/" SIZE="0x0" />
             <ADDRESS_RANGE START="080f8334" END="080f836f" />
             <ADDRESS_RANGE START="080f8378" END="080f83a3" />
             <ADDRESS_RANGE START="080f83a8" END="080f84b7" />
             <ADDRESS_RANGE START="080f84c8" END="080f8551" />
+            <TYPEINFO_CMT>void __stdcall sd_analysis_80f8334(GameState * gamestate)</TYPEINFO_CMT>
             <STACK_FRAME LOCAL_VAR_SIZE="0x30" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0">
                 <STACK_VAR STACK_PTR_OFFSET="-0x30" NAME="local_30" DATATYPE="undefined4" DATATYPE_NAMESPACE="/" SIZE="0x4" />
                 <STACK_VAR STACK_PTR_OFFSET="-0x2c" NAME="local_2c" DATATYPE="undefined4" DATATYPE_NAMESPACE="/" SIZE="0x4" />
                 <STACK_VAR STACK_PTR_OFFSET="-0x28" NAME="local_28" DATATYPE="undefined4" DATATYPE_NAMESPACE="/" SIZE="0x4" />
                 <STACK_VAR STACK_PTR_OFFSET="-0x24" NAME="local_24" DATATYPE="undefined4" DATATYPE_NAMESPACE="/" SIZE="0x4" />
             </STACK_FRAME>
+            <REGISTER_VAR NAME="gamestate" REGISTER="r0" DATATYPE="GameState *" DATATYPE_NAMESPACE="/menu.h" />
         </FUNCTION>
         <FUNCTION ENTRY_POINT="080f855c" NAME="sd_analysis_80f855c" LIBRARY_FUNCTION="n">
+            <RETURN_TYPE DATATYPE="void" DATATYPE_NAMESPACE="/" SIZE="0x0" />
             <ADDRESS_RANGE START="080f855c" END="080f858f" />
             <ADDRESS_RANGE START="080f8598" END="080f85c5" />
             <ADDRESS_RANGE START="080f85cc" END="080f85f5" />
+            <TYPEINFO_CMT>void __stdcall sd_analysis_80f855c(GameState * gamestate)</TYPEINFO_CMT>
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
+            <REGISTER_VAR NAME="gamestate" REGISTER="r0" DATATYPE="GameState *" DATATYPE_NAMESPACE="/menu.h" />
         </FUNCTION>
         <FUNCTION ENTRY_POINT="080f85fc" NAME="printThreeDigitNumber" LIBRARY_FUNCTION="n">
             <ADDRESS_RANGE START="080f85fc" END="080f8651" />
@@ -35942,7 +35988,11 @@ Part at the end is for e reader guys. gives crystals</REGULAR_CMT>
             <ADDRESS_RANGE START="080f86d4" END="080f8719" />
             <ADDRESS_RANGE START="080f8720" END="080f8739" />
             <ADDRESS_RANGE START="080f8740" END="080f8763" />
+            <TYPEINFO_CMT>undefined __stdcall openSecretDisk(GameState * gamestate, u8 diskID, undefined1 param_3)</TYPEINFO_CMT>
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
+            <REGISTER_VAR NAME="gamestate" REGISTER="r0" DATATYPE="GameState *" DATATYPE_NAMESPACE="/menu.h" />
+            <REGISTER_VAR NAME="diskID" REGISTER="r1" DATATYPE="u8" DATATYPE_NAMESPACE="/types.h" />
+            <REGISTER_VAR NAME="param_3" REGISTER="r2" DATATYPE="undefined1" DATATYPE_NAMESPACE="/" />
         </FUNCTION>
         <FUNCTION ENTRY_POINT="080f876c" NAME="clearSecretDiskData" LIBRARY_FUNCTION="n">
             <ADDRESS_RANGE START="080f876c" END="080f879d" />
@@ -36659,7 +36709,7 @@ Part at the end is for e reader guys. gives crystals</REGULAR_CMT>
             <ADDRESS_RANGE START="080fe390" END="080fe45d" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="080fe460" NAME="FUN_080fe460" LIBRARY_FUNCTION="n">
+        <FUNCTION ENTRY_POINT="080fe460" NAME="__udivsi3" LIBRARY_FUNCTION="n">
             <ADDRESS_RANGE START="080fe460" END="080fe495" />
             <ADDRESS_RANGE START="080fe4ce" END="080fe4d7" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
@@ -36669,7 +36719,7 @@ Part at the end is for e reader guys. gives crystals</REGULAR_CMT>
             <TYPEINFO_CMT>undefined FUN_080fe496(void)</TYPEINFO_CMT>
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
         </FUNCTION>
-        <FUNCTION ENTRY_POINT="080fe4d8" NAME="FUN_080fe4d8" LIBRARY_FUNCTION="n">
+        <FUNCTION ENTRY_POINT="080fe4d8" NAME="__umodsi3" LIBRARY_FUNCTION="n">
             <ADDRESS_RANGE START="080fe4d8" END="080fe50b" />
             <ADDRESS_RANGE START="080fe58e" END="080fe597" />
             <STACK_FRAME LOCAL_VAR_SIZE="0x0" PARAM_OFFSET="0x0" RETURN_ADDR_SIZE="0x0" />
