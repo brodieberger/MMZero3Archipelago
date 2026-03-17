@@ -99,6 +99,7 @@ class MMZero3World(World):
         }
 
     def set_rules(self) -> None:
+        
         set_rule(self.multiworld.get_entrance("To Abandoned Research Laboratory", self.player),
                     lambda state: state.has("Sub Arcadia Cleared", self.player))
         

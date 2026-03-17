@@ -38,7 +38,6 @@ def write_tokens(world: "MMZero3World", patch: MMZero3ProcedurePatch) -> None:
     leave_level_patch(patch)
     separate_inventory_patch(patch)
     disk_collection_npc_patch(patch)
-    disk_collection_item_patch(patch)
     disk_detection_loop(patch)
 
     patch.write_file("token_data.bin", patch.get_token_binary())
@@ -50,7 +49,7 @@ def general_changes_patch(patch: MMZero3ProcedurePatch) -> None:
         0x24B4B,
         bytes([0xE0]),
     )
-    # Make disks show up greyed out in mission complete screen.
+    # Make disks display as locked in mission complete screen.
     patch.write_token(
         APTokenTypes.WRITE,
         0xE78D0,
@@ -118,56 +117,35 @@ def leave_level_patch(patch: MMZero3ProcedurePatch) -> None:
     )
 
 def separate_inventory_patch(patch: MMZero3ProcedurePatch) -> None:
-    """Separates in game inventory (items collected by player) and Cervau inventory (items awarded by AP)"""
-    # Note: In RAM, there are two structs that store the players inventory. The first inventory is the disks the player has collected
-    # and what the player has opened using Cervau. After that block there is another struct that copies the first as a backup in case
-    # the player dies and needs to have their inventory wiped. This backup struct is overwritten here to be used for archipelago purposes.
+    """Separates in game inventory (items collected by player) and Cervau inventory (items awarded by AP)
     
-    # Changes pointers, makes Cervau use new inventory pointer which is stored in RAM.
+    Note: In RAM, there are two structs that store the players inventory. The first inventory is the disks the player has collected and what the player has opened using Cervau. After that block there is another struct that copies the first as a backup in case the player dies and needs to have their inventory wiped. This backup struct is overwritten here to be used for archipelago purposes."""
+    
+    # When disk analysis screen is opened, replace inventory pointer to AP inventory
     patch.write_token(
         APTokenTypes.WRITE,
-        0xF80D4,
-        bytes([0x80]),
+        0xF7976,
+        bytes([0x0E, 0xF0, 0x53, 0xFA]),
     )
 
     patch.write_token(
         APTokenTypes.WRITE,
-        0xF7C98,
-        bytes([0x80]),
+        0x105E20,
+        bytes([0x57, 0x46, 0x4E, 0x46, 0x02, 0x4D, 0x01, 0x4C, 0x25, 0x60, 0xF7, 0x46, 0x90, 0xDF, 0x03, 0x02, 0xE8, 0x71, 0x03, 0x02]),
+    )
+
+    # When disk analysis screen is closed, return to normal inventory pointer
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0xF7F42,
+        bytes([0x0D, 0xF0, 0x77, 0xFF]),
     )
 
     patch.write_token(
         APTokenTypes.WRITE,
-        0xF8314,
-        bytes([0x80]),
+        0x105e34,
+        bytes([0x04, 0x1C, 0x40, 0x20, 0x01, 0x49, 0x02, 0x4A, 0x0A, 0x60, 0xF7, 0x46, 0x90, 0xDF, 0x03, 0x02, 0xB8, 0x71, 0x03, 0x02]),
     )
-
-    patch.write_token(
-        APTokenTypes.WRITE,
-        0xF8370,
-        bytes([0x80]),
-    )
-
-    patch.write_token(
-        APTokenTypes.WRITE,
-        0xF86B4,
-        bytes([0x80]),
-    )
-
-    # Branches to custom code, to load the pointer
-    patch.write_token(
-        APTokenTypes.WRITE,
-        0xF8776,
-        bytes([0x0D, 0xF0, 0x53, 0xFB]),
-    )
-
-    # Writes the new pointer to RAM
-    patch.write_token(
-        APTokenTypes.WRITE,
-        0x105e20,
-        bytes([0x00, 0x25, 0x00, 0x95, 0x02, 0x48, 0x01, 0x4a, 0x10, 0x60, 0xf7, 0x46, 0x80, 0xdf, 0x03, 0x02, 0xe8, 0x71, 0x03, 0x02]),
-    )
-
 
     # No Ops branches that saves current inventory to back up inventory.
     patch.write_token(
@@ -195,93 +173,23 @@ def separate_inventory_patch(patch: MMZero3ProcedurePatch) -> None:
     )
 
 def disk_collection_npc_patch(patch: MMZero3ProcedurePatch) -> None:
-    """When player collects disk from NPC, send collected item to memory location"""
-
-    # Reroutes all NPC dialogues to custom code
+    """When player collects disk from NPC, record dialogue ID and save to RAM address 20371E6"""
+    
+    # Branch at the end of the dialogue function
     patch.write_token(
         APTokenTypes.WRITE,
-        0xD93DE,
-        bytes([0x2C, 0xF0, 0xE6, 0xFC]),
+        0xD971A,
+        bytes([0x2C, 0xF0, 0x48, 0xFB]),
     )
 
-    patch.write_token(
-        APTokenTypes.WRITE,
-        0xD9420,
-        bytes([0x2C, 0xF0, 0xC5, 0xFC]),
-    )
-
-    patch.write_token(
-        APTokenTypes.WRITE,
-        0xD945C,
-        bytes([0x2C, 0xF0, 0xA7, 0xFC]),
-    )
-
-    patch.write_token(
-        APTokenTypes.WRITE,
-        0xD949C,
-        bytes([0x2C, 0xF0, 0x87, 0xFC]),
-    )
-
-    patch.write_token(
-        APTokenTypes.WRITE,
-        0xD94DA,
-        bytes([0x2C, 0xF0, 0x68, 0xFC]),
-    )
-
-    patch.write_token(
-        APTokenTypes.WRITE,
-        0xD950E,
-        bytes([0x2C, 0xF0, 0x4E, 0xFC]),
-    )
-
-    patch.write_token(
-        APTokenTypes.WRITE,
-        0xD9540,
-        bytes([0x2C, 0xF0, 0x35, 0xFC]),
-    )
-
-    patch.write_token(
-        APTokenTypes.WRITE,
-        0xD9580,
-        bytes([0x2C, 0xF0, 0x15, 0xFC]),
-    )
-
-    patch.write_token(
-        APTokenTypes.WRITE,
-        0xD95B6,
-        bytes([0x2C, 0xF0, 0xFA, 0xFB]),
-    )
-
-    patch.write_token(
-        APTokenTypes.WRITE,
-        0xD95E8,
-        bytes([0x2C, 0xF0, 0xE1, 0xFB]),
-    )
-
-    # Places AP item into the correct RAM location. Located right after the secret disk struct
-    # Contains the item number (1-4) and offset.
+    # Record dialogue ID to memory address 20371E6 
     patch.write_token(
         APTokenTypes.WRITE,
         0x105DAE,
-        bytes([0x08, 0xB5, 0x09, 0x4B, 0x18, 0x70, 0x10, 0x43, 0x08, 0x70, 0x59, 0x70, 0x00, 0x00, 0x08, 0xbc, 0x00, 0xbd]),
+        bytes([0x68, 0x73, 0xA8, 0x73, 0x01, 0x48, 0x01, 0x80, 0xF7, 0x46, 0xE6, 0x71, 0x03, 0x02]),
     )
 
-def disk_collection_item_patch(patch: MMZero3ProcedurePatch) -> None:
-    """When player collects disk item, send collected item to memory location"""
 
-    # Reroutes to custom code on collecting disk
-    patch.write_token(
-        APTokenTypes.WRITE,
-        0xF889C,
-        bytes([0x0D, 0xF0, 0x90, 0xFA]),
-    )
-
-    # Places AP item into the correct RAM location. Located right after the secret disk struct
-    patch.write_token(
-        APTokenTypes.WRITE,
-        0x105DC0,
-        bytes([0x10, 0xB5, 0x05, 0x4C, 0x20, 0x70, 0x08, 0x43, 0x10, 0x70, 0x04, 0x49, 0x51, 0x1A, 0x62, 0x70, 0x00, 0x00, 0x10, 0xBC, 0x00, 0xBD, 0x70, 0x47, 0xE5, 0x71, 0x03, 0x02, 0xB8, 0x71, 0x03, 0x02]),
-    )
 
 def disk_detection_loop(patch: MMZero3ProcedurePatch) -> None:
     """On AP item retreival, play sound and display info box"""

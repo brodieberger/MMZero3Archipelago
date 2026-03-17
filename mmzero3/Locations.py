@@ -51,7 +51,6 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Resistance Base 174: Talk to Doigt - Mission Set 2": MMZero3LocationData(region="Resistance Base", address=174),
     "Resistance Base 175: Talk to Menart - Mission Set 1": MMZero3LocationData(region="Resistance Base", address=175),
     "Resistance Base 176: Near Pic": MMZero3LocationData(region="Resistance Base", address=176),
-    "Resistance Base 177: Right Room on 1st Floor": MMZero3LocationData(region="Resistance Base", address=177),
 
     "Derelict Spacecraft 133: 5th Grand Cannon Kill": MMZero3LocationData(region="Derelict Spacecraft", address=133),
     "Derelict Spacecraft 140: 3rd Shrimpolin Kill": MMZero3LocationData(region="Derelict Spacecraft", address=140),
