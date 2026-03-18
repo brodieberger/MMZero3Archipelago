@@ -22,8 +22,13 @@ class EasyExSkill(Toggle):
     """Give the player an S-Rank at the end of the level. Always gives EX-Skill. Note this can also make certain bosses harder, so don't consider this an easy mode!"""
     display_name = "Always have S-Rank"
 
+class RewardNotification(Toggle):
+    """Will notify the player of earned Archipelago items. Currently the text is very slow and screen obscuring, so not recommended."""
+    display_name = "In-game reward notification"
+
 @dataclass
 class MMZero3Options(PerGameCommonOptions):
     goal: Goal
     required_secret_disks: RequiredSecretDisks
     easy_ex_skill: EasyExSkill
+    reward_notification: RewardNotification
