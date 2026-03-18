@@ -15,7 +15,7 @@ class RequiredSecretDisks(Range):
     """Number of Secret Disks required to complete the game"""
     display_name = "Required Secret Disks"
     range_start = 0
-    range_end = 160
+    range_end = 180
     default = 80
 
 class EasyExSkill(Toggle):
