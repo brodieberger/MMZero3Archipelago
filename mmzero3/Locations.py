@@ -241,6 +241,34 @@ location_data_table: Dict[str, MMZero3LocationData] = {
         locked_item="Victory",
         address=196,
     ),
+
+    # Chips
+    "Collect Ice Body Chip": MMZero3LocationData(region="Oceanic Highway Ruins", address=197),
+    "Collect Thunder Body Chip": MMZero3LocationData(region="Weapons Repair Factory", address=198),
+    "Collect Flame Body Chip": MMZero3LocationData(region="Aegis Volcano Base", address=199),
+    "Collect Light Body Chip": MMZero3LocationData(region="Old Residential", address=200),
+    "Collect Absorber Body Chip": MMZero3LocationData(region="Giant Elevator", address=201),
+    "Collect Spike Foot Chip": MMZero3LocationData(region="Snowy Plains", address=202),
+    "Collect Quick Foot Chip": MMZero3LocationData(region="Area X-2", address=203),
+    "Collect Double Jump Foot Chip": MMZero3LocationData(region="Energy Facility", address=204),
+    "Collect Shadow Dash Foot Chip": MMZero3LocationData(region="Abandoned Research Laboratory", address=205),
+
+    # EX Skills
+    #"A+ Rank Clear: Derelict Spacecraft": MMZero3LocationData(region="Derelict Spacecraft", address=xxx), # no reward
+    "A+ Rank Clear: Aegis Volcano Base": MMZero3LocationData(region="Aegis Volcano Base", address=206),
+    "A+ Rank Clear: Oceanic Highway Ruins": MMZero3LocationData(region="Oceanic Highway Ruins", address=207),
+    "A+ Rank Clear: Weapons Repair Factory": MMZero3LocationData(region="Weapons Repair Factory", address=208),
+    "A+ Rank Clear: Old Residential": MMZero3LocationData(region="Old Residential", address=209),
+    #"A+ Rank Clear: Missile Factory": MMZero3LocationData(region="Missile Factory", address=xxx), # no reward
+    "A+ Rank Clear: Twilight Desert": MMZero3LocationData(region="Twilight Desert", address=210),
+    "A+ Rank Clear: Forest of Anatre": MMZero3LocationData(region="Forest of Anatre", address=211),
+    "A+ Rank Clear: Frontline Ice Base": MMZero3LocationData(region="Frontline Ice Base", address=212),
+    "A+ Rank Clear: Area X-2": MMZero3LocationData(region="Area X-2", address=213),
+    "A+ Rank Clear: Energy Facility": MMZero3LocationData(region="Energy Facility", address=214),
+    "A+ Rank Clear: Snowy Plains": MMZero3LocationData(region="Snowy Plains", address=215),
+    "A+ Rank Clear: Sunken Library": MMZero3LocationData(region="Sunken Library", address=216),
+    "A+ Rank Clear: Giant Elevator": MMZero3LocationData(region="Giant Elevator", address=217),
+    #"A+ Rank Clear: Sub Arcadia": MMZero3LocationData(region="Giant Elevator", address=xxx), # no reward
 }
 
 location_table = {name: data.address for name, data in location_data_table.items() if data.address is not None}
