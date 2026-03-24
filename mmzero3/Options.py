@@ -19,8 +19,8 @@ class RequiredSecretDisks(Range):
     default = 80
 
 class EasyExSkill(Toggle):
-    """Give the player an S-Rank at the end of the level. Always gives EX-Skill. Note this can also make certain bosses harder, so don't consider this an easy mode!"""
-    display_name = "Always have S-Rank"
+    """Rewards player with EX-Skill at the end of a level regardless of ranking. Currently recommended, as otherwise EXSkills are missable unless you load an earlier save or use savestates. This will be fixed later."""
+    display_name = "Always reward EX-Skill"
 
 class RewardNotification(Toggle):
     """Will notify the player of earned Archipelago items. Currently the text is very slow and screen obscuring, so not recommended."""
