@@ -3,11 +3,11 @@
 Welcome to my project. Things are still under heavy development, but here you will find my development of a custom Archipelago World for Mega Man Zero 3 on the GBA. You should probably read everything here so you know what to expect before playing!
 
 ## General Information
-- As of right now, the only thing randomized are the secret disks. Each one is a location check and an AP item.
+- As of right now, the only things randomized are the secret disks, armor chips, and EX Skills.
 
 - To beat the game, the player must defeat the final boss while collecting a configurable number of secret disks (default: 80). You can set this number using the required_secret_disks option in your YAML file.
 
-- There is another option to always give the player an S ranking. Remember that this will also give each boss a new attack, making the game harder.
+- EX Skills are awarded based on your score on the level you just completed, rather than on your average score going into that level. (Yes, that's how they worked in the vanilla game).
 
 - You can leave every level at will (Except for the opening level and first intermission). In the vanilla game, you would only escape levels that you have beaten previously. This change will be much more important later once the routing changes are implemented.
 
@@ -25,26 +25,27 @@ Welcome to my project. Things are still under heavy development, but here you wi
   Set the number of disks needed for completion. Default is 80, max is 180.
 
 - `easy_ex_skill`:  
-  Gives you S-Rank at the end of every stage, guaranteeing EX Skill rewards. Will make some bosses harder.
+  Always sends the EX Skill location check at the end of a level. Recommended, as EX Skills are currently missable without loading an earlier save or savestate.
 
 - `reward_notification`:
-  Items awarded to the player will be displayed in game through a message box at the bottom of the screen. This feature is optional, as of right now it is very slow and distracting. I will be improving this later, but the choice is there now if you want it.
+  Items awarded to the player will be displayed in game through a message box at the bottom of the screen. This feature is optional, as of right now, it is very slow and distracting. I will be improving this later, but the choice is there now if you want it.
 
 ## Known Bugs
 
-- Certain rewards given by NPCs require you to make the correct dialogue choices. Right now these are broken, and you will always receive the disk regardless of what you say. This will be fixed later.
+- Certain rewards given by NPCs require you to make the correct dialogue choices. Right now these are broken, and you will always receive the disk regardless of what you say.
 
-- There's a chance that I may have missed out on a few dialogue related rewards. If there are any issues please ping me in the discord!
+- EX Skills are currently missable. If you do not receive an 'A' rank or higher on a level that has an EX Skill check, there is no way to revisit that level without loading an earlier save or savestate. This will be fixed in a later update. Consider using the "Always reward EX-Skill" option for now.
 
-- Theres probably some more bugs especially with world generation; I haven't really tested this too much. Seriously please help out.
+- There's a chance that I may have missed out on a few dialogue related rewards. If there are any issues, please ping me in the discord!
+
+- There's probably some more bugs especially with world generation; I haven't done too much testing, so provide any feedback if something goes wrong!
 
 ## Planned Features
-- The primary planned feature is more routing changes. 
+- The primary planned feature is additional routing changes. 
   - Like how Mega Man 2 limits the available robot masters you could fight until you have the proper AP item, this world should likely do the same. 
-  - Limiting Zero's default abilities (wall climb, dash, charge attack, sword combo) like how Mario World does it can also work. Although it would require editing the first level, as it cannot be completed without wall climbing.
+  - Limiting Zero's default abilities (wall climb, dash, charge attack, sword combo) like how Mario World does it could also work. Although it would require editing the first level, as it cannot be completed without wall climbing.
 - Deathlink support.
 - Filler items (Energy Crystals, Health, Extra Lives). These are in the item pool but are currently unimplemented.
-- EX Skills as optional location checks.
 - Other collectables as location checks. Like static health pickups, extra lives, etc.
 - Level, enemy, or entrance randomization.
 
