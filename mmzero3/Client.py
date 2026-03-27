@@ -198,12 +198,12 @@ class MMZero3Client(BizHawkClient):
                         self.player_warned = True
                 # Logic for Vanilla
                 elif self.goal_type == 1:
-                        if level_data == b'\x10' and ctx.finished_game == False:
-                            await ctx.send_msgs([{
-                                "cmd": "Say", "text": "Final Stage Cleared! Game completed!"
-                                }])
-                            await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
-                        ctx.finished_game = True
+                    if level_data == b'\x10' and ctx.finished_game == False:
+                        await ctx.send_msgs([{
+                            "cmd": "Say", "text": "Final Stage Cleared! Game completed!"
+                            }])
+                        await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
+                    ctx.finished_game = True
                     
                 self.in_results_screen = True
 
@@ -240,7 +240,7 @@ class MMZero3Client(BizHawkClient):
                         [(0x0371E5, [item.item], "Combined WRAM")]
                     )
 
-                # If the item is an eReader bitflag item
+                # If the Disk is also an eReader bitflag item
                 if item.item >= 111 and item.item <= 140:
                     if item.item not in BIT_FLAGS:
                         continue
@@ -254,7 +254,7 @@ class MMZero3Client(BizHawkClient):
                     else:
                         self.eReader_bitflag_inventory[byte_index + 1] |= (mask >> 8)
 
-                # If the item is an eReader byte map item
+                # If the disk is also is an eReader byte map item
                 if item.item in BYTE_MAP:
                     addr, value = BYTE_MAP[item.item]
                     self.eReader_byte_map_inventory[addr - 0x02474] = value
