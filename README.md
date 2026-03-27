@@ -3,7 +3,7 @@
 Welcome to my project. Things are still under heavy development, but here you will find my development of a custom Archipelago World for Mega Man Zero 3 on the GBA. You should probably read everything here so you know what to expect before playing!
 
 ## General Information
-- As of right now, the only things randomized are the secret disks, armor chips, and EX Skills.
+- As of right now, the randomized items include: All secret disks, armor chips, and EX Skills, and subtanks.
 
 - To beat the game, the player must defeat the final boss while collecting a configurable number of secret disks (default: 80). You can set this number using the required_secret_disks option in your YAML file.
 
