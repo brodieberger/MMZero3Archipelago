@@ -106,7 +106,8 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Old Residential (6) 028: Box After Bombers": MMZero3LocationData(region="Old Residential", address=28),
     "Old Residential (7) 048: Top Right Secret Door": MMZero3LocationData(region="Old Residential", address=48),
     "Old Residential (8) 013: 2 Pits Left of Secret Door Exit": MMZero3LocationData(region="Old Residential", address=13),
-    
+    "Old Residential Subtank: Top Left after Pantheon Bombers": MMZero3LocationData(region="Old Residential", address=218),
+
     "Missile Factory 139: 4th Eye Cannon Kill": MMZero3LocationData(region="Missile Factory", address=139),
     "Missile Factory 127: 4th Pantheon Guardian Kill": MMZero3LocationData(region="Missile Factory", address=127),
     "Missile Factory 138: 4th Generator Cannon Kill": MMZero3LocationData(region="Missile Factory", address=138),
@@ -139,6 +140,7 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Forest of Anatre (6) 108: 8th Button Spike Pit": MMZero3LocationData(region="Forest of Anatre", address=108),
     "Forest of Anatre (7) 076: Above 9th Button": MMZero3LocationData(region="Forest of Anatre", address=76),
     "Forest of Anatre (8) 040: Breakables Below Boss Room": MMZero3LocationData(region="Forest of Anatre", address=40),
+    "Forest of Anatre Subtank: Climb Extending Wall": MMZero3LocationData(region="Forest of Anatre", address=219),
     
     "Frontline Ice Base 132: 3rd Gyro Cannon Kill": MMZero3LocationData(region="Frontline Ice Base", address=132),
     "Frontline Ice Base 128: 3rd Pantheon Aqua Kill": MMZero3LocationData(region="Frontline Ice Base", address=128),

@@ -40,7 +40,7 @@ def write_tokens(world: "MMZero3World", patch: MMZero3ProcedurePatch) -> None:
     disk_collection_npc_patch(patch)
     if world.options.reward_notification:
         disk_detection_loop(patch)
-    EXSkill_Chips_Patch(patch)
+    EXSkill_chips_patch(patch)
 
     patch.write_file("token_data.bin", patch.get_token_binary())
 
@@ -63,6 +63,13 @@ def general_changes_patch(patch: MMZero3ProcedurePatch) -> None:
         APTokenTypes.WRITE,
         0x236EE,
         bytes([0x00, 0x00]),
+    )
+
+    # Collecting subtanks no longer rewards them to the player, sets RAM address 0203733D to be 1/2 instead.
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0xe0882,
+        bytes([0x01,0x20,0x02,0x49, 0x08, 0x70, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0f, 0xe0, 0x3d, 0x73, 0x03, 0x02, 0xc0, 0xf5, 0x02, 0x02, 0x08, 0x28, 0x09, 0xd1, 0x02, 0x20, 0x03, 0x49, 0x08, 0x70, 0x05, 0xe0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3d, 0x73, 0x03, 0x02]),
     )
 
 def leave_level_patch(patch: MMZero3ProcedurePatch) -> None:
@@ -215,7 +222,7 @@ def disk_detection_loop(patch: MMZero3ProcedurePatch) -> None:
         bytes([0x00]),
     )
 
-def EXSkill_Chips_Patch(patch: MMZero3ProcedurePatch) -> None:
+def EXSkill_chips_patch(patch: MMZero3ProcedurePatch) -> None:
     """Prevents EXSkills and Chips from being rewarded by the game, so that they can be rewarded by Archipelago instead."""
     
     # NO OP Reward Chip
