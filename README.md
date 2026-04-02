@@ -3,7 +3,7 @@
 Welcome to my project. Things are still under heavy development, but here you will find my development of a custom Archipelago World for Mega Man Zero 3 on the GBA. You should probably read everything here so you know what to expect before playing!
 
 ## General Information
-- As of right now, the only things randomized are the secret disks, armor chips, and EX Skills.
+- As of right now, the randomized items include: All secret disks, armor chips, and EX Skills, and subtanks.
 
 - To beat the game, the player must defeat the final boss while collecting a configurable number of secret disks (default: 80). You can set this number using the required_secret_disks option in your YAML file.
 
@@ -41,9 +41,10 @@ Welcome to my project. Things are still under heavy development, but here you wi
 - There's probably some more bugs especially with world generation; I haven't done too much testing, so provide any feedback if something goes wrong!
 
 ## Planned Features
-- The primary planned feature is additional routing changes. 
+- Routing changes. 
   - Like how Mega Man 2 limits the available robot masters you could fight until you have the proper AP item, this world should likely do the same. 
   - Limiting Zero's default abilities (wall climb, dash, charge attack, sword combo) like how Mario World does it could also work. Although it would require editing the first level, as it cannot be completed without wall climbing.
+- All four available weapons added to the item pool.
 - Deathlink support.
 - Filler items (Energy Crystals, Health, Extra Lives). These are in the item pool but are currently unimplemented.
 - Other collectables as location checks. Like static health pickups, extra lives, etc.
