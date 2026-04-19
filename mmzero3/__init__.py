@@ -8,7 +8,7 @@ from .Items import MMZero3Item, item_data_table, item_table
 from .Locations import MMZero3Location, location_data_table, location_table, locked_locations
 from .Options import MMZero3Options
 from .Regions import region_data_table
-from .Rom import MMZero3ProcedurePatch, MMZero3Settings
+from .Rom import MMZero3ProcedurePatch, MMZero3Settings, write_tokens
 from .Client import MMZero3Client
 
 import pkgutil
@@ -19,7 +19,15 @@ from worlds.Files import APProcedurePatch
 class MMZero3WebWorld(WebWorld):
     theme = "ice"
     bug_report_page = "https://github.com/brodieberger/ZeroArchipelago/"
-
+    setup_en = Tutorial(
+        "Multiworld Setup Guide",
+        "A guide to setting up the Mega Man Zero 3 Randomizer connected to an Archipelago Multiworld.",
+        "English",
+        "setup_en.md",
+        "setup/en",
+        ["Stingrays110"]
+    )
+    tutorials = [setup_en]
 
 class MMZero3World(World):
     """
@@ -28,12 +36,10 @@ class MMZero3World(World):
 
     game = "Mega Man Zero 3"
     web = MMZero3WebWorld()
-    
-    settings_key = "MMZero3_settings"
-    settings: ClassVar[Rom.MMZero3Settings]
-
     options_dataclass = MMZero3Options
     options: MMZero3Options
+    settings_key = "MMZero3_settings"
+    settings: ClassVar[MMZero3Settings]
 
     item_name_to_id = item_table
     location_name_to_id = location_table
@@ -43,23 +49,22 @@ class MMZero3World(World):
 
     def create_items(self) -> None:
         item_pool: List[MMZero3Item] = []
-        
-        # Exclude locked items from the item pool
+
         locked_item_names = {data.locked_item for data in locked_locations.values() if data.locked_item}
-        
+
         for name, item in item_data_table.items():
             if item.code and item.can_create(self) and name not in locked_item_names:
                 item_pool.append(self.create_item(name))
 
-        # Add the items to the pool
         self.multiworld.itempool += item_pool
 
-        # Calculate how many filler items are needed
-        total_locations = len([loc for loc in location_data_table.values() if loc.can_create(self)])
-        total_items = len(item_pool) + len(locked_item_names)
-        filler_count = total_locations - total_items
+        # Count only the free (non-locked) locations that are actually created
+        free_location_count = len([
+            loc for loc in location_data_table.values()
+            if loc.can_create(self) and not loc.locked_item
+        ])
 
-        # Fill extra locations with filler items if needed
+        filler_count = free_location_count - len(item_pool)
         for _ in range(filler_count):
             self.multiworld.itempool.append(self.create_item(self.get_filler_item_name()))
 
@@ -139,11 +144,11 @@ class MMZero3World(World):
         self.multiworld.completion_condition[self.player] = lambda state: state.has("Victory", self.player)
         
     def generate_output(self, output_directory: str) -> None:
-        patch = Rom.MMZero3ProcedurePatch(player=self.player, player_name=self.player_name)
+        patch = MMZero3ProcedurePatch(player=self.player, player_name=self.player_name)
         patch.write_file("mmz3-ap.bsdiff4", pkgutil.get_data(__name__, "mmz3-ap.bsdiff4"))
-        Rom.write_tokens(self, patch)
+        write_tokens(self, patch)
         out_file_name = self.multiworld.get_out_file_name_base(self.player)
         patch.write(os.path.join(output_directory, f"{out_file_name}{patch.patch_file_ending}"))
 
-        from Utils import visualize_regions
-        visualize_regions(self.multiworld.get_region("Menu", self.player), "my_world.puml")
+        #from Utils import visualize_regions
+        #visualize_regions(self.multiworld.get_region("Menu", self.player), "my_world.puml")

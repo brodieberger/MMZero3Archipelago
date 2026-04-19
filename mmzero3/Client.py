@@ -295,10 +295,12 @@ class MMZero3Client(BizHawkClient):
     def get_items(self, ctx) -> bytearray:
         """Updates items collected by Zero based on ctx.checked_locations. Used in case of player using savestates. 
         Only lower nibble (found state) is updated. Upper nibble (opened state) is untouched."""
-
         inventory = bytearray(45)
 
         for location_id in ctx.checked_locations:
+            if location_id in {10, 16, 17}:
+                continue
+
             if 1 <= location_id <= 180:
                 item_index = location_id - 1
                 byte_index = item_index // 4

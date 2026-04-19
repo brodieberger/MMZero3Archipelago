@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from Options import Choice, Range, Toggle, PerGameCommonOptions
+from Options import Choice, Range, Toggle, OptionSet, PerGameCommonOptions
 
 class Goal(Choice):
     """

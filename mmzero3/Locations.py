@@ -30,27 +30,26 @@ stage_names = [
 location_data_table: Dict[str, MMZero3LocationData] = {
 
     # Certain dialogue options are only availible in certain game states and are missable. This will be fixed later.
-    "Resistance Base 023: Room 02D - Mission Set 2": MMZero3LocationData(region="Resistance Base", address=23),
-    "Resistance Base 044: Talk to Rocinolle - Mission Set 4": MMZero3LocationData(region="Resistance Base", address=44),
-    "Resistance Base 058: Talk to Right Tower Soldier - Mission Set 1": MMZero3LocationData(region="Resistance Base", address=58),
-    "Resistance Base 092: Talk to Cerveau - Mission Set 1": MMZero3LocationData(region="Resistance Base", address=92),
-    "Resistance Base 099: Room 03D": MMZero3LocationData(region="Resistance Base", address=99),
-    "Resistance Base 106: Left Corner of Rooftop": MMZero3LocationData(region="Resistance Base", address=106),
-    "Resistance Base 107: Talk to Andrew - Mission Set 2": MMZero3LocationData(region="Resistance Base", address=107),
-    "Resistance Base 116: Talk to Alouette - Mission Set 2": MMZero3LocationData(region="Resistance Base", address=116),
-    "Resistance Base 107: Talk to Andrew - Mission Set 2": MMZero3LocationData(region="Resistance Base", address=107),
-    "Resistance Base 165: Near Alouette": MMZero3LocationData(region="Resistance Base", address=165),
-    "Resistance Base 166: Near Cerveau": MMZero3LocationData(region="Resistance Base", address=166),
-    "Resistance Base 167: Talk to Rocinolle - Mission Set 1/2": MMZero3LocationData(region="Resistance Base", address=167),
-    "Resistance Base 168: 2nd Floor Hall": MMZero3LocationData(region="Resistance Base", address=168),
-    "Resistance Base 169: Talk to Hibou - Mission Set 2/3/4": MMZero3LocationData(region="Resistance Base", address=169),
-    "Resistance Base 170: Near Rocinolle": MMZero3LocationData(region="Resistance Base", address=170),
-    "Resistance Base 171: Left Room on 1st Floor": MMZero3LocationData(region="Resistance Base", address=171),
-    "Resistance Base 172: Right Room on 1st Floor": MMZero3LocationData(region="Resistance Base", address=172),
-    "Resistance Base 173: Talk to Hirondelle - Mission Set 2": MMZero3LocationData(region="Resistance Base", address=173),
-    "Resistance Base 174: Talk to Doigt - Mission Set 2": MMZero3LocationData(region="Resistance Base", address=174),
-    "Resistance Base 175: Talk to Menart - Mission Set 1": MMZero3LocationData(region="Resistance Base", address=175),
-    "Resistance Base 176: Near Pic": MMZero3LocationData(region="Resistance Base", address=176),
+    "Resistance Base 023: Room 02D - Mission Set 2": MMZero3LocationData(region="Resistance Base 2", address=23),
+    "Resistance Base 044: Talk to Rocinolle - Mission Set 4": MMZero3LocationData(region="Resistance Base 3", address=44),
+    "Resistance Base 058: Talk to Right Tower Soldier - Mission Set 1": MMZero3LocationData(region="Resistance Base 1", address=58),
+    "Resistance Base 092: Talk to Cerveau - Mission Set 1": MMZero3LocationData(region="Resistance Base 1", address=92),
+    "Resistance Base 099: Room 03D": MMZero3LocationData(region="Resistance Base 1", address=99),
+    "Resistance Base 106: Left Corner of Rooftop": MMZero3LocationData(region="Resistance Base 1", address=106),
+    "Resistance Base 107: Talk to Andrew - Mission Set 2": MMZero3LocationData(region="Resistance Base 2", address=107),
+    "Resistance Base 116: Talk to Alouette - Mission Set 2": MMZero3LocationData(region="Resistance Base 2", address=116),
+    "Resistance Base 165: Near Alouette": MMZero3LocationData(region="Resistance Base 1", address=165),
+    "Resistance Base 166: Near Cerveau": MMZero3LocationData(region="Resistance Base 1", address=166),
+    "Resistance Base 167: Talk to Rocinolle - Mission Set 1/2": MMZero3LocationData(region="Resistance Base 1", address=167),
+    "Resistance Base 168: 2nd Floor Hall": MMZero3LocationData(region="Resistance Base 1", address=168),
+    "Resistance Base 169: Talk to Hibou - Mission Set 2/3/4": MMZero3LocationData(region="Resistance Base 2", address=169),
+    "Resistance Base 170: Near Rocinolle": MMZero3LocationData(region="Resistance Base 1", address=170),
+    "Resistance Base 171: Left Room on 1st Floor": MMZero3LocationData(region="Resistance Base 1", address=171),
+    "Resistance Base 172: Right Room on 1st Floor": MMZero3LocationData(region="Resistance Base 1", address=172),
+    "Resistance Base 173: Talk to Hirondelle - Mission Set 2": MMZero3LocationData(region="Resistance Base 2", address=173),
+    "Resistance Base 174: Talk to Doigt - Mission Set 2": MMZero3LocationData(region="Resistance Base 2", address=174),
+    "Resistance Base 175: Talk to Menart - Mission Set 1": MMZero3LocationData(region="Resistance Base 1", address=175),
+    "Resistance Base 176: Near Pic": MMZero3LocationData(region="Resistance Base 1", address=176),
 
     "Derelict Spacecraft 133: 5th Grand Cannon Kill": MMZero3LocationData(region="Derelict Spacecraft", address=133),
     "Derelict Spacecraft 140: 3rd Shrimpolin Kill": MMZero3LocationData(region="Derelict Spacecraft", address=140),
@@ -106,7 +105,6 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Old Residential (6) 028: Box After Bombers": MMZero3LocationData(region="Old Residential", address=28),
     "Old Residential (7) 048: Top Right Secret Door": MMZero3LocationData(region="Old Residential", address=48),
     "Old Residential (8) 013: 2 Pits Left of Secret Door Exit": MMZero3LocationData(region="Old Residential", address=13),
-    "Old Residential Subtank: Top Left after Pantheon Bombers": MMZero3LocationData(region="Old Residential", address=218),
 
     "Missile Factory 139: 4th Eye Cannon Kill": MMZero3LocationData(region="Missile Factory", address=139),
     "Missile Factory 127: 4th Pantheon Guardian Kill": MMZero3LocationData(region="Missile Factory", address=127),
@@ -140,7 +138,6 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Forest of Anatre (6) 108: 8th Button Spike Pit": MMZero3LocationData(region="Forest of Anatre", address=108),
     "Forest of Anatre (7) 076: Above 9th Button": MMZero3LocationData(region="Forest of Anatre", address=76),
     "Forest of Anatre (8) 040: Breakables Below Boss Room": MMZero3LocationData(region="Forest of Anatre", address=40),
-    "Forest of Anatre Subtank: Climb Extending Wall": MMZero3LocationData(region="Forest of Anatre", address=219),
     
     "Frontline Ice Base 132: 3rd Gyro Cannon Kill": MMZero3LocationData(region="Frontline Ice Base", address=132),
     "Frontline Ice Base 128: 3rd Pantheon Aqua Kill": MMZero3LocationData(region="Frontline Ice Base", address=128),
@@ -176,6 +173,7 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Energy Facility (8) 004: Girder Maze Top Left": MMZero3LocationData(region="Energy Facility", address=4),
     
     "Snowy Plains 162: 4th Shellcrawler Kill": MMZero3LocationData(region="Snowy Plains", address=162),
+    "Snowy Plains 130: 4th Pantheon Base Kill": MMZero3LocationData(region="Snowy Plains", address=130),
     "Snowy Plains (1) 003: 2nd Slope Secret Wall": MMZero3LocationData(region="Snowy Plains", address=3),
     "Snowy Plains (2) 029: 1st Rail Set Start": MMZero3LocationData(region="Snowy Plains", address=29),
     "Snowy Plains (3) 025: 1st Rail Set Middle": MMZero3LocationData(region="Snowy Plains", address=25),
@@ -253,7 +251,7 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Collect Spike Foot Chip": MMZero3LocationData(region="Snowy Plains", address=202),
     "Collect Quick Foot Chip": MMZero3LocationData(region="Area X-2", address=203),
     "Collect Double Jump Foot Chip": MMZero3LocationData(region="Energy Facility", address=204),
-    "Collect Shadow Dash Foot Chip": MMZero3LocationData(region="Abandoned Research Laboratory", address=205),
+    "Collect Shadow Dash Foot Chip": MMZero3LocationData(region="Sunken Library", address=205),
 
     # EX Skills
     #"A+ Rank Clear: Derelict Spacecraft": MMZero3LocationData(region="Derelict Spacecraft", address=xxx), # no reward
@@ -271,6 +269,15 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "A+ Rank Clear: Sunken Library": MMZero3LocationData(region="Sunken Library", address=216),
     "A+ Rank Clear: Giant Elevator": MMZero3LocationData(region="Giant Elevator", address=217),
     #"A+ Rank Clear: Sub Arcadia": MMZero3LocationData(region="Giant Elevator", address=xxx), # no reward
+
+    # Sub Tanks
+    "Old Residential Subtank: Top Left after Pantheon Bombers": MMZero3LocationData(region="Old Residential", address=218),
+    "Forest of Anatre Subtank: Climb Extending Wall": MMZero3LocationData(region="Forest of Anatre", address=219),
+
+    # Weapons
+    #"Collect Recoil Rod": MMZero3LocationData(region="Resistance Base 1", address=220),
+    #"Collect Shield Boomerang": MMZero3LocationData(region="Resistance Base 1", address=221),
+
 }
 
 location_table = {name: data.address for name, data in location_data_table.items() if data.address is not None}

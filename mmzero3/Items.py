@@ -67,7 +67,7 @@ item_data_table: Dict[str, MMZero3ItemData] = {
     "Secret Disk 041: Ajiq (Large Heal)": MMZero3ItemData(code=41, type=ItemClassification.filler),
     "Secret Disk 042: Dobuq (Large Heal)": MMZero3ItemData(code=42, type=ItemClassification.filler),
     "Secret Disk 043: Mulaq (Large Heal)": MMZero3ItemData(code=43, type=ItemClassification.filler),
-    "Secret Disk 044: Mailla (Bullets to Health)": MMZero3ItemData(code=43, type=ItemClassification.useful),
+    "Secret Disk 044: Mailla (Bullets to Health)": MMZero3ItemData(code=44, type=ItemClassification.useful),
     "Secret Disk 045: Miulla (Bullets to Health)": MMZero3ItemData(code=45, type=ItemClassification.useful),
     "Secret Disk 046: Cloppe (Drops Health)": MMZero3ItemData(code=46, type=ItemClassification.useful),
     "Secret Disk 047: Sloppe (Drops Health)": MMZero3ItemData(code=47, type=ItemClassification.useful),
@@ -81,7 +81,7 @@ item_data_table: Dict[str, MMZero3ItemData] = {
     "Secret Disk 055: Pitaph (Slows Enemies)": MMZero3ItemData(code=55, type=ItemClassification.useful),
     "Secret Disk 056: Pitapuh (Slows Enemies)": MMZero3ItemData(code=56, type=ItemClassification.useful),
     "Secret Disk 057: Beetack (Direct Bullets)": MMZero3ItemData(code=57, type=ItemClassification.useful),
-    "Secret Disk 058: Beenipe (Direct Bullets)": MMZero3ItemData(code=57, type=ItemClassification.useful),
+    "Secret Disk 058: Beenipe (Direct Bullets)": MMZero3ItemData(code=58, type=ItemClassification.useful),
     "Secret Disk 059: Archim (Arcing Bullets)": MMZero3ItemData(code=59, type=ItemClassification.useful),
     "Secret Disk 060: Archil (Arcing Bullets)": MMZero3ItemData(code=60, type=ItemClassification.useful),
     "Secret Disk 061: Byse (Double Drop Value)": MMZero3ItemData(code=61, type=ItemClassification.useful),
@@ -253,6 +253,12 @@ item_data_table: Dict[str, MMZero3ItemData] = {
     # Other Items
     "Subtank #1": MMZero3ItemData(code=218, type=ItemClassification.progression),
     "Subtank #2": MMZero3ItemData(code=219, type=ItemClassification.progression),
+
+    # Weapons
+    #"Buster": MMZero3ItemData(code=220, type=ItemClassification.progression),
+    #"Z-Saber": MMZero3ItemData(code=221, type=ItemClassification.progression),
+    #"Recoil Rod": MMZero3ItemData(code=222, type=ItemClassification.progression),
+    #"Shield Boomerang": MMZero3ItemData(code=223, type=ItemClassification.progression),
 
     # Filler Items
     "100 Energy Crystals (Unimplemented)": MMZero3ItemData(
