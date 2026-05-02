@@ -81,6 +81,7 @@ class MMZero3Client(BizHawkClient):
                 cerveau_inv,
                 results_screen,
                 demo_screen,
+                foot_inv,
             ) = await bizhawk.read(ctx.bizhawk_ctx, [
                 (0x3DF94,  10, "Combined WRAM"),  # Disks found in level
                 (0x3733D,   1, "Combined WRAM"),  # Non-disk items found
@@ -89,16 +90,24 @@ class MMZero3Client(BizHawkClient):
                 (0x0371E8, 45, "Combined WRAM"),  # AP inventory (disk analysis screen)
                 (0x030165,  1, "Combined WRAM"),  # Results screen flag
                 (0x042AE2,  1, "Combined WRAM"),  # Demo screen flag
+                (0x03806D,  1, "Combined WRAM"),  # Foot chip inventory
             ])
             self.cerveau_inventory = bytearray(cerveau_inv)
+            self.foot_inventory = bytearray(foot_inv)
+
+            # Don't process anything while on the title/menu screen.
+            if level_data == b'\x00':
+                self.prev_level_value = b'\x00'
+                return
 
             # Will be changed to true if the gamestate needs to be synchronized.
             # Either on some update or the player changing stages.
             needs_sync = False
-            
-            # When the player loads into the hub or a level, it should sync the inventory
-            is_in_hub = level_data.hex() in ('11', '00')
-            if self.prev_level_value != is_in_hub:
+
+            # When the player transitions into the hub or a level, sync the inventory.
+            # Level 0x11 is the resistance base hub.
+            current_level = level_data.hex()
+            if self.prev_level_value != current_level:
                 needs_sync = True
 
             # Check if a disk was picked up in a level
@@ -272,19 +281,13 @@ class MMZero3Client(BizHawkClient):
                 # Foot Chips
                 if item.item in FOOT_CHIP_MAP:
                     byte_index, mask = FOOT_CHIP_MAP[item.item]
-
-                    self.foot_inventory = bytearray((await bizhawk.read(
-                        ctx.bizhawk_ctx,
-                        [(0x03806d, 1, "Combined WRAM")] 
-                    ))[0])
-
                     self.foot_inventory[byte_index] |= mask
 
             self.received_index = len(ctx.items_received)
 
             if needs_sync:
                 await self.sync_game_state(ctx)
-            self.prev_level_value = is_in_hub
+            self.prev_level_value = current_level
 
             self.disks_found = disks_found
             self.dialogue_id = dialogue_id
@@ -292,10 +295,14 @@ class MMZero3Client(BizHawkClient):
         except bizhawk.RequestFailedError:
             pass
 
-    def get_items(self, ctx) -> bytearray:
+    async def get_items(self, ctx) -> bytearray:
         """Updates items collected by Zero based on ctx.checked_locations. Used in case of player using savestates. 
         Only lower nibble (found state) is updated. Upper nibble (opened state) is untouched."""
-        inventory = bytearray(45)
+
+        inventory = bytearray((await bizhawk.read(
+                        ctx.bizhawk_ctx,
+                        [(0x0371B8, 45, "Combined WRAM")] 
+                    ))[0])
 
         for location_id in ctx.checked_locations:
             if location_id in {10, 16, 17}:
@@ -340,9 +347,11 @@ class MMZero3Client(BizHawkClient):
         Done whenever the player collects or receives an item, or transitions between stages."""
         self.in_results_screen = False
 
+        items_inventory = await self.get_items(ctx)
+
         await bizhawk.write(ctx.bizhawk_ctx, [
             (0x0371E8, list(self.cerveau_inventory),          "Combined WRAM"),  # Disk analysis inventory
-            (0x0371B8, list(self.get_items(ctx)),              "Combined WRAM"),  # Checked locations inventory
+            (0x0371B8, list(items_inventory),                 "Combined WRAM"),  # Checked locations inventory
             (0x02438,  list(self.eReader_bitflag_inventory),  "Combined WRAM"),  # eReader bitflags
             (0x02474,  self.eReader_byte_map_inventory,       "Combined WRAM"),  # eReader byte map
             (0x038068, self.ex_skill_inventory,               "Combined WRAM"),  # EX Skills
