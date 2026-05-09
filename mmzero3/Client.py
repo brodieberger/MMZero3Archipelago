@@ -12,6 +12,35 @@ if TYPE_CHECKING:
     from worlds._bizhawk.context import BizHawkClientContext
     from . import MMZero3World
 
+# ROM
+ROM_NAME_ADDR           = 0x0A0
+
+# Game state
+CURRENT_LEVEL_ADDR      = 0x030164
+RESULTS_SCREEN_ADDR     = 0x030165  # Also encodes level rank score on results screen
+DEMO_SCREEN_ADDR        = 0x042AE2
+
+# Item / location tracking
+DISKS_FOUND_ADDR        = 0x3DF94
+OTHER_ITEMS_FOUND_ADDR  = 0x3733D
+DIALOGUE_ID_ADDR        = 0x371E6
+ELF_FLAG_ADDR           = 0x3733C
+ITEM_NOTIFY_ADDR        = 0x0371E5
+
+# Inventories
+CERVEAU_INV_ADDR        = 0x0371E8
+CHECKED_LOCS_INV_ADDR   = 0x0371B8
+EREADER_BITFLAGS_ADDR   = 0x02438
+EREADER_BYTE_MAP_ADDR   = 0x02474
+EX_SKILLS_ADDR          = 0x038068
+BODY_INV_ADDR           = 0x03806C
+FOOT_INV_ADDR           = 0x03806D
+SUBTANK_1_ADDR          = 0x3805C
+SUBTANK_2_ADDR          = 0x3805D
+
+# Unused EWRAM address near the top of Combined WRAM (max 0x47FFF).
+SYNC_COUNTER_ADDR       = 0x37342
+
 class MMZero3Client(BizHawkClient):
     game = "Mega Man Zero 3"
     system = "GBA"
@@ -44,12 +73,12 @@ class MMZero3Client(BizHawkClient):
         self.ex_skill_inventory = bytearray(2)
         self.body_inventory = bytearray([0x01])
         self.foot_inventory = bytearray([0x01])
-    
+
 
     async def validate_rom(self, ctx: "BizHawkClientContext") -> bool:
         try:
             # Check ROM name/patch version
-            rom_name = ((await bizhawk.read(ctx.bizhawk_ctx, [(0x0a0, 12, "ROM")]))[0]).decode("ascii")
+            rom_name = ((await bizhawk.read(ctx.bizhawk_ctx, [(ROM_NAME_ADDR, 12, "ROM")]))[0]).decode("ascii")
             if rom_name != "MEGAMANZERO3":
                 return False  # Not a Mega Man Zero 3 ROM
         except bizhawk.RequestFailedError:
@@ -82,15 +111,17 @@ class MMZero3Client(BizHawkClient):
                 results_screen,
                 demo_screen,
                 foot_inv,
+                sync_counter,
             ) = await bizhawk.read(ctx.bizhawk_ctx, [
-                (0x3DF94,  10, "Combined WRAM"),  # Disks found in level
-                (0x3733D,   1, "Combined WRAM"),  # Non-disk items found
-                (0x371E6,   2, "Combined WRAM"),  # Most recent NPC dialogue
-                (0x030164,  1, "Combined WRAM"),  # Current level
-                (0x0371E8, 45, "Combined WRAM"),  # AP inventory (disk analysis screen)
-                (0x030165,  1, "Combined WRAM"),  # Results screen flag
-                (0x042AE2,  1, "Combined WRAM"),  # Demo screen flag
-                (0x03806D,  1, "Combined WRAM"),  # Foot chip inventory
+                (DISKS_FOUND_ADDR,       10, "Combined WRAM"),  # Disks found in level
+                (OTHER_ITEMS_FOUND_ADDR,  1, "Combined WRAM"),  # Non-disk items found
+                (DIALOGUE_ID_ADDR,        2, "Combined WRAM"),  # Most recent NPC dialogue
+                (CURRENT_LEVEL_ADDR,      1, "Combined WRAM"),  # Current level
+                (CERVEAU_INV_ADDR,       45, "Combined WRAM"),  # AP inventory (disk analysis screen)
+                (RESULTS_SCREEN_ADDR,     1, "Combined WRAM"),  # Results screen flag
+                (DEMO_SCREEN_ADDR,        1, "Combined WRAM"),  # Demo screen flag
+                (FOOT_INV_ADDR,           1, "Combined WRAM"),  # Foot chip inventory
+                (SYNC_COUNTER_ADDR,       2, "Combined WRAM"),  # AP sync counter
             ])
             self.cerveau_inventory = bytearray(cerveau_inv)
             self.foot_inventory = bytearray(foot_inv)
@@ -106,8 +137,15 @@ class MMZero3Client(BizHawkClient):
 
             # When the player transitions into the hub or a level, sync the inventory.
             # Level 0x11 is the resistance base hub.
-            current_level = level_data.hex()
-            if self.prev_level_value != current_level:
+            if self.prev_level_value != level_data:
+                #print("current level has been changed!")
+                needs_sync = True
+
+            # Force a sync if the counter doesn't match the server's item count.
+            # Catches desyncs from savestates without requiring a level transition.
+            if int.from_bytes(sync_counter, "little") != len(ctx.items_received):
+                #print("item count has been changed!")
+                #print(f"sync_counter: {(int.from_bytes(sync_counter, byteorder='little'))}")
                 needs_sync = True
 
             # Check if a disk was picked up in a level
@@ -135,17 +173,17 @@ class MMZero3Client(BizHawkClient):
                             "cmd": "LocationChecks",
                             "locations": [218]
                         }])
-                    
+
                 # Subtank 2 (Forest of Anatre)
                 elif (other_items_found == b'\x02'):
                     await ctx.send_msgs([{
                             "cmd": "LocationChecks",
                             "locations": [219]
                         }])
-                    
+
                 await bizhawk.write(
                     ctx.bizhawk_ctx,
-                    [(0x3733D, [0], "Combined WRAM")]
+                    [(OTHER_ITEMS_FOUND_ADDR, [0], "Combined WRAM")]
                 )
 
             # Check if an NPC has given a disk (or is talked to after their reward period is expired)
@@ -165,8 +203,8 @@ class MMZero3Client(BizHawkClient):
             # Check if the player has completed a level
             # TODO: This method of checking is prone to breaking using savestates
             if results_screen != b'\x00' and not self.in_results_screen:
-                current_level = int.from_bytes(level_data, byteorder='little')
-                location_id = LEVEL_TO_LOCATION.get(current_level)
+                level_id = int.from_bytes(level_data, byteorder='little')
+                location_id = LEVEL_TO_LOCATION.get(level_id)
 
                 if location_id:
 
@@ -174,20 +212,20 @@ class MMZero3Client(BizHawkClient):
                     await ctx.send_msgs([{
                         "cmd": "LocationChecks",
                         "locations": [location_id]
-                    }]) 
+                    }])
 
                     if LOCATION_TO_CHIP.get(location_id):
                         # Send necessary chip
                         await ctx.send_msgs([{
                             "cmd": "LocationChecks",
                             "locations": [LOCATION_TO_CHIP.get(location_id)]
-                        }]) 
-                    
+                        }])
+
                     if await self.should_reward_exskill(ctx) or self.easy_ex_skill == 1:
                         await ctx.send_msgs([{
                             "cmd": "LocationChecks",
                             "locations": [LOCATION_TO_EXSKILL.get(location_id)]
-                        }]) 
+                        }])
 
                 # Completion condition. Runs If the level that was finished was the last level
                 # Logic for Default game goal
@@ -213,7 +251,7 @@ class MMZero3Client(BizHawkClient):
                             }])
                         await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
                     ctx.finished_game = True
-                    
+
                 self.in_results_screen = True
 
             # Additional check to see if the player collected enough disks AFTER beating final stage. Only used in default game goal
@@ -227,6 +265,7 @@ class MMZero3Client(BizHawkClient):
             # Receive an item from AP
             for i in range(self.received_index, len(ctx.items_received)):
                 needs_sync = True
+                #print("Item received from AP!")
                 item = ctx.items_received[i]
 
                 # Disk items
@@ -246,7 +285,7 @@ class MMZero3Client(BizHawkClient):
                     # Send notification to player
                     await bizhawk.write(
                         ctx.bizhawk_ctx,
-                        [(0x0371E5, [item.item], "Combined WRAM")]
+                        [(ITEM_NOTIFY_ADDR, [item.item], "Combined WRAM")]
                     )
 
                 # If the Disk is also an eReader bitflag item
@@ -256,7 +295,7 @@ class MMZero3Client(BizHawkClient):
                     word_index, bit = BIT_FLAGS[item.item]
 
                     byte_index = word_index * 2
-                    mask = 1 << (bit - 1) 
+                    mask = 1 << (bit - 1)
 
                     if bit <= 8:
                         self.eReader_bitflag_inventory[byte_index]     |= mask
@@ -266,8 +305,8 @@ class MMZero3Client(BizHawkClient):
                 # If the disk is also is an eReader byte map item
                 if item.item in BYTE_MAP:
                     addr, value = BYTE_MAP[item.item]
-                    self.eReader_byte_map_inventory[addr - 0x02474] = value
-        
+                    self.eReader_byte_map_inventory[addr - EREADER_BYTE_MAP_ADDR] = value
+
                 # EX Skills
                 if item.item in EX_SKILL_MAP:
                     byte_index, mask = EX_SKILL_MAP[item.item]
@@ -284,10 +323,16 @@ class MMZero3Client(BizHawkClient):
                     self.foot_inventory[byte_index] |= mask
 
             self.received_index = len(ctx.items_received)
+            #print(f"sync_counter: {(int.from_bytes(sync_counter, byteorder='little'))}")
+            #print(f"self.recieved_index: {self.received_index}")
+            #print(f"self.recieved_index: {self.body_inventory}")
 
             if needs_sync:
                 await self.sync_game_state(ctx)
-            self.prev_level_value = current_level
+                await bizhawk.write(ctx.bizhawk_ctx, [
+                    (SYNC_COUNTER_ADDR, list(len(ctx.items_received).to_bytes(2, "little")), "Combined WRAM"),
+                ])
+            self.prev_level_value = level_data
 
             self.disks_found = disks_found
             self.dialogue_id = dialogue_id
@@ -296,12 +341,12 @@ class MMZero3Client(BizHawkClient):
             pass
 
     async def get_items(self, ctx) -> bytearray:
-        """Updates items collected by Zero based on ctx.checked_locations. Used in case of player using savestates. 
+        """Updates items collected by Zero based on ctx.checked_locations. Used in case of player using savestates.
         Only lower nibble (found state) is updated. Upper nibble (opened state) is untouched."""
 
         inventory = bytearray((await bizhawk.read(
                         ctx.bizhawk_ctx,
-                        [(0x0371B8, 45, "Combined WRAM")] 
+                        [(CHECKED_LOCS_INV_ADDR, 45, "Combined WRAM")]
                     ))[0])
 
         for location_id in ctx.checked_locations:
@@ -317,15 +362,15 @@ class MMZero3Client(BizHawkClient):
                 inventory[byte_index] |= (1 << bit_position)
 
         return inventory
-    
+
     async def should_reward_exskill(self, ctx) -> bool:
         """Determine if an EX Skill should be rewarded after a level."""
 
         level_rank, elf_flag = await bizhawk.read(
             ctx.bizhawk_ctx,
             [
-                (0x30165, 1, "Combined WRAM"),
-                (0x3733C, 1, "Combined WRAM"),
+                (RESULTS_SCREEN_ADDR, 1, "Combined WRAM"),
+                (ELF_FLAG_ADDR,       1, "Combined WRAM"),
             ]
         )
         if level_rank[0] > 85:
@@ -335,7 +380,7 @@ class MMZero3Client(BizHawkClient):
         if elf_flag[0] == 0x01:
             await bizhawk.write(
                 ctx.bizhawk_ctx,
-                [(0x3733C, [0], "Combined WRAM")]
+                [(ELF_FLAG_ADDR, [0], "Combined WRAM")]
             )
             return True
 
@@ -343,33 +388,35 @@ class MMZero3Client(BizHawkClient):
 
     async def sync_game_state(self, ctx) -> None:
         """Syncronizes the player's collected items and inventory in order to prevent desyncs when using savestates.
-        
+
         Done whenever the player collects or receives an item, or transitions between stages."""
+
+        #print("syncing!")
         self.in_results_screen = False
 
         items_inventory = await self.get_items(ctx)
 
         await bizhawk.write(ctx.bizhawk_ctx, [
-            (0x0371E8, list(self.cerveau_inventory),          "Combined WRAM"),  # Disk analysis inventory
-            (0x0371B8, list(items_inventory),                 "Combined WRAM"),  # Checked locations inventory
-            (0x02438,  list(self.eReader_bitflag_inventory),  "Combined WRAM"),  # eReader bitflags
-            (0x02474,  self.eReader_byte_map_inventory,       "Combined WRAM"),  # eReader byte map
-            (0x038068, self.ex_skill_inventory,               "Combined WRAM"),  # EX Skills
-            (0x03806C, self.body_inventory,                   "Combined WRAM"),  # Body chips
-            (0x03806D, self.foot_inventory,                   "Combined WRAM"),  # Foot chips
+            (CERVEAU_INV_ADDR,      list(self.cerveau_inventory),          "Combined WRAM"),  # Disk analysis inventory
+            (CHECKED_LOCS_INV_ADDR, list(items_inventory),                 "Combined WRAM"),  # Checked locations inventory
+            (EREADER_BITFLAGS_ADDR, list(self.eReader_bitflag_inventory),  "Combined WRAM"),  # eReader bitflags
+            (EREADER_BYTE_MAP_ADDR, self.eReader_byte_map_inventory,       "Combined WRAM"),  # eReader byte map
+            (EX_SKILLS_ADDR,        self.ex_skill_inventory,               "Combined WRAM"),  # EX Skills
+            (BODY_INV_ADDR,         self.body_inventory,                   "Combined WRAM"),  # Body chips
+            (FOOT_INV_ADDR,         self.foot_inventory,                   "Combined WRAM"),  # Foot chips
         ])
 
         # Update Subtanks
         received_item_ids = {item.item for item in ctx.items_received}
         tank_1, tank_2 = await bizhawk.read(ctx.bizhawk_ctx, [
-            (0x3805C, 1, "Combined WRAM"),
-            (0x3805D, 1, "Combined WRAM"),
+            (SUBTANK_1_ADDR, 1, "Combined WRAM"),
+            (SUBTANK_2_ADDR, 1, "Combined WRAM"),
         ])
 
         tank_writes = []
         if tank_1 == b'\xFF' and 218 in received_item_ids:
-            tank_writes.append((0x3805C, [0], "Combined WRAM"))
+            tank_writes.append((SUBTANK_1_ADDR, [0], "Combined WRAM"))
         if tank_2 == b'\xFF' and 219 in received_item_ids:
-            tank_writes.append((0x3805D, [0], "Combined WRAM"))
+            tank_writes.append((SUBTANK_2_ADDR, [0], "Combined WRAM"))
         if tank_writes:
             await bizhawk.write(ctx.bizhawk_ctx, tank_writes)
