@@ -41,6 +41,7 @@ def write_tokens(world: "MMZero3World", patch: MMZero3ProcedurePatch) -> None:
     if world.options.reward_notification:
         disk_detection_loop(patch)
     EXSkill_chips_patch(patch)
+    weapons_patch(patch)
 
     patch.write_file("token_data.bin", patch.get_token_binary())
 
@@ -92,6 +93,28 @@ def general_changes_patch(patch: MMZero3ProcedurePatch) -> None:
             0x00, 0x00,              # mov r0,r0
             0x3D, 0x73, 0x03, 0x02,  # PTR_gGameState.save.unused_240[9]_080e08ac: 0203733d
         ]),
+    )
+
+    # Branch on game start (to force sync)
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0x0B3CA,
+        bytes([0xFA,0xF0,0x77,0xFD]),
+    )
+
+    # 0x105EBC - 0x105ECB (16 bytes)
+    patch.write_token(
+    APTokenTypes.WRITE,
+    0x105EBC,
+    bytes([
+        0x02, 0x48,              # ldr r0,[0x08105ec8]
+        0x00, 0x70,              # strb r0,[r0,#0x0]
+        0x90, 0x20,              # mov r0,#0x90
+        0x40, 0x02,              # lsl r0,r0,#0x9
+        0xF7, 0x46,              # mov pc,lr
+        0x00, 0x00,              # mov r0,r0
+        0x42, 0x73, 0x03, 0x02,  # PTR_gGameState.save.unused_240[14]_08105ec8: 02037342
+    ]),
     )
 
 def leave_level_patch(patch: MMZero3ProcedurePatch) -> None:
@@ -338,7 +361,7 @@ def EXSkill_chips_patch(patch: MMZero3ProcedurePatch) -> None:
     patch.write_token(
         APTokenTypes.WRITE,
         0x2437C,
-        bytes([0x00,0x00,0x00,0x00]),
+        bytes([0x00,0xF0,0x00,0x00]),
     )
 
     # NO OP EX Skill
@@ -370,6 +393,123 @@ def EXSkill_chips_patch(patch: MMZero3ProcedurePatch) -> None:
             0x3C, 0x73, 0x03, 0x02,  # PTR_gGameState.save.unused_240[8]_08105dc8: 0203733c
         ]),
     )
+
+def weapons_patch(patch: MMZero3ProcedurePatch) -> None:
+    
+    # Branches from function that renders weapon icons
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0xE5A76,
+        bytes([0x20,0xF0,0xF9,0xF9]),
+    )
+
+    # Renders weapon icons as locked or unlocked based on AP items
+    # 0x105E6C - 0x105E97 (44 bytes)
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0x105E6C,
+        bytes([
+            0x02, 0xB5,              # push {r1,lr}
+            0xFF, 0x22,              # mov r2,#0xff
+            0x0A, 0x40,              # and r2,r1
+            0x08, 0x4B,              # ldr r3,[0x08105e94]
+            0x9B, 0x5C,              # ldrb r3,[r3,r2]
+            0x01, 0x2B,              # cmp r3,#0x1
+            0x05, 0xD0,              # beq 0x08105e86
+            0x02, 0xBC,              # pop {r1}
+            0x04, 0x49,              # ldr r1,[0x08105e90]
+            0x00, 0x00,              # mov r0,r0
+            0x11, 0xF7, 0x3E, 0xFC,  # bl 0x08017700
+            0x02, 0xE0,              # b 0x08105e8c
+            0x02, 0xBC,              # pop {r1}
+            0x11, 0xF7, 0x3A, 0xFC,  # bl 0x08017700
+            0x08, 0xBC,              # pop {r3}
+            0x18, 0x47,              # bx r3
+            0x06, 0x0E,              # WORD_08105e90: E06h
+            0x00,                    # 00h
+            0x00,                    # 00h
+            0x3E, 0x73, 0x03, 0x02,  # PTR_gGameState.save.unused_240[10]_08105e94: 0203733e
+        ]),
+    )
+
+
+    # Branches from main weapon selection function
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0xF4564,
+        bytes([0x11,0xF0,0x70,0xFC,0x02,0x20,0x00,0x00,0x00,0x00,0x43,0xe0]),
+    )
+
+    # Handles logic for selecting main weapon
+    # 0x105E48 - 0x105E6B (36 bytes)
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0x105E48,
+        bytes([
+            0x00, 0xB5,              # push {lr}
+            0x07, 0x48,              # ldr r0,[0x08105e68]
+            0x80, 0x5C,              # ldrb r0,[r0,r2]
+            0x01, 0x28,              # cmp r0,#0x1
+            0x05, 0xD1,              # bne 0x08105e5e
+            0x0A, 0x73,              # strb r2,[r1,#0xc]
+            0x02, 0x20,              # mov r0,#0x2
+            0xFE, 0xF6, 0x61, 0xFC,  # bl 0x0800471c
+            0x08, 0xBC,              # pop {r3}
+            0x18, 0x47,              # bx r3
+            0x03, 0x20,              # mov r0,#0x3
+            0xFE, 0xF6, 0x5C, 0xFC,  # bl 0x0800471c
+            0x08, 0xBC,              # pop {r3}
+            0x18, 0x47,              # bx r3
+            0x3E, 0x73, 0x03, 0x02,  # PTR_gGameState.save.unused_240[10]_08105e68: 0203733e
+        ]),
+    )
+
+    # Branches from sub weapon selection function. No Op other code.
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0xF46C0,
+        bytes([0x11,0xF0,0xEA,0xFB, 0x02, 0x20, 0x00, 0x00, 0x00, 0x00, 0x43, 0xe0]),
+    )
+
+    # Handles logic for selecting sub weapon
+    # 0x105E98 - 0x105EBB (36 bytes)
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0x105E98,
+        bytes([
+            0x00, 0xB5,              # push {lr}
+            0x07, 0x48,              # ldr r0,[0x08105eb8]
+            0x80, 0x5C,              # ldrb r0,[r0,r2]
+            0x01, 0x28,              # cmp r0,#0x1
+            0x05, 0xD1,              # bne 0x08105eae
+            0x4A, 0x73,              # strb r2,[r1,#0xd]
+            0x02, 0x20,              # mov r0,#0x2
+            0xFE, 0xF6, 0x39, 0xFC,  # bl 0x0800471c
+            0x08, 0xBC,              # pop {r3}
+            0x18, 0x47,              # bx r3
+            0x03, 0x20,              # mov r0,#0x3
+            0xFE, 0xF6, 0x34, 0xFC,  # bl 0x0800471c
+            0x08, 0xBC,              # pop {r3}
+            0x18, 0x47,              # bx r3
+            0x3E, 0x73, 0x03, 0x02,  # PTR_gGameState.save.unused_240[10]_08105eb8: 0203733e
+        ]),
+    )
+
+        # Branches from function that renders weapon icons
+    
+    # Makes all weapons collected by default
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0x322BC,
+        bytes([0x00,0x21]),
+    )
+    patch.write_token(
+        APTokenTypes.WRITE,
+        0x322DA,
+        bytes([0x0F,0x20]),
+    )
+
+    
 
 class MMZero3Settings(settings.Group):
     class MMZero3RomFile(settings.UserFilePath):

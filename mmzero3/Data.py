@@ -195,6 +195,13 @@ LOCATION_TO_EXSKILL = {
     194: 217
 }
 
+WEAPON_MAP = {
+    220: 0,  # Buster
+    221: 1,  # Z-Saber
+    222: 2,  # Recoil Rod
+    223: 3,  # Shield Boomerang
+}
+
 LOCATION_TO_CHIP = {
     182: 199,
     183: 197,

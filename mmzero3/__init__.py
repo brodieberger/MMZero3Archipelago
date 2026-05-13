@@ -100,7 +100,9 @@ class MMZero3World(World):
         return {
             "required_secret_disks": self.options.required_secret_disks.value,
             "goal": self.options.goal.value,
-            "easy_ex_skill": self.options.easy_ex_skill.value
+            "easy_ex_skill": self.options.easy_ex_skill.value,
+            "randomize_weapons": self.options.randomize_weapons.value,
+            "starting_weapons": list(self.options.starting_weapons.value),
         }
 
     def set_rules(self) -> None:

@@ -38,8 +38,9 @@ FOOT_INV_ADDR           = 0x03806D
 SUBTANK_1_ADDR          = 0x3805C
 SUBTANK_2_ADDR          = 0x3805D
 
-# Unused EWRAM address near the top of Combined WRAM (max 0x47FFF).
+# AP Related Counters
 SYNC_COUNTER_ADDR       = 0x37342
+WEAPONS_UNLOCKED_ADDR   = 0x3733E 
 
 class MMZero3Client(BizHawkClient):
     game = "Mega Man Zero 3"
@@ -59,6 +60,7 @@ class MMZero3Client(BizHawkClient):
         self.required_disks = 80
         self.goal_type = 0  # 0 is for default (kill boss with enough disks), 1 is vanilla (just kill the boss)
         self.easy_ex_skill = 0
+        self.randomize_weapons = 0
 
         # Item tracking
         self.received_index = 0
@@ -73,6 +75,7 @@ class MMZero3Client(BizHawkClient):
         self.ex_skill_inventory = bytearray(2)
         self.body_inventory = bytearray([0x01])
         self.foot_inventory = bytearray([0x01])
+        self.weapon_inventory = bytearray(4)  # 4 bytes, one per weapon: 1 = usable, 0 = locked
 
 
     async def validate_rom(self, ctx: "BizHawkClientContext") -> bool:
@@ -90,7 +93,6 @@ class MMZero3Client(BizHawkClient):
 
         return True
 
-    # TODO: This function could probably be split/optimized
     async def game_watcher(self, ctx: "BizHawkClientContext") -> None:
         try:
 
@@ -99,6 +101,16 @@ class MMZero3Client(BizHawkClient):
                 self.required_disks = ctx.slot_data.get("required_secret_disks", 80)
                 self.goal_type = ctx.slot_data.get("goal", 0)
                 self.easy_ex_skill = ctx.slot_data.get("easy_ex_skill", 0)
+                self.randomize_weapons = ctx.slot_data.get("randomize_weapons", 0)
+                starting_weapons = ctx.slot_data.get("starting_weapons", [])
+                weapon_name_to_index = {"Buster": 0, "Z-Saber": 1, "Recoil Rod": 2, "Shield Boomerang": 3}
+                if not self.randomize_weapons:
+                    self.weapon_inventory = bytearray([1, 1, 1, 1])
+                else:
+                    for weapon_name in starting_weapons:
+                        idx = weapon_name_to_index.get(weapon_name)
+                        if idx is not None:
+                            self.weapon_inventory[idx] = 1
                 self.options_set = True
 
             # Read game state
@@ -138,11 +150,11 @@ class MMZero3Client(BizHawkClient):
             # When the player transitions into the hub or a level, sync the inventory.
             # Level 0x11 is the resistance base hub.
             if self.prev_level_value != level_data:
-                #print("current level has been changed!")
                 needs_sync = True
 
             # Force a sync if the counter doesn't match the server's item count.
             # Catches desyncs from savestates without requiring a level transition.
+            # TODO use this as a way for the game itself to force a resync by setting it to 999 or something
             if int.from_bytes(sync_counter, "little") != len(ctx.items_received):
                 #print("item count has been changed!")
                 #print(f"sync_counter: {(int.from_bytes(sync_counter, byteorder='little'))}")
@@ -265,7 +277,6 @@ class MMZero3Client(BizHawkClient):
             # Receive an item from AP
             for i in range(self.received_index, len(ctx.items_received)):
                 needs_sync = True
-                #print("Item received from AP!")
                 item = ctx.items_received[i]
 
                 # Disk items
@@ -322,10 +333,11 @@ class MMZero3Client(BizHawkClient):
                     byte_index, mask = FOOT_CHIP_MAP[item.item]
                     self.foot_inventory[byte_index] |= mask
 
+                # Weapons
+                if item.item in WEAPON_MAP:
+                    self.weapon_inventory[WEAPON_MAP[item.item]] = 1
+
             self.received_index = len(ctx.items_received)
-            #print(f"sync_counter: {(int.from_bytes(sync_counter, byteorder='little'))}")
-            #print(f"self.recieved_index: {self.received_index}")
-            #print(f"self.recieved_index: {self.body_inventory}")
 
             if needs_sync:
                 await self.sync_game_state(ctx)
@@ -391,7 +403,6 @@ class MMZero3Client(BizHawkClient):
 
         Done whenever the player collects or receives an item, or transitions between stages."""
 
-        #print("syncing!")
         self.in_results_screen = False
 
         items_inventory = await self.get_items(ctx)
@@ -404,6 +415,7 @@ class MMZero3Client(BizHawkClient):
             (EX_SKILLS_ADDR,        self.ex_skill_inventory,               "Combined WRAM"),  # EX Skills
             (BODY_INV_ADDR,         self.body_inventory,                   "Combined WRAM"),  # Body chips
             (FOOT_INV_ADDR,         self.foot_inventory,                   "Combined WRAM"),  # Foot chips
+            (WEAPONS_UNLOCKED_ADDR, list(self.weapon_inventory),           "Combined WRAM"),  # Weapons
         ])
 
         # Update Subtanks

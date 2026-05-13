@@ -255,10 +255,26 @@ item_data_table: Dict[str, MMZero3ItemData] = {
     "Subtank #2": MMZero3ItemData(code=219, type=ItemClassification.progression),
 
     # Weapons
-    #"Buster": MMZero3ItemData(code=220, type=ItemClassification.progression),
-    #"Z-Saber": MMZero3ItemData(code=221, type=ItemClassification.progression),
-    #"Recoil Rod": MMZero3ItemData(code=222, type=ItemClassification.progression),
-    #"Shield Boomerang": MMZero3ItemData(code=223, type=ItemClassification.progression),
+    "Buster": MMZero3ItemData(
+        code=220,
+        type=ItemClassification.progression,
+        can_create=lambda world, n="Buster": bool(world.options.randomize_weapons) and n not in world.options.starting_weapons.value,
+    ),
+    "Z-Saber": MMZero3ItemData(
+        code=221,
+        type=ItemClassification.progression,
+        can_create=lambda world, n="Z-Saber": bool(world.options.randomize_weapons) and n not in world.options.starting_weapons.value,
+    ),
+    "Recoil Rod": MMZero3ItemData(
+        code=222,
+        type=ItemClassification.progression,
+        can_create=lambda world, n="Recoil Rod": bool(world.options.randomize_weapons) and n not in world.options.starting_weapons.value,
+    ),
+    "Shield Boomerang": MMZero3ItemData(
+        code=223,
+        type=ItemClassification.progression,
+        can_create=lambda world, n="Shield Boomerang": bool(world.options.randomize_weapons) and n not in world.options.starting_weapons.value,
+    ),
 
     # Filler Items
     "100 Energy Crystals (Unimplemented)": MMZero3ItemData(
