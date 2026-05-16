@@ -228,12 +228,12 @@ item_data_table: Dict[str, MMZero3ItemData] = {
     # Chips
     "Ice Body Chip": MMZero3ItemData(code=197, type=ItemClassification.useful),
     "Thunder Body Chip": MMZero3ItemData(code=198, type=ItemClassification.useful),
-    "Flame Body Chip": MMZero3ItemData(code=199, type=ItemClassification.useful),
+    "Flame Body Chip": MMZero3ItemData(code=199, type=ItemClassification.progression),
     "Light Body Chip": MMZero3ItemData(code=200, type=ItemClassification.useful),
     "Absorber Body Chip": MMZero3ItemData(code=201, type=ItemClassification.useful),
     "Spike Foot Chip": MMZero3ItemData(code=202, type=ItemClassification.useful),
     "Quick Foot Chip": MMZero3ItemData(code=203, type=ItemClassification.useful),
-    "Double Jump Foot Chip": MMZero3ItemData(code=204, type=ItemClassification.useful),
+    "Double Jump Foot Chip": MMZero3ItemData(code=204, type=ItemClassification.progression),
     "Shadow Dash Foot Chip": MMZero3ItemData(code=205, type=ItemClassification.useful),
 
     # EX Skills

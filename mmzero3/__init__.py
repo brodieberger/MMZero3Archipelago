@@ -106,7 +106,16 @@ class MMZero3World(World):
         }
 
     def set_rules(self) -> None:
-        
+
+        def has_rod(state):
+            return state.has("Recoil Rod", self.player) or not self.options.randomize_weapons
+
+        def has_mobility(state):
+            return state.has("Double Jump Foot Chip", self.player) or has_rod(state)
+
+        def has_flame(state):
+            return state.has("Flame Body Chip", self.player)
+
         set_rule(self.multiworld.get_entrance("To Abandoned Research Laboratory", self.player),
                     lambda state: state.has("Sub Arcadia Cleared", self.player))
         
@@ -141,6 +150,46 @@ class MMZero3World(World):
                         
         set_rule(self.multiworld.get_location("Complete Abandoned Research Laboratory", self.player),
                     lambda state: state.can_reach_region("Abandoned Research Laboratory", self.player))
+
+        # Location rules: Recoil Rod required
+        for loc_name in [
+            "Aegis Volcano Base (4) 114: Push 1st Container",
+            "Weapons Repair Factory (2) 115: Hit 3rd Hammer",
+            "Old Residential (1) 039: 1st Door",
+            "Old Residential (3) 112: Floor Breakables",
+            "Forest of Anatre (8) 040: Breakables Below Boss Room",
+            "Giant Elevator (2) 041: 1st Passage High Ledges",
+            "Giant Elevator (6) 027: 1st Descent Bottom Left Breakable",
+        ]:
+            add_rule(self.multiworld.get_location(loc_name, self.player), has_rod)
+
+        # Location rules: Mobility required (Double Jump or Recoil Rod)
+        for loc_name in [
+            "Aegis Volcano Base (3) 026: Platform Above First Room",
+            "Old Residential Subtank: Top Left after Pantheon Bombers",
+            "Forest of Anatre (7) 076: Above 9th Button",
+        ]:
+            add_rule(self.multiworld.get_location(loc_name, self.player), has_mobility)
+
+        # Location rules: Flame Body Chip required
+        for loc_name in [
+            "Old Residential (4) 074: Left Fork Door",
+            "Forest of Anatre (1) 063: Treetops Above Start",
+            "Forest of Anatre (2) 002: Ledge Above 1st Door",
+        ]:
+            add_rule(self.multiworld.get_location(loc_name, self.player), has_flame)
+
+        # Flame Body Chip + Recoil Rod
+        add_rule(self.multiworld.get_location("Old Residential (2) 001: Stump Door", self.player),
+                 lambda state: has_flame(state) and has_rod(state))
+
+        # Recoil Rod + Mobility (Rod + (Double Jump or Rod) = Rod)
+        add_rule(self.multiworld.get_location("Aegis Volcano Base (5) 073: Container Before Miniboss, Platform After", self.player),
+                 lambda state: has_rod(state) and has_mobility(state))
+
+        # Double Mobility: Double Jump Foot Chip + Recoil Rod
+        add_rule(self.multiworld.get_location("Giant Elevator (1) 045: 1st Passage High Ledges", self.player),
+                 lambda state: state.has("Double Jump Foot Chip", self.player) and has_rod(state))
 
         # Completion condition
         self.multiworld.completion_condition[self.player] = lambda state: state.has("Victory", self.player)

@@ -18,7 +18,7 @@ ROM_NAME_ADDR           = 0x0A0
 # Game state
 CURRENT_LEVEL_ADDR      = 0x030164
 RESULTS_SCREEN_ADDR     = 0x030165  # Also encodes level rank score on results screen
-DEMO_SCREEN_ADDR        = 0x042AE2
+DEMO_SCREEN_ADDR        = 0x02AE2
 
 # Item / location tracking
 DISKS_FOUND_ADDR        = 0x3DF94
@@ -131,7 +131,7 @@ class MMZero3Client(BizHawkClient):
                 (CURRENT_LEVEL_ADDR,      1, "Combined WRAM"),  # Current level
                 (CERVEAU_INV_ADDR,       45, "Combined WRAM"),  # AP inventory (disk analysis screen)
                 (RESULTS_SCREEN_ADDR,     1, "Combined WRAM"),  # Results screen flag
-                (DEMO_SCREEN_ADDR,        1, "Combined WRAM"),  # Demo screen flag
+                (DEMO_SCREEN_ADDR,        1, "IWRAM"),           # Demo screen flag
                 (FOOT_INV_ADDR,           1, "Combined WRAM"),  # Foot chip inventory
                 (SYNC_COUNTER_ADDR,       2, "Combined WRAM"),  # AP sync counter
             ])
@@ -426,9 +426,9 @@ class MMZero3Client(BizHawkClient):
         ])
 
         tank_writes = []
-        if tank_1 == b'\xFF' and 218 in received_item_ids:
+        if tank_1 == b'\xFF' and 221 in received_item_ids:
             tank_writes.append((SUBTANK_1_ADDR, [0], "Combined WRAM"))
-        if tank_2 == b'\xFF' and 219 in received_item_ids:
+        if tank_2 == b'\xFF' and 222 in received_item_ids:
             tank_writes.append((SUBTANK_2_ADDR, [0], "Combined WRAM"))
         if tank_writes:
             await bizhawk.write(ctx.bizhawk_ctx, tank_writes)

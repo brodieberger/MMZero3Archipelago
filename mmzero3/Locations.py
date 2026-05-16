@@ -227,14 +227,21 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Abandoned Research Laboratory (8) 179: Final Section Box": MMZero3LocationData(region="Abandoned Research Laboratory", address=179),
     "Abandoned Research Laboratory (9) 011: Final Section Box": MMZero3LocationData(region="Abandoned Research Laboratory", address=11),
 
-    **{
-        f"Complete {stage}": MMZero3LocationData(
-            region=f"{stage}",
-            locked_item=f"{stage} Cleared",
-            address=180 + idx + 1,
-        )
-        for idx, stage in enumerate(stage_names)
-    },
+    "Complete Derelict Spacecraft": MMZero3LocationData(region="Derelict Spacecraft", locked_item="Derelict Spacecraft Cleared", address=181),
+    "Complete Aegis Volcano Base": MMZero3LocationData(region="Aegis Volcano Base", locked_item="Aegis Volcano Base Cleared", address=182),
+    "Complete Oceanic Highway Ruins": MMZero3LocationData(region="Oceanic Highway Ruins", locked_item="Oceanic Highway Ruins Cleared", address=183),
+    "Complete Weapons Repair Factory": MMZero3LocationData(region="Weapons Repair Factory", locked_item="Weapons Repair Factory Cleared", address=184),
+    "Complete Old Residential": MMZero3LocationData(region="Old Residential", locked_item="Old Residential Cleared", address=185),
+    "Complete Missile Factory": MMZero3LocationData(region="Missile Factory", locked_item="Missile Factory Cleared", address=186),
+    "Complete Twilight Desert": MMZero3LocationData(region="Twilight Desert", locked_item="Twilight Desert Cleared", address=187),
+    "Complete Forest of Anatre": MMZero3LocationData(region="Forest of Anatre", locked_item="Forest of Anatre Cleared", address=188),
+    "Complete Frontline Ice Base": MMZero3LocationData(region="Frontline Ice Base", locked_item="Frontline Ice Base Cleared", address=189),
+    "Complete Area X-2": MMZero3LocationData(region="Area X-2", locked_item="Area X-2 Cleared", address=190),
+    "Complete Energy Facility": MMZero3LocationData(region="Energy Facility", locked_item="Energy Facility Cleared", address=191),
+    "Complete Snowy Plains": MMZero3LocationData(region="Snowy Plains", locked_item="Snowy Plains Cleared", address=192),
+    "Complete Sunken Library": MMZero3LocationData(region="Sunken Library", locked_item="Sunken Library Cleared", address=193),
+    "Complete Giant Elevator": MMZero3LocationData(region="Giant Elevator", locked_item="Giant Elevator Cleared", address=194),
+    "Complete Sub Arcadia": MMZero3LocationData(region="Sub Arcadia", locked_item="Sub Arcadia Cleared", address=195),
 
     "Complete Abandoned Research Laboratory": MMZero3LocationData(
         region="Abandoned Research Laboratory",
@@ -254,25 +261,25 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Collect Shadow Dash Foot Chip": MMZero3LocationData(region="Sunken Library", address=205),
 
     # EX Skills
-    #"A+ Rank Clear: Derelict Spacecraft": MMZero3LocationData(region="Derelict Spacecraft", address=xxx), # no reward
-    "A+ Rank Clear: Aegis Volcano Base": MMZero3LocationData(region="Aegis Volcano Base", address=206),
-    "A+ Rank Clear: Oceanic Highway Ruins": MMZero3LocationData(region="Oceanic Highway Ruins", address=207),
-    "A+ Rank Clear: Weapons Repair Factory": MMZero3LocationData(region="Weapons Repair Factory", address=208),
-    "A+ Rank Clear: Old Residential": MMZero3LocationData(region="Old Residential", address=209),
-    #"A+ Rank Clear: Missile Factory": MMZero3LocationData(region="Missile Factory", address=xxx), # no reward
-    "A+ Rank Clear: Twilight Desert": MMZero3LocationData(region="Twilight Desert", address=210),
-    "A+ Rank Clear: Forest of Anatre": MMZero3LocationData(region="Forest of Anatre", address=211),
-    "A+ Rank Clear: Frontline Ice Base": MMZero3LocationData(region="Frontline Ice Base", address=212),
-    "A+ Rank Clear: Area X-2": MMZero3LocationData(region="Area X-2", address=213),
-    "A+ Rank Clear: Energy Facility": MMZero3LocationData(region="Energy Facility", address=214),
-    "A+ Rank Clear: Snowy Plains": MMZero3LocationData(region="Snowy Plains", address=215),
-    "A+ Rank Clear: Sunken Library": MMZero3LocationData(region="Sunken Library", address=216),
-    "A+ Rank Clear: Giant Elevator": MMZero3LocationData(region="Giant Elevator", address=217),
-    #"A+ Rank Clear: Sub Arcadia": MMZero3LocationData(region="Giant Elevator", address=xxx), # no reward
+    "A+ Rank Clear: Derelict Spacecraft": MMZero3LocationData(region="Derelict Spacecraft", address=206),
+    "A+ Rank Clear: Aegis Volcano Base": MMZero3LocationData(region="Aegis Volcano Base", address=207),
+    "A+ Rank Clear: Oceanic Highway Ruins": MMZero3LocationData(region="Oceanic Highway Ruins", address=208),
+    "A+ Rank Clear: Weapons Repair Factory": MMZero3LocationData(region="Weapons Repair Factory", address=209),
+    "A+ Rank Clear: Old Residential": MMZero3LocationData(region="Old Residential", address=210),
+    "A+ Rank Clear: Missile Factory": MMZero3LocationData(region="Missile Factory", address=211),
+    "A+ Rank Clear: Twilight Desert": MMZero3LocationData(region="Twilight Desert", address=212),
+    "A+ Rank Clear: Forest of Anatre": MMZero3LocationData(region="Forest of Anatre", address=213),
+    "A+ Rank Clear: Frontline Ice Base": MMZero3LocationData(region="Frontline Ice Base", address=214),
+    "A+ Rank Clear: Area X-2": MMZero3LocationData(region="Area X-2", address=215),
+    "A+ Rank Clear: Energy Facility": MMZero3LocationData(region="Energy Facility", address=216),
+    "A+ Rank Clear: Snowy Plains": MMZero3LocationData(region="Snowy Plains", address=217),
+    "A+ Rank Clear: Sunken Library": MMZero3LocationData(region="Sunken Library", address=218),
+    "A+ Rank Clear: Giant Elevator": MMZero3LocationData(region="Giant Elevator", address=219),
+    "A+ Rank Clear: Sub Arcadia": MMZero3LocationData(region="Giant Elevator", address=220),
 
     # Sub Tanks
-    "Old Residential Subtank: Top Left after Pantheon Bombers": MMZero3LocationData(region="Old Residential", address=218),
-    "Forest of Anatre Subtank: Climb Extending Wall": MMZero3LocationData(region="Forest of Anatre", address=219),
+    "Old Residential Subtank: Top Left after Pantheon Bombers": MMZero3LocationData(region="Old Residential", address=221),
+    "Forest of Anatre Subtank: Climb Extending Wall": MMZero3LocationData(region="Forest of Anatre", address=222),
 
     # Weapons
     #"Collect Recoil Rod": MMZero3LocationData(region="Resistance Base 1", address=220),
