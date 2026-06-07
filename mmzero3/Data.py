@@ -199,11 +199,18 @@ LOCATION_TO_EXSKILL = {
     195: 220
 }
 
+# Other stuff
+ITEM_SUBTANK_1 = 221
+ITEM_SUBTANK_2 = 222
+
+LOC_SUBTANK_1 = 221
+LOC_SUBTANK_2 = 222
+
 WEAPON_MAP = {
-    220: 0,  # Buster
-    221: 1,  # Z-Saber
-    222: 2,  # Recoil Rod
-    223: 3,  # Shield Boomerang
+    224: 0,  # Buster
+    225: 1,  # Z-Saber
+    226: 2,  # Recoil Rod
+    227: 3,  # Shield Boomerang
 }
 
 LOCATION_TO_CHIP = {

@@ -251,27 +251,27 @@ item_data_table: Dict[str, MMZero3ItemData] = {
     "EX Skill: Gale Attack": MMZero3ItemData(code=217, type=ItemClassification.useful),
 
     # Other Items
-    "Subtank #1": MMZero3ItemData(code=218, type=ItemClassification.progression),
-    "Subtank #2": MMZero3ItemData(code=219, type=ItemClassification.progression),
+    "Subtank #1": MMZero3ItemData(code=221, type=ItemClassification.progression),
+    "Subtank #2": MMZero3ItemData(code=222, type=ItemClassification.progression),
 
-    # Weapons
+    # Weapons (224-227, skipping 220-223 to stay clear of A+ rank clear location IDs)
     "Buster": MMZero3ItemData(
-        code=220,
+        code=224,
         type=ItemClassification.progression,
         can_create=lambda world, n="Buster": bool(world.options.randomize_weapons) and n not in world.options.starting_weapons.value,
     ),
     "Z-Saber": MMZero3ItemData(
-        code=221,
+        code=225,
         type=ItemClassification.progression,
         can_create=lambda world, n="Z-Saber": bool(world.options.randomize_weapons) and n not in world.options.starting_weapons.value,
     ),
     "Recoil Rod": MMZero3ItemData(
-        code=222,
+        code=226,
         type=ItemClassification.progression,
         can_create=lambda world, n="Recoil Rod": bool(world.options.randomize_weapons) and n not in world.options.starting_weapons.value,
     ),
     "Shield Boomerang": MMZero3ItemData(
-        code=223,
+        code=227,
         type=ItemClassification.progression,
         can_create=lambda world, n="Shield Boomerang": bool(world.options.randomize_weapons) and n not in world.options.starting_weapons.value,
     ),

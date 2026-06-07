@@ -67,14 +67,11 @@ class MMZero3Client(BizHawkClient):
         self.collected_disks = 0
 
         # Inventories
-        self.cerveau_inventory = bytearray(45)
         self.disks_found = bytearray(10)
         self.dialogue_id = bytearray(2)
         self.eReader_bitflag_inventory = [0] * 12
         self.eReader_byte_map_inventory = [0] * 10
         self.ex_skill_inventory = bytearray(2)
-        self.body_inventory = bytearray([0x01])
-        self.foot_inventory = bytearray([0x01])
         self.weapon_inventory = bytearray(4)  # 4 bytes, one per weapon: 1 = usable, 0 = locked
 
 
@@ -119,24 +116,18 @@ class MMZero3Client(BizHawkClient):
                 other_items_found,
                 dialogue_id,
                 level_data,
-                cerveau_inv,
                 results_screen,
                 demo_screen,
-                foot_inv,
                 sync_counter,
             ) = await bizhawk.read(ctx.bizhawk_ctx, [
                 (DISKS_FOUND_ADDR,       10, "Combined WRAM"),  # Disks found in level
                 (OTHER_ITEMS_FOUND_ADDR,  1, "Combined WRAM"),  # Non-disk items found
                 (DIALOGUE_ID_ADDR,        2, "Combined WRAM"),  # Most recent NPC dialogue
                 (CURRENT_LEVEL_ADDR,      1, "Combined WRAM"),  # Current level
-                (CERVEAU_INV_ADDR,       45, "Combined WRAM"),  # AP inventory (disk analysis screen)
                 (RESULTS_SCREEN_ADDR,     1, "Combined WRAM"),  # Results screen flag
                 (DEMO_SCREEN_ADDR,        1, "IWRAM"),           # Demo screen flag
-                (FOOT_INV_ADDR,           1, "Combined WRAM"),  # Foot chip inventory
                 (SYNC_COUNTER_ADDR,       2, "Combined WRAM"),  # AP sync counter
             ])
-            self.cerveau_inventory = bytearray(cerveau_inv)
-            self.foot_inventory = bytearray(foot_inv)
 
             # Don't process anything while on the title/menu screen.
             if level_data == b'\x00':
@@ -183,14 +174,14 @@ class MMZero3Client(BizHawkClient):
                 if other_items_found == b'\x01':
                     await ctx.send_msgs([{
                             "cmd": "LocationChecks",
-                            "locations": [218]
+                            "locations": [LOC_SUBTANK_1]
                         }])
 
                 # Subtank 2 (Forest of Anatre)
                 elif (other_items_found == b'\x02'):
                     await ctx.send_msgs([{
                             "cmd": "LocationChecks",
-                            "locations": [219]
+                            "locations": [LOC_SUBTANK_2]
                         }])
 
                 await bizhawk.write(
@@ -281,16 +272,6 @@ class MMZero3Client(BizHawkClient):
 
                 # Disk items
                 if 1 <= item.item <= 180:
-                    disk_number = item.item - 1           # 0-based index
-                    byte_index = disk_number // 4         # which byte
-                    disk_in_byte = disk_number % 4        # which nibble in byte
-
-                    # Calculate the mask for the "found" bit
-                    found_mask = 1 << disk_in_byte       # 0x01, 0x02, 0x04, 0x08
-
-                    # Update inventory: only the found bit, everything else untouched
-                    self.cerveau_inventory[byte_index] |= found_mask
-
                     self.collected_disks += 1
 
                     # Send notification to player
@@ -322,16 +303,6 @@ class MMZero3Client(BizHawkClient):
                 if item.item in EX_SKILL_MAP:
                     byte_index, mask = EX_SKILL_MAP[item.item]
                     self.ex_skill_inventory[byte_index] |= mask
-
-                # Body Chips
-                if item.item in BODY_CHIP_MAP:
-                    byte_index, mask = BODY_CHIP_MAP[item.item]
-                    self.body_inventory[byte_index] |= mask
-
-                # Foot Chips
-                if item.item in FOOT_CHIP_MAP:
-                    byte_index, mask = FOOT_CHIP_MAP[item.item]
-                    self.foot_inventory[byte_index] |= mask
 
                 # Weapons
                 if item.item in WEAPON_MAP:
@@ -405,30 +376,64 @@ class MMZero3Client(BizHawkClient):
 
         self.in_results_screen = False
 
+        # Read RAM for inventories the game also writes to, plus subtanks
+        (
+            cerveau_ram,
+            foot_ram,
+            body_ram,
+            tank_1,
+            tank_2,
+        ) = await bizhawk.read(ctx.bizhawk_ctx, [
+            (CERVEAU_INV_ADDR,  45, "Combined WRAM"),  # Disk analysis (upper nibble = opened by player)
+            (FOOT_INV_ADDR,      1, "Combined WRAM"),  # Foot chips (disk-based chips written by game)
+            (BODY_INV_ADDR,      1, "Combined WRAM"),  # Body chips (game writes on equip/load)
+            (SUBTANK_1_ADDR,     1, "Combined WRAM"),
+            (SUBTANK_2_ADDR,     1, "Combined WRAM"),
+        ])
+
+        # Recompute AP contributions from all received items
+        cerveau_ap = bytearray(45)
+
+        # bit 0 is always on by default
+        foot_ap    = 0x01
+        body_ap    = 0x01  
+
+        received_item_ids = set()
+        for item in ctx.items_received:
+            item_id = item.item
+            received_item_ids.add(item_id)
+            if 1 <= item_id <= 180:
+                idx = item_id - 1
+                cerveau_ap[idx // 4] |= (1 << (idx % 4))
+            if item_id in FOOT_CHIP_MAP:
+                foot_ap |= FOOT_CHIP_MAP[item_id][1]
+            if item_id in BODY_CHIP_MAP:
+                body_ap |= BODY_CHIP_MAP[item_id][1]
+
+        # Merged: RAM preserves game written state and ensures AP items are always present.
+        # Cerveau: upper nibble (opened) comes from game, lower nibble (found) comes from AP.
+        cerveau_merged = bytearray(cerveau_ram[i] | cerveau_ap[i] for i in range(45))
+        foot_merged    = bytearray([foot_ram[0] | foot_ap])
+        body_merged    = bytearray([body_ram[0] | body_ap])
+
         items_inventory = await self.get_items(ctx)
 
         await bizhawk.write(ctx.bizhawk_ctx, [
-            (CERVEAU_INV_ADDR,      list(self.cerveau_inventory),          "Combined WRAM"),  # Disk analysis inventory
+            (CERVEAU_INV_ADDR,      list(cerveau_merged),                  "Combined WRAM"),  # Disk analysis inventory
             (CHECKED_LOCS_INV_ADDR, list(items_inventory),                 "Combined WRAM"),  # Checked locations inventory
             (EREADER_BITFLAGS_ADDR, list(self.eReader_bitflag_inventory),  "Combined WRAM"),  # eReader bitflags
             (EREADER_BYTE_MAP_ADDR, self.eReader_byte_map_inventory,       "Combined WRAM"),  # eReader byte map
             (EX_SKILLS_ADDR,        self.ex_skill_inventory,               "Combined WRAM"),  # EX Skills
-            (BODY_INV_ADDR,         self.body_inventory,                   "Combined WRAM"),  # Body chips
-            (FOOT_INV_ADDR,         self.foot_inventory,                   "Combined WRAM"),  # Foot chips
+            (BODY_INV_ADDR,         body_merged,                           "Combined WRAM"),  # Body chips
+            (FOOT_INV_ADDR,         foot_merged,                           "Combined WRAM"),  # Foot chips
             (WEAPONS_UNLOCKED_ADDR, list(self.weapon_inventory),           "Combined WRAM"),  # Weapons
         ])
 
-        # Update Subtanks
-        received_item_ids = {item.item for item in ctx.items_received}
-        tank_1, tank_2 = await bizhawk.read(ctx.bizhawk_ctx, [
-            (SUBTANK_1_ADDR, 1, "Combined WRAM"),
-            (SUBTANK_2_ADDR, 1, "Combined WRAM"),
-        ])
-
+        # Subtanks
         tank_writes = []
-        if tank_1 == b'\xFF' and 221 in received_item_ids:
+        if tank_1 == b'\xFF' and ITEM_SUBTANK_1 in received_item_ids:
             tank_writes.append((SUBTANK_1_ADDR, [0], "Combined WRAM"))
-        if tank_2 == b'\xFF' and 222 in received_item_ids:
+        if tank_2 == b'\xFF' and ITEM_SUBTANK_2 in received_item_ids:
             tank_writes.append((SUBTANK_2_ADDR, [0], "Combined WRAM"))
         if tank_writes:
             await bizhawk.write(ctx.bizhawk_ctx, tank_writes)

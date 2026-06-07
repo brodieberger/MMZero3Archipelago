@@ -495,14 +495,14 @@ def weapons_patch(patch: MMZero3ProcedurePatch) -> None:
         ]),
     )
 
-        # Branches from function that renders weapon icons
-    
-    # Makes all weapons collected by default
+    # Equips buster into both slots when game begins (temp fix)
     patch.write_token(
         APTokenTypes.WRITE,
-        0x322BC,
-        bytes([0x00,0x21]),
+        0x322BE,
+        bytes([0x42,0x73]),
     )
+
+    # Makes all weapons collected by default (weapon unlocking no longer handled by game)
     patch.write_token(
         APTokenTypes.WRITE,
         0x322DA,
