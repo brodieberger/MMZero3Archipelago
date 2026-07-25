@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from Options import Choice, Range, Toggle, OptionSet, PerGameCommonOptions
+from Options import Choice, Range, Toggle, OptionSet, DeathLink, PerGameCommonOptions
 
 
 class Goal(Choice):
@@ -29,14 +29,19 @@ class RewardNotification(Toggle):
     display_name = "In-game reward notification"
 
 class RandomizeWeapons(Toggle):
-    """When enabled, the four weapons (Buster, Z-Saber, Recoil Rod, Shield Boomerang) are added to the item pool and must be found before they can be used."""
+    """When enabled, the four weapons (Buster, Z-Saber, Recoil Rod, Shield Boomerang) are added to the item pool and must be found before they can be used.
+
+    When disabled, all four weapons are available from the start and Starting Weapons is ignored."""
     display_name = "Randomize Weapons"
 
 class StartingWeapons(OptionSet):
-    """Which weapons Zero starts with when Randomize Weapons is enabled. Selected weapons are given at the start and will not be placed in the item pool."""
+    """Which weapons Zero starts with when Randomize Weapons is enabled. Selected weapons are given at the start and will not be placed in the item pool.
+
+    Zero cannot damage anything without a weapon, so if this is left empty a single weapon is granted automatically.
+    Ignored when Randomize Weapons is disabled, since every weapon is granted in that case."""
     display_name = "Starting Weapons"
     valid_keys = {"Buster", "Z-Saber", "Recoil Rod", "Shield Boomerang"}
-    default = frozenset()
+    default = frozenset({"Buster", "Z-Saber"})
 
 @dataclass
 class MMZero3Options(PerGameCommonOptions):
@@ -46,3 +51,4 @@ class MMZero3Options(PerGameCommonOptions):
     reward_notification: RewardNotification
     randomize_weapons: RandomizeWeapons
     starting_weapons: StartingWeapons
+    death_link: DeathLink

@@ -213,6 +213,12 @@ WEAPON_MAP = {
     227: 3,  # Shield Boomerang
 }
 
+# Filler: AP Item ID -> energy crystals granted
+# TODO add other crystal amounts?
+CRYSTAL_ITEM_VALUES = {
+    301: 100,
+}
+
 LOCATION_TO_CHIP = {
     182: 199,
     183: 197,

@@ -44,6 +44,17 @@ class MMZero3World(World):
     item_name_to_id = item_table
     location_name_to_id = location_table
 
+
+    starting_weapons: set
+
+    def generate_early(self) -> None:
+        if not self.options.randomize_weapons:
+            self.starting_weapons = set(("Buster", "Z-Saber", "Recoil Rod", "Shield Boomerang"))
+        else:
+            self.starting_weapons = set(self.options.starting_weapons.value)
+            if not self.starting_weapons:
+                self.starting_weapons = {"Buster"}
+
     def create_item(self, name: str) -> MMZero3Item:
         return MMZero3Item(name, item_data_table[name].type, item_data_table[name].code, self.player)
 
@@ -93,8 +104,7 @@ class MMZero3World(World):
             self.get_location(location_name).place_locked_item(locked_item)
 
     def get_filler_item_name(self) -> str:
-        # TODO: implement energy crystal
-        return "100 Energy Crystals (Unimplemented)"
+        return "100 Energy Crystals"
     
     def fill_slot_data(self) -> Dict[str, Any]:
         return {
@@ -102,13 +112,17 @@ class MMZero3World(World):
             "goal": self.options.goal.value,
             "easy_ex_skill": self.options.easy_ex_skill.value,
             "randomize_weapons": self.options.randomize_weapons.value,
-            "starting_weapons": list(self.options.starting_weapons.value),
+            "starting_weapons": sorted(self.starting_weapons),
+            "death_link": self.options.death_link.value,
         }
 
     def set_rules(self) -> None:
 
+        def has_weapon(state, weapon: str) -> bool:
+            return weapon in self.starting_weapons or state.has(weapon, self.player)
+
         def has_rod(state):
-            return state.has("Recoil Rod", self.player) or not self.options.randomize_weapons
+            return has_weapon(state, "Recoil Rod")
 
         def has_mobility(state):
             return state.has("Double Jump Foot Chip", self.player) or has_rod(state)
@@ -154,6 +168,7 @@ class MMZero3World(World):
         # Location rules: Recoil Rod required
         for loc_name in [
             "Aegis Volcano Base (4) 114: Push 1st Container",
+            "Oceanic Highway Ruins (1) 005: 1st Pit Breakable",
             "Weapons Repair Factory (2) 115: Hit 3rd Hammer",
             "Old Residential (1) 039: 1st Door",
             "Old Residential (3) 112: Floor Breakables",

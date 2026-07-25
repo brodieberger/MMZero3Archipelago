@@ -1,4 +1,5 @@
-from typing import TYPE_CHECKING
+import time
+from typing import TYPE_CHECKING, Dict, Any
 
 from NetUtils import ClientStatus
 
@@ -37,6 +38,10 @@ BODY_INV_ADDR           = 0x03806C
 FOOT_INV_ADDR           = 0x03806D
 SUBTANK_1_ADDR          = 0x3805C
 SUBTANK_2_ADDR          = 0x3805D
+SAVE_BODY_INV_ADDR      = 0x37318
+SAVE_FOOT_INV_ADDR      = 0x37319
+HP_ADDR                 = 0x38044  
+CRYSTAL_QUEUE_ADDR      = 0x2F5DC
 
 # AP Related Counters
 SYNC_COUNTER_ADDR       = 0x37342
@@ -62,16 +67,21 @@ class MMZero3Client(BizHawkClient):
         self.easy_ex_skill = 0
         self.randomize_weapons = 0
 
+        # DeathLink
+        self.death_link = False
+        self.pending_death_link = False
+        self.sending_death_link = True
+
         # Item tracking
         self.received_index = 0
         self.collected_disks = 0
+        self.pending_crystals = 0
 
         # Inventories
         self.disks_found = bytearray(10)
         self.dialogue_id = bytearray(2)
         self.eReader_bitflag_inventory = [0] * 12
         self.eReader_byte_map_inventory = [0] * 10
-        self.ex_skill_inventory = bytearray(2)
         self.weapon_inventory = bytearray(4)  # 4 bytes, one per weapon: 1 = usable, 0 = locked
 
 
@@ -85,10 +95,24 @@ class MMZero3Client(BizHawkClient):
             return False  # Not able to get a response, say no for now
 
         ctx.game = self.game
-        ctx.items_handling = 0b011 # gets items from other worlds and OWN world
+        ctx.items_handling = 0b111
         ctx.want_slot_data = True
 
         return True
+
+    def on_package(self, ctx: "BizHawkClientContext", cmd: str, args: Dict[str, Any]) -> None:
+        if cmd == "Bounced" and "tags" in args:
+            if "DeathLink" in args["tags"] and args["data"]["source"] != ctx.slot_info[ctx.slot].name:
+                self.on_deathlink(ctx)
+
+    async def send_deathlink(self, ctx: "BizHawkClientContext") -> None:
+        self.sending_death_link = True
+        ctx.last_death_link = time.time()
+        await ctx.send_death("Zero was destroyed.")
+
+    def on_deathlink(self, ctx: "BizHawkClientContext") -> None:
+        ctx.last_death_link = time.time()
+        self.pending_death_link = True
 
     async def game_watcher(self, ctx: "BizHawkClientContext") -> None:
         try:
@@ -99,15 +123,13 @@ class MMZero3Client(BizHawkClient):
                 self.goal_type = ctx.slot_data.get("goal", 0)
                 self.easy_ex_skill = ctx.slot_data.get("easy_ex_skill", 0)
                 self.randomize_weapons = ctx.slot_data.get("randomize_weapons", 0)
+                self.death_link = bool(ctx.slot_data.get("death_link", 0))
                 starting_weapons = ctx.slot_data.get("starting_weapons", [])
                 weapon_name_to_index = {"Buster": 0, "Z-Saber": 1, "Recoil Rod": 2, "Shield Boomerang": 3}
-                if not self.randomize_weapons:
-                    self.weapon_inventory = bytearray([1, 1, 1, 1])
-                else:
-                    for weapon_name in starting_weapons:
-                        idx = weapon_name_to_index.get(weapon_name)
-                        if idx is not None:
-                            self.weapon_inventory[idx] = 1
+                for weapon_name in starting_weapons:
+                    idx = weapon_name_to_index.get(weapon_name)
+                    if idx is not None:
+                        self.weapon_inventory[idx] = 1
                 self.options_set = True
 
             # Read game state
@@ -119,6 +141,7 @@ class MMZero3Client(BizHawkClient):
                 results_screen,
                 demo_screen,
                 sync_counter,
+                body_hp,
             ) = await bizhawk.read(ctx.bizhawk_ctx, [
                 (DISKS_FOUND_ADDR,       10, "Combined WRAM"),  # Disks found in level
                 (OTHER_ITEMS_FOUND_ADDR,  1, "Combined WRAM"),  # Non-disk items found
@@ -127,6 +150,7 @@ class MMZero3Client(BizHawkClient):
                 (RESULTS_SCREEN_ADDR,     1, "Combined WRAM"),  # Results screen flag
                 (DEMO_SCREEN_ADDR,        1, "IWRAM"),           # Demo screen flag
                 (SYNC_COUNTER_ADDR,       2, "Combined WRAM"),  # AP sync counter
+                (HP_ADDR,            2, "Combined WRAM"),  # Live Zero HP (DeathLink)
             ])
 
             # Don't process anything while on the title/menu screen.
@@ -150,6 +174,25 @@ class MMZero3Client(BizHawkClient):
                 #print("item count has been changed!")
                 #print(f"sync_counter: {(int.from_bytes(sync_counter, byteorder='little'))}")
                 needs_sync = True
+
+            if self.death_link:
+                await ctx.update_death_link(True)
+
+            hp = int.from_bytes(body_hp, "little", signed=True)
+            settled = self.prev_level_value == level_data
+            in_gameplay = settled and demo_screen != b'\x00' and results_screen == b'\x00'
+
+            if self.pending_death_link:
+                self.pending_death_link = False
+                self.sending_death_link = True
+                if in_gameplay:
+                    await bizhawk.write(ctx.bizhawk_ctx, [(HP_ADDR, [0, 0], "Combined WRAM")])
+
+            if "DeathLink" in ctx.tags and ctx.last_death_link + 1 < time.time():
+                if in_gameplay and hp <= 0 and not self.sending_death_link:
+                    await self.send_deathlink(ctx)
+                elif hp > 0:
+                    self.sending_death_link = False
 
             # Check if a disk was picked up in a level
             if disks_found != self.disks_found and demo_screen != b'\x00':
@@ -203,6 +246,9 @@ class MMZero3Client(BizHawkClient):
 
                 self.dialogue_id = dialogue_id
 
+            if results_screen == b'\x00':
+                self.in_results_screen = False
+
             # Check if the player has completed a level
             # TODO: This method of checking is prone to breaking using savestates
             if results_screen != b'\x00' and not self.in_results_screen:
@@ -253,7 +299,7 @@ class MMZero3Client(BizHawkClient):
                             "cmd": "Say", "text": "Final Stage Cleared! Game completed!"
                             }])
                         await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
-                    ctx.finished_game = True
+                        ctx.finished_game = True
 
                 self.in_results_screen = True
 
@@ -299,16 +345,22 @@ class MMZero3Client(BizHawkClient):
                     addr, value = BYTE_MAP[item.item]
                     self.eReader_byte_map_inventory[addr - EREADER_BYTE_MAP_ADDR] = value
 
-                # EX Skills
-                if item.item in EX_SKILL_MAP:
-                    byte_index, mask = EX_SKILL_MAP[item.item]
-                    self.ex_skill_inventory[byte_index] |= mask
+                if item.item in CRYSTAL_ITEM_VALUES:
+                    self.pending_crystals += CRYSTAL_ITEM_VALUES[item.item]
 
-                # Weapons
-                if item.item in WEAPON_MAP:
-                    self.weapon_inventory[WEAPON_MAP[item.item]] = 1
 
             self.received_index = len(ctx.items_received)
+
+            if self.pending_crystals and in_gameplay:
+                queue = int.from_bytes(
+                    (await bizhawk.read(ctx.bizhawk_ctx, [(CRYSTAL_QUEUE_ADDR, 4, "Combined WRAM")]))[0],
+                    "little",
+                )
+                queue = min(queue + self.pending_crystals, 9999)
+                await bizhawk.write(ctx.bizhawk_ctx, [
+                    (CRYSTAL_QUEUE_ADDR, list(queue.to_bytes(4, "little")), "Combined WRAM"),
+                ])
+                self.pending_crystals = 0
 
             if needs_sync:
                 await self.sync_game_state(ctx)
@@ -374,21 +426,23 @@ class MMZero3Client(BizHawkClient):
 
         Done whenever the player collects or receives an item, or transitions between stages."""
 
-        self.in_results_screen = False
-
         # Read RAM for inventories the game also writes to, plus subtanks
         (
             cerveau_ram,
             foot_ram,
             body_ram,
+            save_body_ram,
+            save_foot_ram,
             tank_1,
             tank_2,
         ) = await bizhawk.read(ctx.bizhawk_ctx, [
-            (CERVEAU_INV_ADDR,  45, "Combined WRAM"),  # Disk analysis (upper nibble = opened by player)
-            (FOOT_INV_ADDR,      1, "Combined WRAM"),  # Foot chips (disk-based chips written by game)
-            (BODY_INV_ADDR,      1, "Combined WRAM"),  # Body chips (game writes on equip/load)
-            (SUBTANK_1_ADDR,     1, "Combined WRAM"),
-            (SUBTANK_2_ADDR,     1, "Combined WRAM"),
+            (CERVEAU_INV_ADDR,   45, "Combined WRAM"),  # Disk analysis (upper nibble = opened by player)
+            (FOOT_INV_ADDR,       1, "Combined WRAM"),  # Live foot chips (disk-based chips written by game)
+            (BODY_INV_ADDR,       1, "Combined WRAM"),  # Live body chips (game writes on equip/load)
+            (SAVE_BODY_INV_ADDR,  1, "Combined WRAM"),  # Save-copy body chips
+            (SAVE_FOOT_INV_ADDR,  1, "Combined WRAM"),  # Save-copy foot chips
+            (SUBTANK_1_ADDR,      1, "Combined WRAM"),
+            (SUBTANK_2_ADDR,      1, "Combined WRAM"),
         ])
 
         # Recompute AP contributions from all received items
@@ -397,6 +451,8 @@ class MMZero3Client(BizHawkClient):
         # bit 0 is always on by default
         foot_ap    = 0x01
         body_ap    = 0x01  
+        ex_skill_ap = bytearray(2)
+        weapons_ap  = bytearray(self.weapon_inventory)
 
         received_item_ids = set()
         for item in ctx.items_received:
@@ -409,12 +465,21 @@ class MMZero3Client(BizHawkClient):
                 foot_ap |= FOOT_CHIP_MAP[item_id][1]
             if item_id in BODY_CHIP_MAP:
                 body_ap |= BODY_CHIP_MAP[item_id][1]
+            if item_id in EX_SKILL_MAP:
+                byte_index, mask = EX_SKILL_MAP[item_id]
+                ex_skill_ap[byte_index] |= mask
+            if item_id in WEAPON_MAP:
+                weapons_ap[WEAPON_MAP[item_id]] = 1
 
         # Merged: RAM preserves game written state and ensures AP items are always present.
         # Cerveau: upper nibble (opened) comes from game, lower nibble (found) comes from AP.
         cerveau_merged = bytearray(cerveau_ram[i] | cerveau_ap[i] for i in range(45))
         foot_merged    = bytearray([foot_ram[0] | foot_ap])
         body_merged    = bytearray([body_ram[0] | body_ap])
+
+        # Mirror the chips into the save copy (gGameState.save.status) as well.
+        save_body_merged = bytearray([save_body_ram[0] | body_ap])
+        save_foot_merged = bytearray([save_foot_ram[0] | foot_ap])
 
         items_inventory = await self.get_items(ctx)
 
@@ -423,10 +488,12 @@ class MMZero3Client(BizHawkClient):
             (CHECKED_LOCS_INV_ADDR, list(items_inventory),                 "Combined WRAM"),  # Checked locations inventory
             (EREADER_BITFLAGS_ADDR, list(self.eReader_bitflag_inventory),  "Combined WRAM"),  # eReader bitflags
             (EREADER_BYTE_MAP_ADDR, self.eReader_byte_map_inventory,       "Combined WRAM"),  # eReader byte map
-            (EX_SKILLS_ADDR,        self.ex_skill_inventory,               "Combined WRAM"),  # EX Skills
-            (BODY_INV_ADDR,         body_merged,                           "Combined WRAM"),  # Body chips
-            (FOOT_INV_ADDR,         foot_merged,                           "Combined WRAM"),  # Foot chips
-            (WEAPONS_UNLOCKED_ADDR, list(self.weapon_inventory),           "Combined WRAM"),  # Weapons
+            (EX_SKILLS_ADDR,        ex_skill_ap,                           "Combined WRAM"),  # EX Skills
+            (BODY_INV_ADDR,         body_merged,                           "Combined WRAM"),  # Body chips (live entity)
+            (FOOT_INV_ADDR,         foot_merged,                           "Combined WRAM"),  # Foot chips (live entity)
+            (SAVE_BODY_INV_ADDR,    save_body_merged,                      "Combined WRAM"),  # Body chips (save copy)
+            (SAVE_FOOT_INV_ADDR,    save_foot_merged,                      "Combined WRAM"),  # Foot chips (save copy)
+            (WEAPONS_UNLOCKED_ADDR, list(weapons_ap),                      "Combined WRAM"),  # Weapons
         ])
 
         # Subtanks

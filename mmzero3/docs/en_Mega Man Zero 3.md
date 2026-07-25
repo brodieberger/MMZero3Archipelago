@@ -30,6 +30,14 @@ Welcome to my project. Things are still under heavy development, but here you wi
 - `reward_notification`:
   Items awarded to the player will be displayed in game through a message box at the bottom of the screen. This feature is optional, as of right now, it is very slow and distracting. I will be improving this later, but the choice is there now if you want it.
 
+- `randomize_weapons`:  
+  When enabled, the four weapons (Buster, Z-Saber, Recoil Rod, Shield Boomerang) are added to the item pool and must be found before they can be used.
+
+- `starting_weapons`:  
+  Which weapons Zero starts with when Randomize Weapons is enabled. Selected weapons are given at the start and will not be placed in the item pool.
+  
+  - `valid_keys` = {"Buster", "Z-Saber", "Recoil Rod", "Shield Boomerang"}
+
 ## Known Bugs
 
 - Certain rewards given by NPCs require you to make the correct dialogue choices. Right now these are broken, and you will always receive the disk regardless of what you say.
@@ -41,13 +49,11 @@ Welcome to my project. Things are still under heavy development, but here you wi
 - There's probably some more bugs especially with world generation; I haven't done too much testing, so provide any feedback if something goes wrong!
 
 ## Planned Features
+- Retrying levels to get an A+ rank (without having to load an earlier save).
 - Routing changes. 
   - Like how Mega Man 2 limits the available robot masters you could fight until you have the proper AP item, this world should likely do the same. 
   - Limiting Zero's default abilities (wall climb, dash, charge attack, sword combo) like how Mario World does it could also work. Although it would require editing the first level, as it cannot be completed without wall climbing.
-- All four available weapons added to the item pool.
-- Deathlink support.
-- Filler items (Energy Crystals, Health, Extra Lives). These are in the item pool but are currently unimplemented.
-- Other collectables as location checks. Like static health pickups, extra lives, etc.
+- More filler items (Health, Extra Lives).
 - Level, enemy, or entrance randomization.
 
 ---

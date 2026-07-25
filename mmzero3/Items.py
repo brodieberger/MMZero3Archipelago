@@ -258,26 +258,26 @@ item_data_table: Dict[str, MMZero3ItemData] = {
     "Buster": MMZero3ItemData(
         code=224,
         type=ItemClassification.progression,
-        can_create=lambda world, n="Buster": bool(world.options.randomize_weapons) and n not in world.options.starting_weapons.value,
+        can_create=lambda world, n="Buster": n not in world.starting_weapons,
     ),
     "Z-Saber": MMZero3ItemData(
         code=225,
         type=ItemClassification.progression,
-        can_create=lambda world, n="Z-Saber": bool(world.options.randomize_weapons) and n not in world.options.starting_weapons.value,
+        can_create=lambda world, n="Z-Saber": n not in world.starting_weapons,
     ),
     "Recoil Rod": MMZero3ItemData(
         code=226,
         type=ItemClassification.progression,
-        can_create=lambda world, n="Recoil Rod": bool(world.options.randomize_weapons) and n not in world.options.starting_weapons.value,
+        can_create=lambda world, n="Recoil Rod": n not in world.starting_weapons,
     ),
     "Shield Boomerang": MMZero3ItemData(
         code=227,
         type=ItemClassification.progression,
-        can_create=lambda world, n="Shield Boomerang": bool(world.options.randomize_weapons) and n not in world.options.starting_weapons.value,
+        can_create=lambda world, n="Shield Boomerang": n not in world.starting_weapons,
     ),
 
     # Filler Items
-    "100 Energy Crystals (Unimplemented)": MMZero3ItemData(
+    "100 Energy Crystals": MMZero3ItemData(
         code=301,
         can_create=lambda world: False  # Only created from `get_filler_item_name`.
     ),
