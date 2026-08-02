@@ -15,6 +15,8 @@ Welcome to my project. Things are still under heavy development, but here you wi
 
 - All skippable cutscenes are skippable by default.
 
+- In order to receive the disk reward location check from an NPC, be sure to exhaust all oftheir dialogue!
+
 ## Options
 
 - `goal`:  
