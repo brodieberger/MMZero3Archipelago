@@ -29,7 +29,6 @@ stage_names = [
 
 location_data_table: Dict[str, MMZero3LocationData] = {
 
-    # Certain dialogue options are only availible in certain game states and are missable. This will be fixed later.
     "Resistance Base 023: Room 02D - Mission Set 2": MMZero3LocationData(region="Resistance Base 2", address=23),
     "Resistance Base 044: Talk to Rocinolle - Mission Set 4": MMZero3LocationData(region="Resistance Base 3", address=44),
     "Resistance Base 058: Talk to Right Tower Soldier - Mission Set 1": MMZero3LocationData(region="Resistance Base 1", address=58),
@@ -282,8 +281,8 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Forest of Anatre Subtank: Climb Extending Wall": MMZero3LocationData(region="Forest of Anatre", address=222),
 
     # Weapons
-    #"Collect Recoil Rod": MMZero3LocationData(region="Resistance Base 1", address=220),
-    #"Collect Shield Boomerang": MMZero3LocationData(region="Resistance Base 1", address=221),
+    "Collect Recoil Rod": MMZero3LocationData(region="Resistance Base 1", address=226),
+    "Collect Shield Boomerang": MMZero3LocationData(region="Resistance Base 1", address=227),
 
 }
 

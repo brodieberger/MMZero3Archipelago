@@ -17,25 +17,26 @@ if TYPE_CHECKING:
 ROM_NAME_ADDR           = 0x0A0
 
 # Game state
-CURRENT_LEVEL_ADDR      = 0x030164
-RESULTS_SCREEN_ADDR     = 0x030165  # Also encodes level rank score on results screen
+CURRENT_LEVEL_ADDR      = 0x30164
+RESULTS_SCREEN_ADDR     = 0x30165  # Also encodes level rank score on results screen
 DEMO_SCREEN_ADDR        = 0x02AE2
 
 # Item / location tracking
 DISKS_FOUND_ADDR        = 0x3DF94
 OTHER_ITEMS_FOUND_ADDR  = 0x3733D
 DIALOGUE_ID_ADDR        = 0x371E6
+TEXTBOX_ID_ADDR         = 0x30C30
 ELF_FLAG_ADDR           = 0x3733C
-ITEM_NOTIFY_ADDR        = 0x0371E5
+ITEM_NOTIFY_ADDR        = 0x371E5
 
 # Inventories
-CERVEAU_INV_ADDR        = 0x0371E8
-CHECKED_LOCS_INV_ADDR   = 0x0371B8
+CERVEAU_INV_ADDR        = 0x371E8
+CHECKED_LOCS_INV_ADDR   = 0x371B8
 EREADER_BITFLAGS_ADDR   = 0x02438
 EREADER_BYTE_MAP_ADDR   = 0x02474
-EX_SKILLS_ADDR          = 0x038068
-BODY_INV_ADDR           = 0x03806C
-FOOT_INV_ADDR           = 0x03806D
+EX_SKILLS_ADDR          = 0x38068
+BODY_INV_ADDR           = 0x3806C
+FOOT_INV_ADDR           = 0x3806D
 SUBTANK_1_ADDR          = 0x3805C
 SUBTANK_2_ADDR          = 0x3805D
 SAVE_BODY_INV_ADDR      = 0x37318
@@ -80,6 +81,7 @@ class MMZero3Client(BizHawkClient):
         # Inventories
         self.disks_found = bytearray(10)
         self.dialogue_id = bytearray(2)
+        self.textbox_id = bytearray(4)
         self.eReader_bitflag_inventory = [0] * 12
         self.eReader_byte_map_inventory = [0] * 10
         self.weapon_inventory = bytearray(4)  # 4 bytes, one per weapon: 1 = usable, 0 = locked
@@ -137,6 +139,7 @@ class MMZero3Client(BizHawkClient):
                 disks_found,
                 other_items_found,
                 dialogue_id,
+                textbox_id,
                 level_data,
                 results_screen,
                 demo_screen,
@@ -145,12 +148,13 @@ class MMZero3Client(BizHawkClient):
             ) = await bizhawk.read(ctx.bizhawk_ctx, [
                 (DISKS_FOUND_ADDR,       10, "Combined WRAM"),  # Disks found in level
                 (OTHER_ITEMS_FOUND_ADDR,  1, "Combined WRAM"),  # Non-disk items found
-                (DIALOGUE_ID_ADDR,        2, "Combined WRAM"),  # Most recent NPC dialogue
+                (DIALOGUE_ID_ADDR,        2, "Combined WRAM"),  # Most recent NPC Reward Dialogue ID
+                (TEXTBOX_ID_ADDR,         4, "Combined WRAM"),  # Pointer to Text displayed
                 (CURRENT_LEVEL_ADDR,      1, "Combined WRAM"),  # Current level
                 (RESULTS_SCREEN_ADDR,     1, "Combined WRAM"),  # Results screen flag
-                (DEMO_SCREEN_ADDR,        1, "IWRAM"),           # Demo screen flag
+                (DEMO_SCREEN_ADDR,        1, "IWRAM"),          # Demo screen flag
                 (SYNC_COUNTER_ADDR,       2, "Combined WRAM"),  # AP sync counter
-                (HP_ADDR,            2, "Combined WRAM"),  # Live Zero HP (DeathLink)
+                (HP_ADDR,                 2, "Combined WRAM"),  # Live Zero HP (DeathLink)
             ])
 
             # Don't process anything while on the title/menu screen.
@@ -234,7 +238,6 @@ class MMZero3Client(BizHawkClient):
 
             # Check if an NPC has given a disk (or is talked to after their reward period is expired)
             if dialogue_id != self.dialogue_id:
-
                 new_dialogue = int.from_bytes(dialogue_id, "little")
                 location = DIALOGUE_LOCATION_MAP.get(new_dialogue)
 
@@ -245,6 +248,19 @@ class MMZero3Client(BizHawkClient):
                     }])
 
                 self.dialogue_id = dialogue_id
+
+            # Check if a textbox is related to a location check (Only used for Cerveau stuff atm)
+            if textbox_id != self.textbox_id:
+                new_textbox = int.from_bytes(textbox_id, "little")
+                location = TEXTBOX_LOCATION_MAP.get(new_textbox)
+
+                if location is not None:
+                    await ctx.send_msgs([{
+                        "cmd": "LocationChecks",
+                        "locations": [location]
+                    }])
+
+                self.textbox_id = textbox_id
 
             if results_screen == b'\x00':
                 self.in_results_screen = False
@@ -371,6 +387,7 @@ class MMZero3Client(BizHawkClient):
 
             self.disks_found = disks_found
             self.dialogue_id = dialogue_id
+            self.textbox_id = textbox_id
 
         except bizhawk.RequestFailedError:
             pass

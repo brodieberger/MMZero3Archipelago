@@ -117,7 +117,7 @@ DIALOGUE_LOCATION_MAP = {
     0x24A: 116,
 
     0x24e: 169, # (Hibou)
-    0x24f: 160,
+    0x24f: 169,
     0x250: 169,
     0x251: 169,
 
@@ -143,11 +143,21 @@ DIALOGUE_LOCATION_MAP = {
 
     0x2b1: 23, #(guy in room 02D)
     0x2B3: 23,
+}
 
-    #207: 92 (cerveau),
-    0x20b: 92,
-    0x20c: 92,
-    0x20d: 92,
+
+# Which location check to give based on what is displayed in the textbox. ADDRESS: 2030C30
+# Dialogue ID: location check to give (NPC)
+TEXTBOX_LOCATION_MAP = {
+    # Get Recoil Rod / Shield Boomerang
+    0x08386E8B: 226, # Recoil Rod
+    0x08376EA5: 227, # Shield Boomerang
+    0x08387D83: 226, # Recoil Rod (backup in case of fast forwarding dialogue)
+    0x08387E80: 227, # Same but for shield boomerang
+
+    # Cerveau Disk
+    0x0837862E: 92, # CERVEAU: About Harpuia
+    0x08378769: 92, # CERVEAU: Zero hope for the future
 }
 
 BODY_CHIP_MAP = {

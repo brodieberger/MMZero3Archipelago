@@ -250,13 +250,15 @@ item_data_table: Dict[str, MMZero3ItemData] = {
     "EX Skill: V-Shot": MMZero3ItemData(code=216, type=ItemClassification.useful),
     "EX Skill: Gale Attack": MMZero3ItemData(code=217, type=ItemClassification.useful),
 
-    # (skipping 218-220 to stay clear of A+ rank clear location IDs)
+    # skipping 218-220 to stay clear of A+ rank clear location IDs)
 
     # Other Items
     "Subtank #1": MMZero3ItemData(code=221, type=ItemClassification.progression),
     "Subtank #2": MMZero3ItemData(code=222, type=ItemClassification.progression),
 
-    # Weapons 
+    # skipping 223 because i skipped it by accident and im lazy
+
+    # Weapons
     "Buster": MMZero3ItemData(
         code=224,
         type=ItemClassification.progression,
