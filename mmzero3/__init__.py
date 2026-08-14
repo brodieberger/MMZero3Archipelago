@@ -109,7 +109,6 @@ class MMZero3World(World):
     def fill_slot_data(self) -> Dict[str, Any]:
         return {
             "required_secret_disks": self.options.required_secret_disks.value,
-            "goal": self.options.goal.value,
             "easy_ex_skill": self.options.easy_ex_skill.value,
             "randomize_weapons": self.options.randomize_weapons.value,
             "starting_weapons": sorted(self.starting_weapons),
@@ -211,7 +210,7 @@ class MMZero3World(World):
         
     def generate_output(self, output_directory: str) -> None:
         patch = MMZero3ProcedurePatch(player=self.player, player_name=self.player_name)
-        patch.write_file("mmz3-ap.bsdiff4", pkgutil.get_data(__name__, "mmz3-ap.bsdiff4"))
+        patch.write_file("basepatch.bsdiff4", pkgutil.get_data(__name__, "basepatch.bsdiff4"))
         write_tokens(self, patch)
         out_file_name = self.multiworld.get_out_file_name_base(self.player)
         patch.write(os.path.join(output_directory, f"{out_file_name}{patch.patch_file_ending}"))

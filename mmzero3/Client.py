@@ -1,54 +1,44 @@
+import logging
 import time
-from typing import TYPE_CHECKING, Dict, Any
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 from NetUtils import ClientStatus
-
 import worlds._bizhawk as bizhawk
-from .Options import MMZero3Options
 from worlds._bizhawk.client import BizHawkClient
 
-from .Data import *
+from . import Data
+from .Locations import location_data_table
 
 if TYPE_CHECKING:
     from worlds._bizhawk.context import BizHawkClientContext
-    from . import MMZero3World
 
-# ROM
-ROM_NAME_ADDR           = 0x0A0
+logger = logging.getLogger("Client")
 
-# Game state
-CURRENT_LEVEL_ADDR      = 0x30164
-RESULTS_SCREEN_ADDR     = 0x30165  # Also encodes level rank score on results screen
-DEMO_SCREEN_ADDR        = 0x02AE2
+WRAM = "Combined WRAM"
 
-# Item / location tracking
-DISKS_FOUND_ADDR        = 0x3DF94
-OTHER_ITEMS_FOUND_ADDR  = 0x3733D
-DIALOGUE_ID_ADDR        = 0x371E6
-TEXTBOX_ID_ADDR         = 0x30C30
-ELF_FLAG_ADDR           = 0x3733C
-ITEM_NOTIFY_ADDR        = 0x371E5
+ROM_NAME_ADDR = 0x0A0
+EXPECTED_ROM_NAME = "MEGAMANZERO3"
 
-# Inventories
-CERVEAU_INV_ADDR        = 0x371E8
-CHECKED_LOCS_INV_ADDR   = 0x371B8
-EREADER_BITFLAGS_ADDR   = 0x02438
-EREADER_BYTE_MAP_ADDR   = 0x02474
-EX_SKILLS_ADDR          = 0x38068
-BODY_INV_ADDR           = 0x3806C
-FOOT_INV_ADDR           = 0x3806D
-SUBTANK_1_ADDR          = 0x3805C
-SUBTANK_2_ADDR          = 0x3805D
-SAVE_BODY_INV_ADDR      = 0x37318
-SAVE_FOOT_INV_ADDR      = 0x37319
-HP_ADDR                 = 0x38044  
-CRYSTAL_QUEUE_ADDR      = 0x2F5DC
+SAVE_ADDR = 0x370FC
+SAVE_DISK_ADDR = SAVE_ADDR + 0x0BC    # save.disk, 4 disks per byte, low nibble means found.
+UNUSED_240_ADDR = SAVE_ADDR + 0x240   # save.unused_240, hijacked to store AP related progress
+TAKEN_FLAGS_ADDR = UNUSED_240_ADDR + Data.AP_TAKEN_BYTE
 
-# AP Related Counters
-SYNC_COUNTER_ADDR       = 0x37342
-WEAPONS_UNLOCKED_ADDR   = 0x3733E 
+SUBTANK_TAKEN_BITS = {
+    Data.AP_LOC_SUBTANK_1: Data.AP_TAKEN_SUBTANK1,
+    Data.AP_LOC_SUBTANK_2: Data.AP_TAKEN_SUBTANK2,
+}
+
+# The four Sunken Library data files, left out as they are used in level logic.
+SKIP_DISK_RESTORE = frozenset({10, 16, 17, 18})
+
+DEFAULT_REQUIRED_DISKS = 80
+FINAL_STAGE_LOCATION = location_data_table["Complete Abandoned Research Laboratory"].address
+
 
 class MMZero3Client(BizHawkClient):
+    """Talks to gAp, the AP mailbox. See the ROM source code!"""
+
     game = "Mega Man Zero 3"
     system = "GBA"
     patch_suffix = ".apmmzero3"
@@ -56,59 +46,259 @@ class MMZero3Client(BizHawkClient):
     def __init__(self):
         super().__init__()
 
-        # State tracking
-        self.prev_level_value = None
-        self.in_results_screen = False
-        self.player_warned = False
+        self.ap_disabled = False        # for ROM/client version mismatch
+        self.ap_handshake_logged = False
+        self.locations_reported = set()  # location IDs already forwarded to the server
 
-        # Options (overwritten from slot data)
+        # Options, overwritten from slot data
         self.options_set = False
-        self.required_disks = 80
-        self.goal_type = 0  # 0 is for default (kill boss with enough disks), 1 is vanilla (just kill the boss)
-        self.easy_ex_skill = 0
-        self.randomize_weapons = 0
+        self.required_disks = DEFAULT_REQUIRED_DISKS
 
         # DeathLink
         self.death_link = False
         self.pending_death_link = False
-        self.sending_death_link = True
+        self.death_count_seen = None    # last gAp.deathCount; None until the mailbox is live
 
-        # Item tracking
-        self.received_index = 0
-        self.collected_disks = 0
-        self.pending_crystals = 0
-
-        # Inventories
-        self.disks_found = bytearray(10)
-        self.dialogue_id = bytearray(2)
-        self.textbox_id = bytearray(4)
-        self.eReader_bitflag_inventory = [0] * 12
-        self.eReader_byte_map_inventory = [0] * 10
-        self.weapon_inventory = bytearray(4)  # 4 bytes, one per weapon: 1 = usable, 0 = locked
-
+        self.save_loaded = False
+        self.player_warned = False      # told the player the final stage needs more disks
 
     async def validate_rom(self, ctx: "BizHawkClientContext") -> bool:
         try:
-            # Check ROM name/patch version
-            rom_name = ((await bizhawk.read(ctx.bizhawk_ctx, [(ROM_NAME_ADDR, 12, "ROM")]))[0]).decode("ascii")
-            if rom_name != "MEGAMANZERO3":
-                return False  # Not a Mega Man Zero 3 ROM
+            rom_name = (await bizhawk.read(ctx.bizhawk_ctx, [(ROM_NAME_ADDR, 12, "ROM")]))[0]
         except bizhawk.RequestFailedError:
-            return False  # Not able to get a response, say no for now
+            return False
+        if rom_name.decode("ascii", "replace") != EXPECTED_ROM_NAME:
+            return False
 
         ctx.game = self.game
         ctx.items_handling = 0b111
         ctx.want_slot_data = True
-
         return True
 
-    def on_package(self, ctx: "BizHawkClientContext", cmd: str, args: Dict[str, Any]) -> None:
-        if cmd == "Bounced" and "tags" in args:
-            if "DeathLink" in args["tags"] and args["data"]["source"] != ctx.slot_info[ctx.slot].name:
-                self.on_deathlink(ctx)
+    async def game_watcher(self, ctx: "BizHawkClientContext") -> None:
+        """If you are searching through the code to understand how it works, I would start here!
+        Runs every second or so and processes most of the logic. Interacts with the gAP fields,
+        which you can find in the Rom's codebase as ap.c and ap.h"""
+        try:
+            self.read_slot_data(ctx)
+            if self.death_link:
+                await ctx.update_death_link(True)
+
+            mailbox = await self.read_mailbox(ctx)
+            if mailbox is not None:
+                await self.handle_checked_locations(ctx)
+                await self.handle_received_items(ctx, mailbox)
+                await self.handle_death_link(ctx, mailbox)
+                await self.handle_goal(ctx, mailbox)
+
+            await self.handle_collected_pickups(ctx)
+        except bizhawk.RequestFailedError:
+            pass
+
+    def read_slot_data(self, ctx: "BizHawkClientContext") -> None:
+        if not ctx.slot_data or self.options_set:
+            return
+        self.required_disks = ctx.slot_data.get("required_secret_disks", DEFAULT_REQUIRED_DISKS)
+        self.death_link = bool(ctx.slot_data.get("death_link", 0))
+        self.options_set = True
+
+    async def read_mailbox(self, ctx: "BizHawkClientContext") -> Optional[Dict[str, int]]:
+        """One read of gAp. None means the ROM isn't ready.
+
+        ApInit runs on the first Process_Game(), so the ready value not matching means the game is still booting or in the starting menu.
+        """
+        if self.ap_disabled or ctx.slot is None or not ctx.server_locations:
+            return None
+
+        ready, version, inbox_write, inbox_read, items_applied, disks_owned, death_count, can_accept_items = \
+            await bizhawk.read(ctx.bizhawk_ctx, [
+                (Data.READY, 4, WRAM),
+                (Data.VERSION, 2, WRAM),
+                (Data.INBOX_WRITE_INDEX, 1, WRAM),
+                (Data.INBOX_READ_INDEX, 1, WRAM),
+                (Data.ITEMS_APPLIED, 2, WRAM),
+                (Data.DISKS_OWNED, 2, WRAM),
+                (Data.DEATH_COUNT, 2, WRAM),
+                (Data.CAN_ACCEPT_ITEMS, 1, WRAM),
+            ])
+
+        if int.from_bytes(ready, "little") != Data.AP_READY:
+            return None
+
+        rom_version = int.from_bytes(version, "little")
+        if rom_version != Data.AP_VERSION:
+            self.ap_disabled = True
+            message = (f"ROM/client version mismatch: the ROM is version "
+                       f"{rom_version}, this apworld is version {Data.AP_VERSION}. "
+                       f"Please generate a new game/ROM!")
+            logger.error("MMZero3: %s", message)
+            await ctx.send_msgs([{"cmd": "Say", "text": f"[MMZ3] {message}"}])
+            return None
+
+        if not self.ap_handshake_logged:
+            logger.info("MMZero3: Archipelago Connected!")
+            self.ap_handshake_logged = True
+
+        return {
+            "inbox_write": inbox_write[0],
+            "inbox_read": inbox_read[0],
+            "items_applied": int.from_bytes(items_applied, "little"),
+            "disks_owned": int.from_bytes(disks_owned, "little"),
+            "death_count": int.from_bytes(death_count, "little"),
+            "can_accept_items": can_accept_items[0] != 0,
+        }
+
+    async def handle_checked_locations(self, ctx: "BizHawkClientContext") -> None:
+        """Forward every newly set bit of gAp.checkedLocations to the server.
+
+        Game -> client only: one bit per location ID, set by the ROM and never cleared.
+        """
+        checked_bits = (await bizhawk.read(ctx.bizhawk_ctx, [
+            (Data.CHECKED_LOCATIONS, Data.CHECKED_LOCATIONS_COUNT, WRAM),
+        ]))[0]
+
+        newly_checked_locations = []
+        for location_id in range(len(checked_bits) * 8):
+            # 8 locations per byte: >> 3 picks the byte, & 7 the bit inside it. Each bit is one location found in theg ame.
+            if not checked_bits[location_id >> 3] & (1 << (location_id & 7)):
+                continue
+            if location_id in self.locations_reported:
+                continue
+            self.locations_reported.add(location_id)
+            if location_id in ctx.server_locations:
+                newly_checked_locations.append(location_id)
+            else:
+                logger.warning("MMZero3: ROM reported unknown location id %d.", location_id)
+
+        if newly_checked_locations:
+            await ctx.send_msgs([{"cmd": "LocationChecks", "locations": newly_checked_locations}])
+            logger.debug("MMZero3: reported %d locations: %s", len(newly_checked_locations), newly_checked_locations)
+
+    async def handle_received_items(self, ctx: "BizHawkClientContext",
+                                    mailbox: Dict[str, int]) -> None:
+        """Hand received items to the game through the itemInbox"""
+        if not mailbox["can_accept_items"]:
+            return
+
+        write_index = mailbox["inbox_write"]
+        read_index = mailbox["inbox_read"]
+
+        items_in_inbox = write_index - read_index
+        if items_in_inbox < 0:
+            items_in_inbox += Data.ITEM_INBOX_COUNT
+
+        items_given_to_game = mailbox["items_applied"] + items_in_inbox
+
+        # One slot is always left free, so equal indices can only mean empty.
+        free_slots = Data.ITEM_INBOX_COUNT - 1 - items_in_inbox
+        items_to_give = ctx.items_received[items_given_to_game:items_given_to_game + free_slots]
+        if not items_to_give:
+            return
+
+        writes = []
+        for item in items_to_give:
+            item_code = int(item.item)
+            address = Data.ITEM_INBOX + write_index * Data.ITEM_INBOX_ELEMENT_SIZE
+            code_bytes = item_code.to_bytes(Data.ITEM_INBOX_ELEMENT_SIZE, "little")
+            writes.append((address, list(code_bytes), WRAM))
+
+            write_index += 1
+            if write_index == Data.ITEM_INBOX_COUNT:
+                write_index = 0
+
+        writes.append((Data.INBOX_WRITE_INDEX, [write_index], WRAM))
+        await bizhawk.write(ctx.bizhawk_ctx, writes)
+
+        still_waiting = len(ctx.items_received) - items_given_to_game - len(items_to_give)
+        logger.debug("MMZero3: pushed %d items to the game, %d total still waiting.", len(items_to_give), still_waiting)
+
+    async def handle_death_link(self, ctx: "BizHawkClientContext",
+                                mailbox: Dict[str, int]) -> None:
+        death_count = mailbox["death_count"]
+        if self.death_count_seen is None:
+            self.death_count_seen = death_count
+        elif death_count > self.death_count_seen:
+            self.death_count_seen = death_count
+            if "DeathLink" in ctx.tags:
+                await self.send_deathlink(ctx)
+        elif death_count < self.death_count_seen:
+            self.death_count_seen = death_count
+
+        if self.pending_death_link:
+            self.pending_death_link = False
+            await bizhawk.write(ctx.bizhawk_ctx, [
+                (Data.KILL_REQUEST, [Data.AP_KILL_REQUESTED], WRAM),
+            ])
+
+    async def handle_goal(self, ctx: "BizHawkClientContext", mailbox: Dict[str, int]) -> None:
+        """
+        Clear the final stage holding the required number of disks, set by a player option.
+        """
+        if ctx.finished_game:
+            return
+        if mailbox["can_accept_items"]:
+            # Variable is a temp fix, just to make sure that the warning message is displayed,
+            # Since without this check it wouldn't give the warning message until you load a new game after the final level.
+            self.save_loaded = True
+
+        if (FINAL_STAGE_LOCATION not in ctx.checked_locations
+                and FINAL_STAGE_LOCATION not in self.locations_reported):
+            return
+
+        disks_owned = mailbox["disks_owned"]
+        if disks_owned < self.required_disks:
+            if self.save_loaded and not self.player_warned:
+                self.player_warned = True
+                await ctx.send_msgs([
+                    {"cmd": "Say", "text": f"Final stage cleared! You still need "
+                                           f"{self.required_disks - disks_owned} more disks."},
+                    {"cmd": "Say", "text": "Collect more disks and the goal will send itself."},
+                    {"cmd": "Say", "text": "Feel free to start new game plus, or load an earlier save!"},
+                ])
+            return
+
+        if self.required_disks == 0:
+            text = "Final stage cleared! Game completed!"
+        elif self.player_warned:
+            text = f"{disks_owned} Disks collected! Game completed!"
+        else:
+            text = (f"Final stage cleared with {disks_owned} Disks, "
+                    f"{disks_owned - self.required_disks} more than needed!")
+        await ctx.send_msgs([
+            {"cmd": "Say", "text": text},
+            {"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL},
+        ])
+        ctx.finished_game = True
+
+    async def handle_collected_pickups(self, ctx: "BizHawkClientContext") -> None:
+        """Keep the game's RAM synced with the locations the server says are checked.
+
+        Stops pickups from respawning
+        """
+        collected_disks, taken_byte = await bizhawk.read(ctx.bizhawk_ctx, [
+            (SAVE_DISK_ADDR, Data.AP_DISK_BYTES, WRAM),
+            (TAKEN_FLAGS_ADDR, 1, WRAM),
+        ])
+        repaired_disks = bytearray(collected_disks)
+        repaired_taken = taken_byte[0]
+        for location_id in ctx.checked_locations:
+            if location_id in SKIP_DISK_RESTORE:
+                continue
+            if Data.AP_ITEM_DISK_FIRST <= location_id <= Data.AP_ITEM_DISK_LAST:
+                disk_index = location_id - 1
+                repaired_disks[disk_index // 4] |= 1 << (disk_index % 4)
+            elif location_id in SUBTANK_TAKEN_BITS:
+                repaired_taken |= SUBTANK_TAKEN_BITS[location_id]
+
+        writes = []
+        if repaired_disks != collected_disks:
+            writes.append((SAVE_DISK_ADDR, list(repaired_disks), WRAM))
+        if repaired_taken != taken_byte[0]:
+            writes.append((TAKEN_FLAGS_ADDR, [repaired_taken], WRAM))
+        if writes:
+            await bizhawk.write(ctx.bizhawk_ctx, writes)
 
     async def send_deathlink(self, ctx: "BizHawkClientContext") -> None:
-        self.sending_death_link = True
         ctx.last_death_link = time.time()
         await ctx.send_death("Zero was destroyed.")
 
@@ -116,408 +306,7 @@ class MMZero3Client(BizHawkClient):
         ctx.last_death_link = time.time()
         self.pending_death_link = True
 
-    async def game_watcher(self, ctx: "BizHawkClientContext") -> None:
-        try:
-
-            # Set the options
-            if ctx.slot_data and not self.options_set:
-                self.required_disks = ctx.slot_data.get("required_secret_disks", 80)
-                self.goal_type = ctx.slot_data.get("goal", 0)
-                self.easy_ex_skill = ctx.slot_data.get("easy_ex_skill", 0)
-                self.randomize_weapons = ctx.slot_data.get("randomize_weapons", 0)
-                self.death_link = bool(ctx.slot_data.get("death_link", 0))
-                starting_weapons = ctx.slot_data.get("starting_weapons", [])
-                weapon_name_to_index = {"Buster": 0, "Z-Saber": 1, "Recoil Rod": 2, "Shield Boomerang": 3}
-                for weapon_name in starting_weapons:
-                    idx = weapon_name_to_index.get(weapon_name)
-                    if idx is not None:
-                        self.weapon_inventory[idx] = 1
-                self.options_set = True
-
-            # Read game state
-            (
-                disks_found,
-                other_items_found,
-                dialogue_id,
-                textbox_id,
-                level_data,
-                results_screen,
-                demo_screen,
-                sync_counter,
-                body_hp,
-            ) = await bizhawk.read(ctx.bizhawk_ctx, [
-                (DISKS_FOUND_ADDR,       10, "Combined WRAM"),  # Disks found in level
-                (OTHER_ITEMS_FOUND_ADDR,  1, "Combined WRAM"),  # Non-disk items found
-                (DIALOGUE_ID_ADDR,        2, "Combined WRAM"),  # Most recent NPC Reward Dialogue ID
-                (TEXTBOX_ID_ADDR,         4, "Combined WRAM"),  # Pointer to Text displayed
-                (CURRENT_LEVEL_ADDR,      1, "Combined WRAM"),  # Current level
-                (RESULTS_SCREEN_ADDR,     1, "Combined WRAM"),  # Results screen flag
-                (DEMO_SCREEN_ADDR,        1, "IWRAM"),          # Demo screen flag
-                (SYNC_COUNTER_ADDR,       2, "Combined WRAM"),  # AP sync counter
-                (HP_ADDR,                 2, "Combined WRAM"),  # Live Zero HP (DeathLink)
-            ])
-
-            # Don't process anything while on the title/menu screen.
-            if level_data == b'\x00':
-                self.prev_level_value = b'\x00'
-                return
-
-            # Will be changed to true if the gamestate needs to be synchronized.
-            # Either on some update or the player changing stages.
-            needs_sync = False
-
-            # When the player transitions into the hub or a level, sync the inventory.
-            # Level 0x11 is the resistance base hub.
-            if self.prev_level_value != level_data:
-                needs_sync = True
-
-            # Force a sync if the counter doesn't match the server's item count.
-            # Catches desyncs from savestates without requiring a level transition.
-            # TODO use this as a way for the game itself to force a resync by setting it to 999 or something
-            if int.from_bytes(sync_counter, "little") != len(ctx.items_received):
-                #print("item count has been changed!")
-                #print(f"sync_counter: {(int.from_bytes(sync_counter, byteorder='little'))}")
-                needs_sync = True
-
-            if self.death_link:
-                await ctx.update_death_link(True)
-
-            hp = int.from_bytes(body_hp, "little", signed=True)
-            settled = self.prev_level_value == level_data
-            in_gameplay = settled and demo_screen != b'\x00' and results_screen == b'\x00'
-
-            if self.pending_death_link:
-                self.pending_death_link = False
-                self.sending_death_link = True
-                if in_gameplay:
-                    await bizhawk.write(ctx.bizhawk_ctx, [(HP_ADDR, [0, 0], "Combined WRAM")])
-
-            if "DeathLink" in ctx.tags and ctx.last_death_link + 1 < time.time():
-                if in_gameplay and hp <= 0 and not self.sending_death_link:
-                    await self.send_deathlink(ctx)
-                elif hp > 0:
-                    self.sending_death_link = False
-
-            # Check if a disk was picked up in a level
-            if disks_found != self.disks_found and demo_screen != b'\x00':
-                new_locations = []
-
-                for old, new in zip(self.disks_found, disks_found):
-                    if old == 0xFF and new != 0xFF:
-                        new_locations.append(new+1)
-
-                if new_locations:
-                    await ctx.send_msgs([{
-                        "cmd": "LocationChecks",
-                        "locations": new_locations
-                    }])
-
-                self.disks_found = disks_found
-
-            # Check if non disk item was collected
-            if other_items_found != b'\x00':
-
-                # Subtank 1 (Old Residential Area)
-                if other_items_found == b'\x01':
-                    await ctx.send_msgs([{
-                            "cmd": "LocationChecks",
-                            "locations": [LOC_SUBTANK_1]
-                        }])
-
-                # Subtank 2 (Forest of Anatre)
-                elif (other_items_found == b'\x02'):
-                    await ctx.send_msgs([{
-                            "cmd": "LocationChecks",
-                            "locations": [LOC_SUBTANK_2]
-                        }])
-
-                await bizhawk.write(
-                    ctx.bizhawk_ctx,
-                    [(OTHER_ITEMS_FOUND_ADDR, [0], "Combined WRAM")]
-                )
-
-            # Check if an NPC has given a disk (or is talked to after their reward period is expired)
-            if dialogue_id != self.dialogue_id:
-                new_dialogue = int.from_bytes(dialogue_id, "little")
-                location = DIALOGUE_LOCATION_MAP.get(new_dialogue)
-
-                if location is not None:
-                    await ctx.send_msgs([{
-                        "cmd": "LocationChecks",
-                        "locations": [location]
-                    }])
-
-                self.dialogue_id = dialogue_id
-
-            # Check if a textbox is related to a location check (Only used for Cerveau stuff atm)
-            if textbox_id != self.textbox_id:
-                new_textbox = int.from_bytes(textbox_id, "little")
-                location = TEXTBOX_LOCATION_MAP.get(new_textbox)
-
-                if location is not None:
-                    await ctx.send_msgs([{
-                        "cmd": "LocationChecks",
-                        "locations": [location]
-                    }])
-
-                self.textbox_id = textbox_id
-
-            if results_screen == b'\x00':
-                self.in_results_screen = False
-
-            # Check if the player has completed a level
-            # TODO: This method of checking is prone to breaking using savestates
-            if results_screen != b'\x00' and not self.in_results_screen:
-                level_id = int.from_bytes(level_data, byteorder='little')
-                location_id = LEVEL_TO_LOCATION.get(level_id)
-
-                if location_id:
-
-                    # Send completion item
-                    await ctx.send_msgs([{
-                        "cmd": "LocationChecks",
-                        "locations": [location_id]
-                    }])
-
-                    if LOCATION_TO_CHIP.get(location_id):
-                        # Send necessary chip
-                        await ctx.send_msgs([{
-                            "cmd": "LocationChecks",
-                            "locations": [LOCATION_TO_CHIP.get(location_id)]
-                        }])
-
-                    if await self.should_reward_exskill(ctx) or self.easy_ex_skill == 1:
-                        await ctx.send_msgs([{
-                            "cmd": "LocationChecks",
-                            "locations": [LOCATION_TO_EXSKILL.get(location_id)]
-                        }])
-
-                # Completion condition. Runs If the level that was finished was the last level
-                # Logic for Default game goal
-                if self.goal_type == 0:
-                    if level_data == b'\x10' and self.collected_disks >= self.required_disks and not ctx.finished_game:
-                        await ctx.send_msgs([{
-                            "cmd": "Say", "text": f"Final stage cleared! You had {self.collected_disks} Disks, which was {self.collected_disks - self.required_disks} more disks than needed!"
-                            }])
-                        await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
-                        ctx.finished_game = True
-                    elif level_data == b'\x10' and self.collected_disks < self.required_disks and not self.player_warned and not ctx.finished_game:
-                        await ctx.send_msgs([
-                            {"cmd": "Say", "text": f"Final stage cleared! You still need {self.required_disks - self.collected_disks} more disks."},
-                            {"cmd": "Say", "text": "Load a previous save and collect more disks."},
-                            {"cmd": "Say", "text": "Do NOT save over your file after the credits!"}
-                        ])
-                        self.player_warned = True
-                # Logic for Vanilla
-                elif self.goal_type == 1:
-                    if level_data == b'\x10' and ctx.finished_game == False:
-                        await ctx.send_msgs([{
-                            "cmd": "Say", "text": "Final Stage Cleared! Game completed!"
-                            }])
-                        await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
-                        ctx.finished_game = True
-
-                self.in_results_screen = True
-
-            # Additional check to see if the player collected enough disks AFTER beating final stage. Only used in default game goal
-            if self.player_warned == True and self.collected_disks >= self.required_disks and ctx.finished_game == False:
-                await ctx.send_msgs([{
-                    "cmd": "Say", "text": f"{self.required_disks} Disks collected! Game completed!"
-                }])
-                await ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
-                ctx.finished_game = True
-
-            # Receive an item from AP
-            for i in range(self.received_index, len(ctx.items_received)):
-                needs_sync = True
-                item = ctx.items_received[i]
-
-                # Disk items
-                if 1 <= item.item <= 180:
-                    self.collected_disks += 1
-
-                    # Send notification to player
-                    await bizhawk.write(
-                        ctx.bizhawk_ctx,
-                        [(ITEM_NOTIFY_ADDR, [item.item], "Combined WRAM")]
-                    )
-
-                # If the Disk is also an eReader bitflag item
-                if item.item >= 111 and item.item <= 140:
-                    if item.item not in BIT_FLAGS:
-                        continue
-                    word_index, bit = BIT_FLAGS[item.item]
-
-                    byte_index = word_index * 2
-                    mask = 1 << (bit - 1)
-
-                    if bit <= 8:
-                        self.eReader_bitflag_inventory[byte_index]     |= mask
-                    else:
-                        self.eReader_bitflag_inventory[byte_index + 1] |= (mask >> 8)
-
-                # If the disk is also is an eReader byte map item
-                if item.item in BYTE_MAP:
-                    addr, value = BYTE_MAP[item.item]
-                    self.eReader_byte_map_inventory[addr - EREADER_BYTE_MAP_ADDR] = value
-
-                if item.item in CRYSTAL_ITEM_VALUES:
-                    self.pending_crystals += CRYSTAL_ITEM_VALUES[item.item]
-
-
-            self.received_index = len(ctx.items_received)
-
-            if self.pending_crystals and in_gameplay:
-                queue = int.from_bytes(
-                    (await bizhawk.read(ctx.bizhawk_ctx, [(CRYSTAL_QUEUE_ADDR, 4, "Combined WRAM")]))[0],
-                    "little",
-                )
-                queue = min(queue + self.pending_crystals, 9999)
-                await bizhawk.write(ctx.bizhawk_ctx, [
-                    (CRYSTAL_QUEUE_ADDR, list(queue.to_bytes(4, "little")), "Combined WRAM"),
-                ])
-                self.pending_crystals = 0
-
-            if needs_sync:
-                await self.sync_game_state(ctx)
-                await bizhawk.write(ctx.bizhawk_ctx, [
-                    (SYNC_COUNTER_ADDR, list(len(ctx.items_received).to_bytes(2, "little")), "Combined WRAM"),
-                ])
-            self.prev_level_value = level_data
-
-            self.disks_found = disks_found
-            self.dialogue_id = dialogue_id
-            self.textbox_id = textbox_id
-
-        except bizhawk.RequestFailedError:
-            pass
-
-    async def get_items(self, ctx) -> bytearray:
-        """Updates items collected by Zero based on ctx.checked_locations. Used in case of player using savestates.
-        Only lower nibble (found state) is updated. Upper nibble (opened state) is untouched."""
-
-        inventory = bytearray((await bizhawk.read(
-                        ctx.bizhawk_ctx,
-                        [(CHECKED_LOCS_INV_ADDR, 45, "Combined WRAM")]
-                    ))[0])
-
-        for location_id in ctx.checked_locations:
-            if location_id in {10, 16, 17}:
-                continue
-
-            if 1 <= location_id <= 180:
-                item_index = location_id - 1
-                byte_index = item_index // 4
-                bit_position = item_index % 4
-
-                # Only set the lower nibble bit (bit positions 0–3)
-                inventory[byte_index] |= (1 << bit_position)
-
-        return inventory
-
-    async def should_reward_exskill(self, ctx) -> bool:
-        """Determine if an EX Skill should be rewarded after a level."""
-
-        level_rank, elf_flag = await bizhawk.read(
-            ctx.bizhawk_ctx,
-            [
-                (RESULTS_SCREEN_ADDR, 1, "Combined WRAM"),
-                (ELF_FLAG_ADDR,       1, "Combined WRAM"),
-            ]
-        )
-        if level_rank[0] > 85:
-            return True
-
-        # If the player has used a rank increasing cyber elf
-        if elf_flag[0] == 0x01:
-            await bizhawk.write(
-                ctx.bizhawk_ctx,
-                [(ELF_FLAG_ADDR, [0], "Combined WRAM")]
-            )
-            return True
-
-        return False
-
-    async def sync_game_state(self, ctx) -> None:
-        """Syncronizes the player's collected items and inventory in order to prevent desyncs when using savestates.
-
-        Done whenever the player collects or receives an item, or transitions between stages."""
-
-        # Read RAM for inventories the game also writes to, plus subtanks
-        (
-            cerveau_ram,
-            foot_ram,
-            body_ram,
-            save_body_ram,
-            save_foot_ram,
-            tank_1,
-            tank_2,
-        ) = await bizhawk.read(ctx.bizhawk_ctx, [
-            (CERVEAU_INV_ADDR,   45, "Combined WRAM"),  # Disk analysis (upper nibble = opened by player)
-            (FOOT_INV_ADDR,       1, "Combined WRAM"),  # Live foot chips (disk-based chips written by game)
-            (BODY_INV_ADDR,       1, "Combined WRAM"),  # Live body chips (game writes on equip/load)
-            (SAVE_BODY_INV_ADDR,  1, "Combined WRAM"),  # Save-copy body chips
-            (SAVE_FOOT_INV_ADDR,  1, "Combined WRAM"),  # Save-copy foot chips
-            (SUBTANK_1_ADDR,      1, "Combined WRAM"),
-            (SUBTANK_2_ADDR,      1, "Combined WRAM"),
-        ])
-
-        # Recompute AP contributions from all received items
-        cerveau_ap = bytearray(45)
-
-        # bit 0 is always on by default
-        foot_ap    = 0x01
-        body_ap    = 0x01  
-        ex_skill_ap = bytearray(2)
-        weapons_ap  = bytearray(self.weapon_inventory)
-
-        received_item_ids = set()
-        for item in ctx.items_received:
-            item_id = item.item
-            received_item_ids.add(item_id)
-            if 1 <= item_id <= 180:
-                idx = item_id - 1
-                cerveau_ap[idx // 4] |= (1 << (idx % 4))
-            if item_id in FOOT_CHIP_MAP:
-                foot_ap |= FOOT_CHIP_MAP[item_id][1]
-            if item_id in BODY_CHIP_MAP:
-                body_ap |= BODY_CHIP_MAP[item_id][1]
-            if item_id in EX_SKILL_MAP:
-                byte_index, mask = EX_SKILL_MAP[item_id]
-                ex_skill_ap[byte_index] |= mask
-            if item_id in WEAPON_MAP:
-                weapons_ap[WEAPON_MAP[item_id]] = 1
-
-        # Merged: RAM preserves game written state and ensures AP items are always present.
-        # Cerveau: upper nibble (opened) comes from game, lower nibble (found) comes from AP.
-        cerveau_merged = bytearray(cerveau_ram[i] | cerveau_ap[i] for i in range(45))
-        foot_merged    = bytearray([foot_ram[0] | foot_ap])
-        body_merged    = bytearray([body_ram[0] | body_ap])
-
-        # Mirror the chips into the save copy (gGameState.save.status) as well.
-        save_body_merged = bytearray([save_body_ram[0] | body_ap])
-        save_foot_merged = bytearray([save_foot_ram[0] | foot_ap])
-
-        items_inventory = await self.get_items(ctx)
-
-        await bizhawk.write(ctx.bizhawk_ctx, [
-            (CERVEAU_INV_ADDR,      list(cerveau_merged),                  "Combined WRAM"),  # Disk analysis inventory
-            (CHECKED_LOCS_INV_ADDR, list(items_inventory),                 "Combined WRAM"),  # Checked locations inventory
-            (EREADER_BITFLAGS_ADDR, list(self.eReader_bitflag_inventory),  "Combined WRAM"),  # eReader bitflags
-            (EREADER_BYTE_MAP_ADDR, self.eReader_byte_map_inventory,       "Combined WRAM"),  # eReader byte map
-            (EX_SKILLS_ADDR,        ex_skill_ap,                           "Combined WRAM"),  # EX Skills
-            (BODY_INV_ADDR,         body_merged,                           "Combined WRAM"),  # Body chips (live entity)
-            (FOOT_INV_ADDR,         foot_merged,                           "Combined WRAM"),  # Foot chips (live entity)
-            (SAVE_BODY_INV_ADDR,    save_body_merged,                      "Combined WRAM"),  # Body chips (save copy)
-            (SAVE_FOOT_INV_ADDR,    save_foot_merged,                      "Combined WRAM"),  # Foot chips (save copy)
-            (WEAPONS_UNLOCKED_ADDR, list(weapons_ap),                      "Combined WRAM"),  # Weapons
-        ])
-
-        # Subtanks
-        tank_writes = []
-        if tank_1 == b'\xFF' and ITEM_SUBTANK_1 in received_item_ids:
-            tank_writes.append((SUBTANK_1_ADDR, [0], "Combined WRAM"))
-        if tank_2 == b'\xFF' and ITEM_SUBTANK_2 in received_item_ids:
-            tank_writes.append((SUBTANK_2_ADDR, [0], "Combined WRAM"))
-        if tank_writes:
-            await bizhawk.write(ctx.bizhawk_ctx, tank_writes)
+    def on_package(self, ctx: "BizHawkClientContext", cmd: str, args: Dict[str, Any]) -> None:
+        if cmd == "Bounced" and "tags" in args:
+            if "DeathLink" in args["tags"] and args["data"]["source"] != ctx.slot_info[ctx.slot].name:
+                self.on_deathlink(ctx)

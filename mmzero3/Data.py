@@ -1,242 +1,44 @@
-# level RAM byte -> archipelago location ID
-LEVEL_TO_LOCATION = {
-    0x01: 181,  # spacecraft
-    0x02: 182,  # volcano base
-    0x03: 183,  # highway
-    0x04: 184,  # weapons repair factory
-    0x05: 185,  # old residential
-    0x06: 186,  # omega missile
-    0x07: 187,  # twighlight desert
-    0x08: 188,  # forest
-    0x09: 189,  # ice base
-    0x0A: 190,  # area x2
-    0x0B: 191,  # energy facility
-    0x0C: 192,  # snowy plaiuns
-    0x0D: 193,  # sunken library
-    0x0E: 194,  # giant elevator
-    0x0F: 195,  # sub arcadia
-    0x10: 196,  # final level
-}
+# Fields to be read from gAp and gApSeedConfig.
+# EWRAM address minus 0x02000000
 
-# Bitflags for eReader content. AP Item ID -> (word_index, bit_position)
-BIT_FLAGS = {
-    111: (0, 1),
-    112: (0, 6),
-    113: (0, 7),
-    114: (0, 10),
-    115: (1, 1),
-    117: (1, 4),
-    118: (1, 10),
-    119: (1, 12),
-    120: (1, 13),
-    121: (1, 15),
-    122: (2, 2),
-    123: (2, 4),
-    124: (2, 5),
-    125: (2, 7),
-    126: (2, 8),
-    127: (2, 13),
-    128: (2, 15),
-    129: (3, 4),
-    130: (3, 5),
-    131: (3, 7),
-    132: (3, 8),
-    133: (3, 10),
-    134: (3, 13),
-    135: (4, 2),
-    136: (4, 11),
-    137: (4, 13),
-    138: (5, 3),
-    139: (5, 5),
-    140: (5, 6),
-}
+# gAp.ready reads AP_READY once the game has booted, and gAp.version reads AP_VERSION.
+AP_READY = 0x335A5041      # Spells out 'APZ3' in little endian
+AP_VERSION = 15
 
-# Byte map for for eReader content. AP Item ID -> (Ram Address, Value)
-BYTE_MAP = {
-    # Dialogue Window (0x2002474)
-    141: (0x02474, 0x01),
-    142: (0x02474, 0x02),
-    143: (0x02474, 0x03),
-    144: (0x02474, 0x04),
-    145: (0x02474, 0x05),
-    146: (0x02474, 0x06),
-    147: (0x02474, 0x07),
-    148: (0x02474, 0x08),
+# Constants from ap.h
+AP_KILL_REQUESTED = 1
+AP_TAKEN_BYTE = 8
+AP_TAKEN_SUBTANK1 = 1
+AP_TAKEN_SUBTANK2 = 2
+AP_LOC_SUBTANK_1 = 221
+AP_LOC_SUBTANK_2 = 222
+AP_ITEM_DISK_FIRST = 1
+AP_ITEM_DISK_LAST = 180
+AP_DISK_BYTES = 45
 
-    # Title Screen Design (0x2002475)
-    149: (0x02475, 0x01),
-    150: (0x02475, 0x02),
-    151: (0x02475, 0x03),
-    152: (0x02475, 0x04),
+# gAp
+GAP = 0x0003EE80
+READY = 0x0003EE80
+VERSION = 0x0003EE84
+ITEM_INBOX = 0x0003EE86
+ITEM_INBOX_COUNT = 16
+ITEM_INBOX_ELEMENT_SIZE = 2
+ITEMS_APPLIED = 0x0003EEA6
+INBOX_WRITE_INDEX = 0x0003EEA8
+INBOX_READ_INDEX = 0x0003EEA9
+CHECKED_LOCATIONS = 0x0003EEAA
+CHECKED_LOCATIONS_COUNT = 29
+RANK_ELF_USED = 0x0003EEC7
+DISKS_OWNED = 0x0003EEC8
+DEATH_COUNT = 0x0003EECA
+KILL_REQUEST = 0x0003EECC
+CAN_ACCEPT_ITEMS = 0x0003EECD
 
-    # Elevator Design (0x2002476)
-    153: (0x02476, 0x01),
-    154: (0x02476, 0x02),
-
-    # Base Environment (0x2002477)
-    155: (0x02477, 0x01),
-    156: (0x02477, 0x02),
-
-    # Ciel's Computer Design (0x2002478)
-    157: (0x02478, 0x01),
-    158: (0x02478, 0x02),
-    159: (0x02478, 0x03),
-    160: (0x02478, 0x04),
-
-    # Life Pickup Design (0x2002479)
-    161: (0x02479, 0x01),
-    162: (0x02479, 0x02),
-
-    # E-Crystals Design (0x200247A)
-    163: (0x0247A, 0x01),
-    164: (0x0247A, 0x02),
-
-    # Z Plate Design (0x200247C)
-    177: (0x0247C, 0x01),
-    178: (0x0247C, 0x02),
-
-    # Buster Shot Design (0x200247D)
-    179: (0x0247D, 0x01),
-    180: (0x0247D, 0x02),
-}
-
-# Which location check to give based on dialogue. (So that no disks can be missed based on dialogue)
-# Dialogue ID: location check to give (NPC)
-DIALOGUE_LOCATION_MAP = {
-    0x241: 107, #(Andrew)
-    0x242: 107,
-    0x243: 107,
-    0x2CF: 107,
-    0x2D0: 107,
-    0x2D1: 107,
-    0x2D2: 107,
-
-    0x247: 116, #(Alouette)
-    0x248: 116,
-    0x249: 116,
-    0x24A: 116,
-
-    0x24e: 169, # (Hibou)
-    0x24f: 169,
-    0x250: 169,
-    0x251: 169,
-
-    0x253: 175, # (Menart)
-    0x254: 175,
-    0x255: 175,
-    0x256: 175,
-    0x257: 175,
-    0x268: 175,
-
-    0x25a: 167, # (Rocinolle)
-    0x25C: 167,
-    0x25d: 44, #(Rocinolle unmissable)
-    0x25e: 167,
-
-    0x271: 173, #(Hirondelle unmissable)
-
-    0x284: 174, #(Doigt unmissable)
-
-    0x2a6: 58, # (Tower guy)
-    0x2A9: 58,
-    0x2AB: 58,
-
-    0x2b1: 23, #(guy in room 02D)
-    0x2B3: 23,
-}
-
-
-# Which location check to give based on what is displayed in the textbox. ADDRESS: 2030C30
-# Dialogue ID: location check to give (NPC)
-TEXTBOX_LOCATION_MAP = {
-    # Get Recoil Rod / Shield Boomerang
-    0x08386E8B: 226, # Recoil Rod
-    0x08376EA5: 227, # Shield Boomerang
-    0x08387D83: 226, # Recoil Rod (backup in case of fast forwarding dialogue)
-    0x08387E80: 227, # Same but for shield boomerang
-
-    # Cerveau Disk
-    0x0837862E: 92, # CERVEAU: About Harpuia
-    0x08378769: 92, # CERVEAU: Zero hope for the future
-}
-
-BODY_CHIP_MAP = {
-    197: (0, 0x20),  # Ice
-    198: (0, 0x08),  # Thunder
-    199: (0, 0x10),  # Flame
-    200: (0, 0x02),  # Light
-    201: (0, 0x04),  # Absorber
-}
-
-FOOT_CHIP_MAP = {
-    202: (0, 0x20),  # Spike
-    203: (0, 0x10),  # Quick
-    204: (0, 0x04),  # Double Jump
-    205: (0, 0x08),  # Shadow Dash
-}
-
-EX_SKILL_MAP = {
-    206: (0, 0x04),  # Burst Shot
-    207: (0, 0x80),  # Throw Blade
-    208: (0, 0x20),  # Saber Smash
-    209: (1, 0x01),  # 1000 Slash
-    210: (1, 0x04),  # Shield Sweep
-    211: (0, 0x40),  # Split Heavens
-    212: (0, 0x08),  # Blizzard Arrow
-    213: (0, 0x01),  # Reflect Laser
-    214: (1, 0x02),  # Soul Launcher
-    215: (1, 0x08),  # Orbit Shield
-    216: (0, 0x02),  # V-Shot
-    217: (0, 0x10),  # Gale Attack
-}
-
-#Level-Complete Location ID > EXSkill Obtained Location ID
-LOCATION_TO_EXSKILL = {
-    181: 206,
-    182: 207,
-    183: 208,
-    184: 209,
-    185: 210,
-    186: 211,
-    187: 212,
-    188: 213,
-    189: 214,
-    190: 215,
-    191: 216,
-    192: 217,
-    193: 218,
-    194: 219,
-    195: 220
-}
-
-# Other stuff
-ITEM_SUBTANK_1 = 221
-ITEM_SUBTANK_2 = 222
-
-LOC_SUBTANK_1 = 221
-LOC_SUBTANK_2 = 222
-
-WEAPON_MAP = {
-    224: 0,  # Buster
-    225: 1,  # Z-Saber
-    226: 2,  # Recoil Rod
-    227: 3,  # Shield Boomerang
-}
-
-# Filler: AP Item ID -> energy crystals granted
-# TODO add other crystal amounts?
-CRYSTAL_ITEM_VALUES = {
-    301: 100,
-}
-
-LOCATION_TO_CHIP = {
-    182: 199,
-    183: 197,
-    184: 198,
-    185: 200,
-    190: 203, 
-    191: 204,
-    192: 202, 
-    193: 205,
-    194: 201
+# gApSeedConfig, ROM data
+SEED_CONFIG_ROM_OFFSET = 0x008009D8
+SEED_CONFIG_SIZE = 4
+SEED_CONFIG_FIELDS = {   # ap.h name: (offset, size)
+    "requiredDisks": (0, 2),
+    "startingWeapons": (2, 1),
+    "easyExSkill": (3, 1),
 }

@@ -237,18 +237,18 @@ item_data_table: Dict[str, MMZero3ItemData] = {
     "Shadow Dash Foot Chip": MMZero3ItemData(code=205, type=ItemClassification.useful),
 
     # EX Skills
-    "EX Skill: Burst Shot": MMZero3ItemData(code=206, type=ItemClassification.useful),
-    "EX Skill: Throw Blade": MMZero3ItemData(code=207, type=ItemClassification.useful),
-    "EX Skill: Saber Smash": MMZero3ItemData(code=208, type=ItemClassification.useful),
-    "EX Skill: 1000 Slash": MMZero3ItemData(code=209, type=ItemClassification.useful),
-    "EX Skill: Shield Sweep": MMZero3ItemData(code=210, type=ItemClassification.useful),
-    "EX Skill: Split Heavens": MMZero3ItemData(code=211, type=ItemClassification.useful),
-    "EX Skill: Blizzard Arrow": MMZero3ItemData(code=212, type=ItemClassification.useful),
-    "EX Skill: Reflected Laser": MMZero3ItemData(code=213, type=ItemClassification.useful),
-    "EX Skill: Soul Launcher": MMZero3ItemData(code=214, type=ItemClassification.useful),
-    "EX Skill: Orbit Shield": MMZero3ItemData(code=215, type=ItemClassification.useful),
-    "EX Skill: V-Shot": MMZero3ItemData(code=216, type=ItemClassification.useful),
-    "EX Skill: Gale Attack": MMZero3ItemData(code=217, type=ItemClassification.useful),
+    "EX Skill: Burst Shot": MMZero3ItemData(code=208, type=ItemClassification.useful),
+    "EX Skill: Throw Blade": MMZero3ItemData(code=213, type=ItemClassification.useful),
+    "EX Skill: Saber Smash": MMZero3ItemData(code=211, type=ItemClassification.useful),
+    "EX Skill: 1000 Slash": MMZero3ItemData(code=214, type=ItemClassification.useful),
+    "EX Skill: Shield Sweep": MMZero3ItemData(code=216, type=ItemClassification.useful),
+    "EX Skill: Split Heavens": MMZero3ItemData(code=212, type=ItemClassification.useful),
+    "EX Skill: Blizzard Arrow": MMZero3ItemData(code=209, type=ItemClassification.useful),
+    "EX Skill: Reflected Laser": MMZero3ItemData(code=206, type=ItemClassification.useful),
+    "EX Skill: Soul Launcher": MMZero3ItemData(code=215, type=ItemClassification.useful),
+    "EX Skill: Orbit Shield": MMZero3ItemData(code=217, type=ItemClassification.useful),
+    "EX Skill: V-Shot": MMZero3ItemData(code=207, type=ItemClassification.useful),
+    "EX Skill: Gale Attack": MMZero3ItemData(code=210, type=ItemClassification.useful),
 
     # skipping 218-220 to stay clear of A+ rank clear location IDs)
 
