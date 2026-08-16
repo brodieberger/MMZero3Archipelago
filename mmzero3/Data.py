@@ -3,7 +3,7 @@
 
 # gAp.ready reads AP_READY once the game has booted, and gAp.version reads AP_VERSION.
 AP_READY = 0x335A5041      # Spells out 'APZ3' in little endian
-AP_VERSION = 15
+AP_VERSION = 17
 
 # Constants from ap.h
 AP_KILL_REQUESTED = 1
@@ -15,6 +15,8 @@ AP_LOC_SUBTANK_2 = 222
 AP_ITEM_DISK_FIRST = 1
 AP_ITEM_DISK_LAST = 180
 AP_DISK_BYTES = 45
+AP_ITEM_STORY_MID = 229
+AP_ITEM_STORY_LATE = 230
 
 # gAp
 GAP = 0x0003EE80
@@ -35,7 +37,7 @@ KILL_REQUEST = 0x0003EECC
 CAN_ACCEPT_ITEMS = 0x0003EECD
 
 # gApSeedConfig, ROM data
-SEED_CONFIG_ROM_OFFSET = 0x008009D8
+SEED_CONFIG_ROM_OFFSET = 0x00800D30
 SEED_CONFIG_SIZE = 4
 SEED_CONFIG_FIELDS = {   # ap.h name: (offset, size)
     "requiredDisks": (0, 2),

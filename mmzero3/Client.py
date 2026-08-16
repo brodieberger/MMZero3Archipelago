@@ -7,6 +7,7 @@ import worlds._bizhawk as bizhawk
 from worlds._bizhawk.client import BizHawkClient
 
 from . import Data
+from .Items import item_table
 from .Locations import location_data_table
 
 if TYPE_CHECKING:
@@ -32,8 +33,8 @@ SUBTANK_TAKEN_BITS = {
 # The four Sunken Library data files, left out as they are used in level logic.
 SKIP_DISK_RESTORE = frozenset({10, 16, 17, 18})
 
-DEFAULT_REQUIRED_DISKS = 80
 FINAL_STAGE_LOCATION = location_data_table["Complete Abandoned Research Laboratory"].address
+STORY_PROGRESS_ITEM_CODE = item_table["Story Progress"]
 
 
 class MMZero3Client(BizHawkClient):
@@ -46,21 +47,17 @@ class MMZero3Client(BizHawkClient):
     def __init__(self):
         super().__init__()
 
-        self.ap_disabled = False        # for ROM/client version mismatch
+        self.version_mismatch = False
         self.ap_handshake_logged = False
         self.locations_reported = set()  # location IDs already forwarded to the server
 
         # Options, overwritten from slot data
         self.options_set = False
-        self.required_disks = DEFAULT_REQUIRED_DISKS
 
         # DeathLink
         self.death_link = False
         self.pending_death_link = False
         self.death_count_seen = None    # last gAp.deathCount; None until the mailbox is live
-
-        self.save_loaded = False
-        self.player_warned = False      # told the player the final stage needs more disks
 
     async def validate_rom(self, ctx: "BizHawkClientContext") -> bool:
         try:
@@ -89,7 +86,7 @@ class MMZero3Client(BizHawkClient):
                 await self.handle_checked_locations(ctx)
                 await self.handle_received_items(ctx, mailbox)
                 await self.handle_death_link(ctx, mailbox)
-                await self.handle_goal(ctx, mailbox)
+                await self.handle_goal(ctx)
 
             await self.handle_collected_pickups(ctx)
         except bizhawk.RequestFailedError:
@@ -98,7 +95,6 @@ class MMZero3Client(BizHawkClient):
     def read_slot_data(self, ctx: "BizHawkClientContext") -> None:
         if not ctx.slot_data or self.options_set:
             return
-        self.required_disks = ctx.slot_data.get("required_secret_disks", DEFAULT_REQUIRED_DISKS)
         self.death_link = bool(ctx.slot_data.get("death_link", 0))
         self.options_set = True
 
@@ -107,27 +103,29 @@ class MMZero3Client(BizHawkClient):
 
         ApInit runs on the first Process_Game(), so the ready value not matching means the game is still booting or in the starting menu.
         """
-        if self.ap_disabled or ctx.slot is None or not ctx.server_locations:
+        if self.version_mismatch or ctx.slot is None or not ctx.server_locations:
             return None
 
-        ready, version, inbox_write, inbox_read, items_applied, disks_owned, death_count, can_accept_items = \
-            await bizhawk.read(ctx.bizhawk_ctx, [
-                (Data.READY, 4, WRAM),
-                (Data.VERSION, 2, WRAM),
-                (Data.INBOX_WRITE_INDEX, 1, WRAM),
-                (Data.INBOX_READ_INDEX, 1, WRAM),
-                (Data.ITEMS_APPLIED, 2, WRAM),
-                (Data.DISKS_OWNED, 2, WRAM),
-                (Data.DEATH_COUNT, 2, WRAM),
-                (Data.CAN_ACCEPT_ITEMS, 1, WRAM),
-            ])
+        mailbox_bytes = await bizhawk.read(ctx.bizhawk_ctx, [
+            (Data.READY, 4, WRAM),
+            (Data.VERSION, 2, WRAM),
+            (Data.INBOX_WRITE_INDEX, 1, WRAM),
+            (Data.INBOX_READ_INDEX, 1, WRAM),
+            (Data.ITEMS_APPLIED, 2, WRAM),
+            (Data.DISKS_OWNED, 2, WRAM),
+            (Data.DEATH_COUNT, 2, WRAM),
+            (Data.CAN_ACCEPT_ITEMS, 1, WRAM),
+        ])
+
+        (ready, version, inbox_write_index, inbox_read_index,
+         items_applied, disks_owned, death_count, can_accept_items) = mailbox_bytes
 
         if int.from_bytes(ready, "little") != Data.AP_READY:
             return None
 
         rom_version = int.from_bytes(version, "little")
         if rom_version != Data.AP_VERSION:
-            self.ap_disabled = True
+            self.version_mismatch = True
             message = (f"ROM/client version mismatch: the ROM is version "
                        f"{rom_version}, this apworld is version {Data.AP_VERSION}. "
                        f"Please generate a new game/ROM!")
@@ -140,8 +138,8 @@ class MMZero3Client(BizHawkClient):
             self.ap_handshake_logged = True
 
         return {
-            "inbox_write": inbox_write[0],
-            "inbox_read": inbox_read[0],
+            "inbox_write_index": inbox_write_index[0],
+            "inbox_read_index": inbox_read_index[0],
             "items_applied": int.from_bytes(items_applied, "little"),
             "disks_owned": int.from_bytes(disks_owned, "little"),
             "death_count": int.from_bytes(death_count, "little"),
@@ -174,43 +172,71 @@ class MMZero3Client(BizHawkClient):
             await ctx.send_msgs([{"cmd": "LocationChecks", "locations": newly_checked_locations}])
             logger.debug("MMZero3: reported %d locations: %s", len(newly_checked_locations), newly_checked_locations)
 
-    async def handle_received_items(self, ctx: "BizHawkClientContext",
-                                    mailbox: Dict[str, int]) -> None:
+    async def handle_received_items(self, ctx: "BizHawkClientContext", mailbox: Dict[str, int]) -> None:
         """Hand received items to the game through the itemInbox"""
         if not mailbox["can_accept_items"]:
             return
 
-        write_index = mailbox["inbox_write"]
-        read_index = mailbox["inbox_read"]
+        # Both are positions in the 16-slot ring buffer, not counts of items.
+        next_slot_to_write = mailbox["inbox_write_index"]
+        next_slot_the_game_will_read = mailbox["inbox_read_index"]
 
-        items_in_inbox = write_index - read_index
-        if items_in_inbox < 0:
-            items_in_inbox += Data.ITEM_INBOX_COUNT
+        items_sitting_in_inbox = next_slot_to_write - next_slot_the_game_will_read
+        if items_sitting_in_inbox < 0:
+            items_sitting_in_inbox += Data.ITEM_INBOX_COUNT
 
-        items_given_to_game = mailbox["items_applied"] + items_in_inbox
+        # The client keeps no counter of its own; it reads its position back out of the game.
+        items_the_game_already_has = mailbox["items_applied"] + items_sitting_in_inbox
 
         # One slot is always left free, so equal indices can only mean empty.
-        free_slots = Data.ITEM_INBOX_COUNT - 1 - items_in_inbox
-        items_to_give = ctx.items_received[items_given_to_game:items_given_to_game + free_slots]
-        if not items_to_give:
+        free_inbox_slots = Data.ITEM_INBOX_COUNT - 1 - items_sitting_in_inbox
+
+        first_item_to_send = items_the_game_already_has
+        items_not_yet_sent = len(ctx.items_received) - first_item_to_send
+        items_to_send_now = min(items_not_yet_sent, free_inbox_slots)
+        if items_to_send_now <= 0:
             return
 
-        writes = []
-        for item in items_to_give:
-            item_code = int(item.item)
-            address = Data.ITEM_INBOX + write_index * Data.ITEM_INBOX_ELEMENT_SIZE
-            code_bytes = item_code.to_bytes(Data.ITEM_INBOX_ELEMENT_SIZE, "little")
-            writes.append((address, list(code_bytes), WRAM))
+        pending_writes = []
+        for offset in range(items_to_send_now):
+            item_index = first_item_to_send + offset
+            item_code = self.game_item_code(ctx, item_index)
+            slot_address = Data.ITEM_INBOX + next_slot_to_write * Data.ITEM_INBOX_ELEMENT_SIZE
+            item_code_bytes = item_code.to_bytes(Data.ITEM_INBOX_ELEMENT_SIZE, "little")
+            pending_writes.append((slot_address, list(item_code_bytes), WRAM))
 
-            write_index += 1
-            if write_index == Data.ITEM_INBOX_COUNT:
-                write_index = 0
+            next_slot_to_write += 1
+            if next_slot_to_write == Data.ITEM_INBOX_COUNT:
+                next_slot_to_write = 0
 
-        writes.append((Data.INBOX_WRITE_INDEX, [write_index], WRAM))
-        await bizhawk.write(ctx.bizhawk_ctx, writes)
+        pending_writes.append((Data.INBOX_WRITE_INDEX, [next_slot_to_write], WRAM))
+        await bizhawk.write(ctx.bizhawk_ctx, pending_writes)
 
-        still_waiting = len(ctx.items_received) - items_given_to_game - len(items_to_give)
-        logger.debug("MMZero3: pushed %d items to the game, %d total still waiting.", len(items_to_give), still_waiting)
+        items_still_waiting = items_not_yet_sent - items_to_send_now
+        logger.debug("MMZero3: pushed %d items to the game, %d total still waiting.", items_to_send_now, items_still_waiting)
+
+    def game_item_code(self, ctx: "BizHawkClientContext", item_index: int) -> int:
+        """The ROM item code to send for ctx.items_received[item_index].
+
+        Almost every AP item code is also the ROM's code except for Story Progress.
+        """
+        ap_item_code = int(ctx.items_received[item_index].item)
+        if ap_item_code != STORY_PROGRESS_ITEM_CODE:
+            return ap_item_code
+
+        # Process multiple copies of the progressive story progress item.
+        # Turn first copy into ROM code 229 and copy 2 into 230
+        copies_received_so_far = 0
+        for earlier_item in ctx.items_received[:item_index + 1]:
+            if int(earlier_item.item) == STORY_PROGRESS_ITEM_CODE:
+                copies_received_so_far += 1
+
+        if copies_received_so_far == 1:
+            return Data.AP_ITEM_STORY_MID
+        return Data.AP_ITEM_STORY_LATE
+
+
+        # TODO Implement progressive weapon upgrades into here too
 
     async def handle_death_link(self, ctx: "BizHawkClientContext",
                                 mailbox: Dict[str, int]) -> None:
@@ -230,42 +256,17 @@ class MMZero3Client(BizHawkClient):
                 (Data.KILL_REQUEST, [Data.AP_KILL_REQUESTED], WRAM),
             ])
 
-    async def handle_goal(self, ctx: "BizHawkClientContext", mailbox: Dict[str, int]) -> None:
+    async def handle_goal(self, ctx: "BizHawkClientContext") -> None:
         """
-        Clear the final stage holding the required number of disks, set by a player option.
+        Check if final stage is cleared.
         """
         if ctx.finished_game:
             return
-        if mailbox["can_accept_items"]:
-            # Variable is a temp fix, just to make sure that the warning message is displayed,
-            # Since without this check it wouldn't give the warning message until you load a new game after the final level.
-            self.save_loaded = True
-
-        if (FINAL_STAGE_LOCATION not in ctx.checked_locations
-                and FINAL_STAGE_LOCATION not in self.locations_reported):
+        if (FINAL_STAGE_LOCATION not in ctx.checked_locations and FINAL_STAGE_LOCATION not in self.locations_reported):
             return
 
-        disks_owned = mailbox["disks_owned"]
-        if disks_owned < self.required_disks:
-            if self.save_loaded and not self.player_warned:
-                self.player_warned = True
-                await ctx.send_msgs([
-                    {"cmd": "Say", "text": f"Final stage cleared! You still need "
-                                           f"{self.required_disks - disks_owned} more disks."},
-                    {"cmd": "Say", "text": "Collect more disks and the goal will send itself."},
-                    {"cmd": "Say", "text": "Feel free to start new game plus, or load an earlier save!"},
-                ])
-            return
-
-        if self.required_disks == 0:
-            text = "Final stage cleared! Game completed!"
-        elif self.player_warned:
-            text = f"{disks_owned} Disks collected! Game completed!"
-        else:
-            text = (f"Final stage cleared with {disks_owned} Disks, "
-                    f"{disks_owned - self.required_disks} more than needed!")
         await ctx.send_msgs([
-            {"cmd": "Say", "text": text},
+            {"cmd": "Say", "text": "Final stage cleared! Game completed!"},
             {"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL},
         ])
         ctx.finished_game = True

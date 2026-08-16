@@ -3,11 +3,14 @@ from Options import Range, Toggle, OptionSet, DeathLink, PerGameCommonOptions
 
 
 class RequiredSecretDisks(Range):
-    """Number of Secret Disks required to complete the game, on top of beating the final boss."""
+    """Number of Secret Disks required to unlock the final stage.
+
+    The Abandoned Research Laboratory opens once every other stage has been cleared and
+    you are holding this many disks. Clearing it completes the game."""
     display_name = "Required Secret Disks"
     range_start = 0
     range_end = 180
-    default = 80
+    default = 120
 
 class EasyExSkill(Toggle):
     """Rewards player with EX-Skill at the end of a level regardless of ranking."""
