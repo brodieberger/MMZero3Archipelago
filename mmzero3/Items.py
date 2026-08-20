@@ -147,7 +147,8 @@ item_data_table: Dict[str, MMZero3ItemData] = {
     "Secret Disk 117: Orange Cats to Base": MMZero3ItemData(code=117, type=ItemClassification.filler),
     "Secret Disk 118: Phantom Cyber Elf to Base Roof": MMZero3ItemData(code=118, type=ItemClassification.filler),
     "Secret Disk 119: Posters to Base": MMZero3ItemData(code=119, type=ItemClassification.filler),
-    "Secret Disk 120: New Room Near Andrew": MMZero3ItemData(code=120, type=ItemClassification.filler),
+    # The Room spawns 1-up which is a check
+    "Secret Disk 120: New Room Near Andrew": MMZero3ItemData(code=120, type=ItemClassification.progression), 
     "Secret Disk 121: Reploid to Room 1F-A": MMZero3ItemData(code=121, type=ItemClassification.filler),
     
     "Secret Disk 122: Flowers to Base Roof": MMZero3ItemData(code=122, type=ItemClassification.filler),

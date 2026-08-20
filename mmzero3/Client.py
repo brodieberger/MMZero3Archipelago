@@ -84,6 +84,7 @@ class MMZero3Client(BizHawkClient):
             mailbox = await self.read_mailbox(ctx)
             if mailbox is not None:
                 await self.handle_checked_locations(ctx)
+                await self.handle_server_checked(ctx)
                 await self.handle_received_items(ctx, mailbox)
                 await self.handle_death_link(ctx, mailbox)
                 await self.handle_goal(ctx)
@@ -171,6 +172,17 @@ class MMZero3Client(BizHawkClient):
         if newly_checked_locations:
             await ctx.send_msgs([{"cmd": "LocationChecks", "locations": newly_checked_locations}])
             logger.debug("MMZero3: reported %d locations: %s", len(newly_checked_locations), newly_checked_locations)
+
+    async def handle_server_checked(self, ctx: "BizHawkClientContext") -> None:
+        """
+        Lets the game know which locations have been checked. So that certain items can render the effect
+        for when they haven't been picked up yet. (For pickup sanity)
+        """
+        payload = bytearray(Data.SERVER_CHECKED_COUNT)
+        for location_id in ctx.checked_locations:
+            if 0 <= location_id < Data.SERVER_CHECKED_COUNT * 8:
+                payload[location_id >> 3] |= 1 << (location_id & 7)
+        await bizhawk.write(ctx.bizhawk_ctx, [(Data.SERVER_CHECKED, list(payload), WRAM)])
 
     async def handle_received_items(self, ctx: "BizHawkClientContext", mailbox: Dict[str, int]) -> None:
         """Hand received items to the game through the itemInbox"""
