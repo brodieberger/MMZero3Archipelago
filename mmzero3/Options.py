@@ -17,7 +17,7 @@ class EasyExSkill(Toggle):
     display_name = "Always reward EX-Skill"
     
 
-class RandomizeWeapons(Toggle):
+class RandomizeWeapons(DefaultOnToggle):
     """When enabled, the four weapons (Buster, Z-Saber, Recoil Rod, Shield Boomerang) are added to the item pool and must be found before they can be used.
 
     When disabled, all four weapons are available from the start and Starting Weapons is ignored."""
