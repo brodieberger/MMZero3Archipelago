@@ -3,7 +3,9 @@
 Welcome to my project. Things are still under development, but here you will find my development of a custom Archipelago World for Mega Man Zero 3 on the GBA. You should probably read everything here so you know what to expect before playing!
 
 ## General Information
-- As of right now, the randomized items include: All secret disks, armor chips, EX Skills, subtanks, the four weapons, stage access items, and story progress. E-Crystals are filler.
+- As of right now, the location checks you can find are: All secret disks, armor chips, EX Skills, subtanks, static extra life pickups, and finding the Recoil Rod and Shield Boomerang.
+  
+- The items that can be sent to you are all secret disks, armor chips, EX Skills, subtanks, all four weapons, stage access items, and story progress, with E-Crystals as filler
 
 - Every stage is locked behind its own access item. You start in the Resistance Base with no stages accessible. The first access item is guaranteed to be early local, so check around the base and talk to NPCs.
 
@@ -13,6 +15,8 @@ Welcome to my project. Things are still under development, but here you will fin
   - Picking a level you have already beaten asks you how you want to run it. EXPLORE is the vanilla revisit for picking up disks you missed. RETRY MISSION plays the level as a real mission again, so the boss is back and you get another shot at the A+ rank check.
 
 - To beat the game, clear the Abandoned Research Laboratory. It won't open until you have cleared every other stage AND you are holding a configurable number of secret disks (default: 120).
+
+- There are now Story Progress items in the pool. Collecting one makes the game believe you completed the first intermission (Missile Factory), collecting the second makes the game believe you completed the second intermission (Copy X). This is kind of a bandaid fix, since all it really does is advance NPC dialogue so you can get the secret disk checks from them. It will be removed later.
 
 - EX Skills are awarded based on your score on the level you just completed, rather than on your average score going into that level. (Yes, that's how they worked in the vanilla game). Your global rank score is calculated based on your average of all of your highest scores on completed levels.
 
