@@ -49,7 +49,15 @@ class MMZero3World(World):
     starting_weapons: set
 
     def generate_early(self) -> None:
-        if not self.options.randomize_weapons:
+        # Inform the Universal Tracker what the starting items are
+        passthrough = None
+        if hasattr(self.multiworld, "re_gen_passthrough"):
+            if "Mega Man Zero 3" in self.multiworld.re_gen_passthrough:
+                passthrough = self.multiworld.re_gen_passthrough["Mega Man Zero 3"]
+
+        if passthrough:
+            self.starting_weapons = set(passthrough["starting_weapons"])
+        elif not self.options.randomize_weapons:
             self.starting_weapons = set(("Buster", "Z-Saber", "Recoil Rod", "Shield Boomerang"))
         else:
             self.starting_weapons = set(self.options.starting_weapons.value)
@@ -170,8 +178,10 @@ class MMZero3World(World):
         # Location rules: Mobility required (Double Jump or Recoil Rod)
         for loc_name in [
             "Aegis Volcano Base (3) 026: Platform Above First Room",
+            "Aegis Volcano Base (5) 073: Push Container Before Miniboss, Platform After",
             "Old Residential Subtank: Top Left after Pantheon Bombers",
             "Forest of Anatre (7) 076: Above 9th Button",
+            "Giant Elevator 1-UP: 1st Passage High Ledges"
         ]:
             add_rule(self.multiworld.get_location(loc_name, self.player), has_mobility)
 
@@ -180,6 +190,9 @@ class MMZero3World(World):
             "Old Residential (4) 074: Left Fork Door",
             "Forest of Anatre (1) 063: Treetops Above Start",
             "Forest of Anatre (2) 002: Ledge Above 1st Door",
+            "Old Residential 1-UP (1): Right of Fork",
+            "Old Residential 1-UP (2): Left Fork Door",
+            "Forest of Anatre 1-UP: In Tree Near Start"
         ]:
             add_rule(self.multiworld.get_location(loc_name, self.player), has_flame)
 
@@ -187,16 +200,12 @@ class MMZero3World(World):
         add_rule(self.multiworld.get_location("Old Residential (2) 001: Stump Door", self.player),
                  lambda state: has_flame(state) and has_rod(state))
 
-        # Recoil Rod + Mobility (Rod + (Double Jump or Rod) = Rod)
-        add_rule(self.multiworld.get_location("Aegis Volcano Base (5) 073: Container Before Miniboss, Platform After", self.player),
-                 lambda state: has_rod(state) and has_mobility(state))
-
         # Double Mobility: Double Jump Foot Chip + Recoil Rod
         add_rule(self.multiworld.get_location("Giant Elevator (1) 045: 1st Passage High Ledges", self.player),
                  lambda state: state.has("Double Jump Foot Chip", self.player) and has_rod(state))
 
         # Collectable 1-UP spawns in the new room
-        add_rule(self.multiworld.get_location("Resistance Base 1-UP", self.player),
+        add_rule(self.multiworld.get_location("Resistance Base 1-UP: In Locked Room by Andrew", self.player),
                  lambda state: state.has("Secret Disk 120: New Room Near Andrew", self.player))
 
         # Completion condition
@@ -211,3 +220,7 @@ class MMZero3World(World):
 
         #from Utils import visualize_regions
         #visualize_regions(self.multiworld.get_region("Menu", self.player), "my_world.puml")
+
+    @staticmethod
+    def interpret_slot_data(slot_data: Dict[str, Any]) -> Dict[str, Any]:
+        return slot_data

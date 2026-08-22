@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from Options import Range, Toggle, OptionSet, DeathLink, PerGameCommonOptions
+from Options import Range, Toggle, DefaultOnToggle, OptionSet, DeathLink, PerGameCommonOptions
 
 
 class RequiredSecretDisks(Range):
@@ -26,7 +26,7 @@ class RandomizeWeapons(Toggle):
 class StartingWeapons(OptionSet):
     """Which weapons Zero starts with when Randomize Weapons is enabled. Selected weapons are given at the start and will not be placed in the item pool.
 
-    Zero cannot damage anything without a weapon, so if this is left empty a single weapon is granted automatically.
+    If this is left empty the Buster will be granted automatically. (WIP: will soon be a random weapon)
     Ignored when Randomize Weapons is disabled, since every weapon is granted in that case."""
     display_name = "Starting Weapons"
     valid_keys = {"Buster", "Z-Saber", "Recoil Rod", "Shield Boomerang"}

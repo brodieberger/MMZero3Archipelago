@@ -67,7 +67,7 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Aegis Volcano Base (2) 102: 1st Box Inside": MMZero3LocationData(region="Aegis Volcano Base", address=102),
     "Aegis Volcano Base (3) 026: Platform Above First Room": MMZero3LocationData(region="Aegis Volcano Base", address=26),
     "Aegis Volcano Base (4) 114: Push 1st Container": MMZero3LocationData(region="Aegis Volcano Base", address=114),
-    "Aegis Volcano Base (5) 073: Container Before Miniboss, Platform After": MMZero3LocationData(region="Aegis Volcano Base", address=73),
+    "Aegis Volcano Base (5) 073: Push Container Before Miniboss, Platform After": MMZero3LocationData(region="Aegis Volcano Base", address=73),
     "Aegis Volcano Base (6) 152: 10th Crossbyne Kill (Miniboss)": MMZero3LocationData(region="Aegis Volcano Base", address=152),
     "Aegis Volcano Base (7) 072: Lamplort Box": MMZero3LocationData(region="Aegis Volcano Base", address=72),
     "Aegis Volcano Base (8) 008: Top Gabyoall Box": MMZero3LocationData(region="Aegis Volcano Base", address=8),
@@ -286,17 +286,17 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Collect Recoil Rod": MMZero3LocationData(region="Resistance Base 1", address=226),
     "Collect Shield Boomerang": MMZero3LocationData(region="Resistance Base 1", address=227),
 
-    # Extra Lives. 
-    # WIP Oceanic Highway Ruins and Old Residential each have two one ups that save the same check
-    "Oceanic Highway Ruins 1-UP": MMZero3LocationData(region="Oceanic Highway Ruins", address=234),
-    "Old Residential 1-UP": MMZero3LocationData(region="Old Residential", address=236),
-    "Missile Factory 1-UP": MMZero3LocationData(region="Missile Factory", address=237),
-    "Forest of Anatre 1-UP": MMZero3LocationData(region="Forest of Anatre", address=239),
-    "Energy Facility 1-UP": MMZero3LocationData(region="Energy Facility", address=242),
-    "Snowy Plains 1-UP": MMZero3LocationData(region="Snowy Plains", address=243),
-    "Giant Elevator 1-UP": MMZero3LocationData(region="Giant Elevator", address=245),
-    "Sub Arcadia 1-UP": MMZero3LocationData(region="Sub Arcadia", address=246),
-    "Resistance Base 1-UP": MMZero3LocationData(region="Resistance Base 1", address=248),
+    # Extra Lives
+    "Oceanic Highway Ruins 1-UP: 1st Section Floating Platforms": MMZero3LocationData(region="Oceanic Highway Ruins", address=231),
+    "Old Residential 1-UP (1): Right of Fork": MMZero3LocationData(region="Old Residential", address=232), #needs fire
+    "Old Residential 1-UP (2): Left Fork Door": MMZero3LocationData(region="Old Residential", address=233), # needs fire
+    "Missile Factory 1-UP: Towards End Of Missile": MMZero3LocationData(region="Missile Factory", address=234),
+    "Forest of Anatre 1-UP: In Tree Near Start": MMZero3LocationData(region="Forest of Anatre", address=235), # needs fire
+    "Energy Facility 1-UP: Girder Maze Top Left": MMZero3LocationData(region="Energy Facility", address=236),
+    "Snowy Plains 1-UP: Pit Before 2nd Rail Set": MMZero3LocationData(region="Snowy Plains", address=237), 
+    "Giant Elevator 1-UP: 1st Passage High Ledges": MMZero3LocationData(region="Giant Elevator", address=238), # either mobility
+    "Sub Arcadia 1-UP: Above Exit Door in Spike Room": MMZero3LocationData(region="Sub Arcadia", address=239),
+    "Resistance Base 1-UP: In Locked Room by Andrew": MMZero3LocationData(region="Resistance Base 1", address=240),
 
 }
 
