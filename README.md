@@ -3,7 +3,7 @@
 Welcome to my project. Things are still under development, but here you will find my development of a custom Archipelago World for Mega Man Zero 3 on the GBA. You should probably read everything here so you know what to expect before playing!
 
 ## General Information
-- As of right now, the location checks you can find are: All secret disks, armor chips, EX Skills, subtanks, and Recoil Rod and Shield Boomerang.
+- As of right now, the location checks you can find are: All secret disks, armor chips, EX Skills, subtanks, static extra life pickups, and finding the Recoil Rod and Shield Boomerang.
   
 - The items that can be sent to you are all secret disks, armor chips, EX Skills, subtanks, all four weapons, stage access items, and story progress, with E-Crystals as filler
 
