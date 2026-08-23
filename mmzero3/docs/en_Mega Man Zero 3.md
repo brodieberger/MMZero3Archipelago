@@ -22,6 +22,8 @@ Welcome to my project. Things are still under development, but here you will fin
 
 - To beat the game, clear the Abandoned Research Laboratory. It won't open until you have cleared every other stage AND you are holding a configurable number of secret disks (default: 120).
 
+- There are now Story Progress items in the pool. Collecting one makes the game believe you completed the first intermission (Missile Factory), collecting the second makes the game believe you completed the second intermission (Copy X). This is kind of a bandaid fix, since all it really does is advance NPC dialogue so you can get the secret disk checks from them. It will be removed later.
+
 - EX Skills are awarded based on your score on the level you just completed, rather than on your average score going into that level. (Yes, that's how they worked in the vanilla game). Your global rank score is calculated based on your average of all of your highest scores on completed levels.
 
 
