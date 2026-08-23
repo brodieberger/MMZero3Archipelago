@@ -1,4 +1,4 @@
-from typing import Callable, Dict, NamedTuple, Optional, TYPE_CHECKING
+from typing import Callable, Dict, List, NamedTuple, Optional, TYPE_CHECKING
 
 from BaseClasses import Item, ItemClassification
 
@@ -13,7 +13,7 @@ class MMZero3ItemData(NamedTuple):
     type: ItemClassification = ItemClassification.filler
     can_create: Callable[["MMZero3World"], bool] = lambda world: True
     # How many copies of the item go in the pool. For progressive items.
-    count: int = 1
+    count: Callable[["MMZero3World"], int] = lambda world: 1
 
 
 # Stage names as they appear in game order. Final level not included here.
@@ -24,6 +24,20 @@ stage_names = [
     "Area X-2", "Energy Facility", "Snowy Plains",
     "Sunken Library", "Giant Elevator", "Sub Arcadia"
 ]
+
+# Weapon as they appear in game order.
+weapon_names = ["Buster", "Z-Saber", "Recoil Rod", "Shield Boomerang"]
+
+# Progressive upgrades.
+weapon_chains: Dict[str, List[str]] = {
+    "Buster": ["Owns", "Semi Charge", "Full Charge", "Attack +1", "Attack +2", "Attack +3"],
+    "Z-Saber": ["Owns", "2nd Slash", "3rd Slash", "Charged Slash", "Attack +1", "Attack +2", "Attack +3"],
+    "Recoil Rod": ["Owns", "Charged Rod", "Attack +1", "Attack +2", "Attack +3"],
+    "Shield Boomerang": ["Owns", "Charged Throw", "Attack +1", "Attack +2", "Attack +3"],
+}
+def weapon_ability_level(weapon: str, ability: str) -> int:
+    return weapon_chains[weapon].index(ability) + 1
+
 
 item_data_table: Dict[str, MMZero3ItemData] = {
     "Secret Disk 001: Auto-Charge Head Chip": MMZero3ItemData(code=1, type=ItemClassification.useful),
@@ -247,7 +261,8 @@ item_data_table: Dict[str, MMZero3ItemData] = {
     "EX Skill: Saber Smash": MMZero3ItemData(code=211, type=ItemClassification.useful),
     "EX Skill: 1000 Slash": MMZero3ItemData(code=214, type=ItemClassification.useful),
     "EX Skill: Shield Sweep": MMZero3ItemData(code=216, type=ItemClassification.useful),
-    "EX Skill: Split Heavens": MMZero3ItemData(code=212, type=ItemClassification.useful),
+    # Progression: It deals fire damage without needing charge attacks.
+    "EX Skill: Split Heavens": MMZero3ItemData(code=212, type=ItemClassification.progression),
     "EX Skill: Blizzard Arrow": MMZero3ItemData(code=209, type=ItemClassification.useful),
     "EX Skill: Reflected Laser": MMZero3ItemData(code=206, type=ItemClassification.useful),
     "EX Skill: Soul Launcher": MMZero3ItemData(code=215, type=ItemClassification.useful),
@@ -264,32 +279,21 @@ item_data_table: Dict[str, MMZero3ItemData] = {
     # skipping 223 because i skipped it by accident and im lazy
 
     # Weapons
-    "Buster": MMZero3ItemData(
-        code=224,
-        type=ItemClassification.progression,
-        can_create=lambda world, n="Buster": n not in world.starting_weapons,
-    ),
-    "Z-Saber": MMZero3ItemData(
-        code=225,
-        type=ItemClassification.progression,
-        can_create=lambda world, n="Z-Saber": n not in world.starting_weapons,
-    ),
-    "Recoil Rod": MMZero3ItemData(
-        code=226,
-        type=ItemClassification.progression,
-        can_create=lambda world, n="Recoil Rod": n not in world.starting_weapons,
-    ),
-    "Shield Boomerang": MMZero3ItemData(
-        code=227,
-        type=ItemClassification.progression,
-        can_create=lambda world, n="Shield Boomerang": n not in world.starting_weapons,
-    ),
+    # A starting weapon is already at step 1, so it has one less copy.
+    **{
+        f"Progressive {weapon}": MMZero3ItemData(
+            code=224 + idx,
+            type=ItemClassification.progression,
+            count=lambda world, w=weapon: len(weapon_chains[w]) - (1 if w in world.starting_weapons else 0),
+        )
+        for idx, weapon in enumerate(weapon_names)
+    },
 
     # Advances the Resistance Base's story state. Mostly just unlocks new NPC dialogue
     "Story Progress": MMZero3ItemData(
         code=228,
         type=ItemClassification.progression,
-        count=2,
+        count=lambda world: 2,
     ),
 
     # Filler Items
@@ -301,6 +305,7 @@ item_data_table: Dict[str, MMZero3ItemData] = {
 
 item_table = {name: data.code for name, data in item_data_table.items() if data.code is not None}
 stage_access_names = [f"{stage} Access" for stage in stage_names]
+progressive_weapon_names = [f"Progressive {weapon}" for weapon in weapon_names]
 
 # Story Progress
 STORY_MID = 1   # Mission Set 2 NPCs dialogue

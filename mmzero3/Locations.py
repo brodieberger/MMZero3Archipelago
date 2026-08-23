@@ -298,6 +298,19 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Sub Arcadia 1-UP: Above Exit Door in Spike Room": MMZero3LocationData(region="Sub Arcadia", address=239),
     "Resistance Base 1-UP: In Locked Room by Andrew": MMZero3LocationData(region="Resistance Base 1", address=240),
 
+    # Minibosses.
+    "Weapons Repair Factory Miniboss: Bee Server": MMZero3LocationData(region="Weapons Repair Factory", address=242),
+    "Oceanic Highway Ruins Miniboss: Modified Pantheon Aqua": MMZero3LocationData(region="Oceanic Highway Ruins", address=243),
+    "Old Residential Miniboss: Megamilpa": MMZero3LocationData(region="Old Residential", address=244),
+    "Twilight Desert Miniboss: Or Wormer": MMZero3LocationData(region="Twilight Desert", address=245),
+    "Snowy Plains Miniboss: Blanc Wormer": MMZero3LocationData(region="Snowy Plains", address=246),
+    "Energy Facility Miniboss: Locomo-If": MMZero3LocationData(region="Energy Facility", address=247),
+    "Energy Facility Port Room 1: Reactor Core": MMZero3LocationData(region="Energy Facility", address=248),
+    "Energy Facility Port Room 2: Reactor Core": MMZero3LocationData(region="Energy Facility", address=249),
+    "Giant Elevator Miniboss: Spearook": MMZero3LocationData(region="Giant Elevator", address=250),
+    "Sub Arcadia Miniboss: Phantom": MMZero3LocationData(region="Sub Arcadia", address=251),
+    "Aegis Volcano Base Miniboss: Crossbynes": MMZero3LocationData(region="Aegis Volcano Base", address=252),
+
 }
 
 location_table = {name: data.address for name, data in location_data_table.items() if data.address is not None}

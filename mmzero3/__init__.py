@@ -5,7 +5,7 @@ from BaseClasses import Region, Tutorial
 from worlds.AutoWorld import WebWorld, World
 from worlds.generic.Rules import add_rule, set_rule, forbid_item, add_item_rule
 from .Items import (MMZero3Item, STORY_LATE, STORY_MID, item_data_table,
-                    item_table, stage_access_names, stage_names)
+                    item_table, stage_access_names, stage_names, weapon_ability_level)
 from .Locations import MMZero3Location, location_data_table, location_table, locked_locations
 from .Options import MMZero3Options
 from .Regions import region_data_table
@@ -57,8 +57,6 @@ class MMZero3World(World):
 
         if passthrough:
             self.starting_weapons = set(passthrough["starting_weapons"])
-        elif not self.options.randomize_weapons:
-            self.starting_weapons = set(("Buster", "Z-Saber", "Recoil Rod", "Shield Boomerang"))
         else:
             self.starting_weapons = set(self.options.starting_weapons.value)
             if not self.starting_weapons:
@@ -78,7 +76,7 @@ class MMZero3World(World):
 
         for name, item in item_data_table.items():
             if item.code and item.can_create(self) and name not in locked_item_names:
-                item_pool.extend(self.create_item(name) for _ in range(item.count))
+                item_pool.extend(self.create_item(name) for _ in range(item.count(self)))
 
         self.multiworld.itempool += item_pool
 
@@ -123,24 +121,33 @@ class MMZero3World(World):
         return {
             "required_secret_disks": self.options.required_secret_disks.value,
             "easy_ex_skill": self.options.easy_ex_skill.value,
-            "randomize_weapons": self.options.randomize_weapons.value,
             "starting_weapons": sorted(self.starting_weapons),
             "death_link": self.options.death_link.value,
         }
 
     def set_rules(self) -> None:
+        def has_weapon_at(state, weapon: str, ability: str) -> bool:
+            copies_needed = weapon_ability_level(weapon, ability)
+            if weapon in self.starting_weapons:
+                copies_needed -= 1
+            return state.has(f"Progressive {weapon}", self.player, copies_needed)
 
-        def has_weapon(state, weapon: str) -> bool:
-            return weapon in self.starting_weapons or state.has(weapon, self.player)
-
+        # Breaking blocks, moving platforms, and the rod jump.
         def has_rod(state):
-            return has_weapon(state, "Recoil Rod")
+            return has_weapon_at(state, "Recoil Rod", "Charged Rod")
 
         def has_mobility(state):
             return state.has("Double Jump Foot Chip", self.player) or has_rod(state)
 
         def has_flame(state):
-            return state.has("Flame Body Chip", self.player)
+            if not state.has("Flame Body Chip", self.player):
+                return False
+            return (has_weapon_at(state, "Buster", "Full Charge")
+                    or has_weapon_at(state, "Z-Saber", "Charged Slash")
+                    or has_weapon_at(state, "Recoil Rod", "Charged Rod")
+                    or has_weapon_at(state, "Shield Boomerang", "Charged Throw")
+                    or (state.has("EX Skill: Split Heavens", self.player)
+                        and has_weapon_at(state, "Z-Saber", "Owns")))
 
         # Access items.
         for stage_name in stage_names:

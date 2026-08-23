@@ -7,7 +7,7 @@ import worlds._bizhawk as bizhawk
 from worlds._bizhawk.client import BizHawkClient
 
 from . import Data
-from .Items import item_table
+from .Items import item_table, progressive_weapon_names, weapon_chains, weapon_names
 from .Locations import location_data_table
 
 if TYPE_CHECKING:
@@ -35,6 +35,10 @@ SKIP_DISK_RESTORE = frozenset({10, 16, 17, 18})
 
 FINAL_STAGE_LOCATION = location_data_table["Complete Abandoned Research Laboratory"].address
 STORY_PROGRESS_ITEM_CODE = item_table["Story Progress"]
+PROGRESSIVE_WEAPONS = {
+    item_table[progressive]: (index, len(weapon_chains[weapon]))
+    for index, (weapon, progressive) in enumerate(zip(weapon_names, progressive_weapon_names))
+}
 
 
 class MMZero3Client(BizHawkClient):
@@ -53,6 +57,7 @@ class MMZero3Client(BizHawkClient):
 
         # Options, overwritten from slot data
         self.options_set = False
+        self.starting_weapons = None 
 
         # DeathLink
         self.death_link = False
@@ -97,6 +102,7 @@ class MMZero3Client(BizHawkClient):
         if not ctx.slot_data or self.options_set:
             return
         self.death_link = bool(ctx.slot_data.get("death_link", 0))
+        self.starting_weapons = set(ctx.slot_data.get("starting_weapons", ()))
         self.options_set = True
 
     async def read_mailbox(self, ctx: "BizHawkClientContext") -> Optional[Dict[str, int]]:
@@ -188,6 +194,8 @@ class MMZero3Client(BizHawkClient):
         """Hand received items to the game through the itemInbox"""
         if not mailbox["can_accept_items"]:
             return
+        if self.starting_weapons is None:
+            return
 
         # Both are positions in the 16-slot ring buffer, not counts of items.
         next_slot_to_write = mailbox["inbox_write_index"]
@@ -230,25 +238,42 @@ class MMZero3Client(BizHawkClient):
     def game_item_code(self, ctx: "BizHawkClientContext", item_index: int) -> int:
         """The ROM item code to send for ctx.items_received[item_index].
 
-        Almost every AP item code is also the ROM's code except for Story Progress.
+        Used for any progressive item (weapons and story progress).
         """
         ap_item_code = int(ctx.items_received[item_index].item)
-        if ap_item_code != STORY_PROGRESS_ITEM_CODE:
-            return ap_item_code
 
-        # Process multiple copies of the progressive story progress item.
-        # Turn first copy into ROM code 229 and copy 2 into 230
-        copies_received_so_far = 0
-        for earlier_item in ctx.items_received[:item_index + 1]:
-            if int(earlier_item.item) == STORY_PROGRESS_ITEM_CODE:
-                copies_received_so_far += 1
+        if ap_item_code == STORY_PROGRESS_ITEM_CODE:
+            # First copy becomes ROM code 229, second copy 230.
+            if self.copies_received(ctx, item_index) == 1:
+                return Data.AP_ITEM_STORY_MID
+            return Data.AP_ITEM_STORY_LATE
 
-        if copies_received_so_far == 1:
-            return Data.AP_ITEM_STORY_MID
-        return Data.AP_ITEM_STORY_LATE
+        if ap_item_code in PROGRESSIVE_WEAPONS:
+            weapon_index, max_level = PROGRESSIVE_WEAPONS[ap_item_code]
+            level = self.copies_received(ctx, item_index)
 
+            if weapon_names[weapon_index] in self.starting_weapons:
+                level += 1
 
-        # TODO Implement progressive weapon upgrades into here too
+            if level > max_level:
+                level = max_level
+
+            return (Data.AP_ITEM_WEAPON_LEVEL_FIRST
+                    + weapon_index * Data.AP_ITEM_CODES_PER_WEAPON
+                    + level)
+
+        return ap_item_code
+
+    @staticmethod
+    def copies_received(ctx: "BizHawkClientContext", item_index: int) -> int:
+        this_item = ctx.items_received[item_index].item
+        history_so_far = ctx.items_received[:item_index + 1]
+
+        copies = 0
+        for earlier_item in history_so_far:
+            if earlier_item.item == this_item:
+                copies += 1
+        return copies
 
     async def handle_death_link(self, ctx: "BizHawkClientContext",
                                 mailbox: Dict[str, int]) -> None:

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from Options import Range, Toggle, DefaultOnToggle, OptionSet, DeathLink, PerGameCommonOptions
+from Options import Range, Toggle, OptionSet, DeathLink, PerGameCommonOptions
 
 
 class RequiredSecretDisks(Range):
@@ -17,17 +17,10 @@ class EasyExSkill(Toggle):
     display_name = "Always reward EX-Skill"
     
 
-class RandomizeWeapons(DefaultOnToggle):
-    """When enabled, the four weapons (Buster, Z-Saber, Recoil Rod, Shield Boomerang) are added to the item pool and must be found before they can be used.
-
-    When disabled, all four weapons are available from the start and Starting Weapons is ignored."""
-    display_name = "Randomize Weapons"
-
 class StartingWeapons(OptionSet):
-    """Which weapons Zero starts with when Randomize Weapons is enabled. Selected weapons are given at the start and will not be placed in the item pool.
-
-    If this is left empty the Buster will be granted automatically. (WIP: will soon be a random weapon)
-    Ignored when Randomize Weapons is disabled, since every weapon is granted in that case."""
+    """Which weapons Zero starts with.
+    The weapon will still start at its first tier, and progressive unlocks (charge attacks and saber combos) will need to be unlocked.
+    If this is left empty the Buster will be granted automatically. (WIP: will soon be a random weapon)"""
     display_name = "Starting Weapons"
     valid_keys = {"Buster", "Z-Saber", "Recoil Rod", "Shield Boomerang"}
     default = frozenset({"Buster", "Z-Saber"})
@@ -36,6 +29,5 @@ class StartingWeapons(OptionSet):
 class MMZero3Options(PerGameCommonOptions):
     required_secret_disks: RequiredSecretDisks
     easy_ex_skill: EasyExSkill
-    randomize_weapons: RandomizeWeapons
     starting_weapons: StartingWeapons
     death_link: DeathLink
