@@ -3,34 +3,22 @@
 Welcome to my project. Things are still under development, but here you will find my development of a custom Archipelago World for Mega Man Zero 3 on the GBA. You should probably read everything here so you know what to expect before playing!
 
 ## General Information (IMPORTANT)
-
 - **Locations:** All 180 secret disks, stage clears, an A+ rank clear in each of the 15 stages, the nine armor chips, both sub tanks, Cerveau's Recoil Rod and Shield Boomerang, ten extra life pickups, and eleven miniboss fights.
-
 - **Item pool:** 180 secret disks, the four weapons as progressive upgrade unlocks, nine armor chips, twelve EX Skills, two sub tanks, fifteen stage access items and two Story Progress items. E-Crystals are filler.
-
-
-
-
 - There's a modified mission select screen, which allows you to select from any level as long as you have its access item.
   - Boss portraits are in groups of four like in vanilla, but now you can tab between the pages with left and right on the d-pad (the shoulder buttons work too).
   - Hovering a level tells you its name, how many of its disks you have found, whether it's LOCKED / OPEN / CLEARED, as well as your best rank on that stage if it has been cleared.
   - Picking a level you have already beaten asks you how you want to run it. EXPLORE is the vanilla revisit for picking up disks you missed. RETRY MISSION plays the level as a real mission again, so the boss is back and you get another shot at the A+ rank check.
   - Talking to the operator in the command room takes you straight to this screen. Press up next to Ciel and you get the choice of her or the operator, so you can still talk to her.
-
 - To beat the game, clear the Abandoned Research Laboratory. It won't open until you have cleared every other stage AND you are holding a configurable number of secret disks (default: 120)
-
 - Later NPC conversations, and the checks attached to them, are gated behind the two Story Progress items.
-
 - EX Skills are awarded based on your score on the level you just completed, rather than on your average score going into that level. (Yes, that's how they worked in the vanilla game). Your global rank score is calculated based on your average of all of your highest scores on completed levels.
-
 
 ## Weapon Progression
 
 Each of the four weapons is a progressive item. For example, the item pool holds several copies of "Progressive Z-Saber", and every copy you receive moves that weapon one step up its upgrade path. This feature works very similar to the weapon XP system from Zero 1 and 2.
 
-
-
-The first copy hands you the weapon itself, the ones after it unlock that weapon's abilities, and the last three are attack power boosts (ripped from the E-Reader cards).
+The first copy sends you the weapon itself, the ones after it unlock that weapon's abilities, and the last three are attack power boosts (ripped from the E-Reader cards).
 
 The upgrade progress is shown in game as stars in the pause menu, like in Zero 1 and 2.
 
@@ -42,23 +30,17 @@ The upgrade progress is shown in game as stars in the pause menu, like in Zero 1
 | Shield Boomerang | weapon, charged throw,  damage (+1, +2, +3) |
 
 Note: Anything you list in `starting_weapons`  begins at step 1. You will still have to collect the progressive items in order to upgrade it.
-## Quality of Life Stuff
 
+## Quality of Life Stuff
 - The pause menu shows you how many secret disks are required to collect in order to unlock the final stage.
 - All skippable cutscenes are skippable by default.
-
 - You can leave any level at any time.
-
 - Pressing SELECT during gameplay swaps your sub weapon to the next one you own.
 - When Archipelago gives you an item, a small icon pops up over Zero's head with a unique icon will be displayed for each item.
-
 - Collecting certain lore related secret disks will simultaneously unlock a random e-Reader graphical change. A full list can be seen [here](https://tcrf.net/Mega_Man_Zero_3/e-Reader_Functions).
-
 - Your player rank is based on the average of your best clear in each stage, so replaying a level badly can no longer drag it down.
 
-
 ## Options
-
 - `required_secret_disks`:  
   How many disks you need to be holding before the final stage will open (In addition to clearing every other level). Default is 120, max is 180.
 
@@ -72,12 +54,12 @@ Note: Anything you list in `starting_weapons`  begins at step 1. You will still 
   Standard DeathLink. Dying sends, and receiving kills you.
 
 ## Known Bugs.
-
-
 - There have been repeated issues of trackers reporting currently unobtainable items as obtainable. Be sure to report any instance of that.
-- There are some occasional graphic bugs due to the new sprites in the game (from the unfound check animation and pop up indicators). If you see any please try to take a screenshot of your whole game window and send it to the discord.
+- The item popup only shows one at a time, skipping multiple if they arrive at the same time.
+- The pop up icons shares tile space with whatever the room you're in has loaded. If you ever see a garbled icon or one with messed up colors, tell me which room you were in.
 - I hope to soon bring this world from unstable to stable, so report anything that seems off, not just bugs!
-## Planned Featuause.
+  
+## Planned Features.
 - A weapon wheel on SELECT for swapping chips and weapons without opening the menu. Right now it just cycles sub weapons.
 - Other collectables as location checks. Like static health pickups, E-Crystals, breakable containers, etc.
 - Level geometry, enemy, or entrance randomization.
