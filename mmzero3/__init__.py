@@ -207,6 +207,10 @@ class MMZero3World(World):
         add_rule(self.multiworld.get_location("Old Residential (2) 001: Stump Door", self.player),
                  lambda state: has_flame(state) and has_rod(state))
 
+        # Mobility OR Frog Foot Chip
+        add_rule(self.multiworld.get_location("Frontline Ice Base (1) 066: Top Route Tower", self.player),
+                    lambda state: state.has("Secret Disk 004: Frog Foot Chip", self.player) or has_mobility(state))
+
         # Double Mobility: Double Jump Foot Chip + Recoil Rod
         add_rule(self.multiworld.get_location("Giant Elevator (1) 045: 1st Passage High Ledges", self.player),
                  lambda state: state.has("Double Jump Foot Chip", self.player) and has_rod(state))
