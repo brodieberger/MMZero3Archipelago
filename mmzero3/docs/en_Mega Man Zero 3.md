@@ -35,9 +35,9 @@ Note: Anything you list in `starting_weapons`  begins at step 1. You will still 
 - All skippable cutscenes are skippable by default.
 - You can leave any level at any time.
 - Pressing SELECT during gameplay swaps your sub weapon to the next one you own.
-- When Archipelago gives you an item, a small icon pops up over Zero's head with a unique icon will be displayed for each item.
+- When Archipelago gives you an item, a small icon pops up over Zero's head with a unique icon displayed for each item.
 - Collecting certain lore related secret disks will simultaneously unlock a random e-Reader graphical change. A full list can be seen [here](https://tcrf.net/Mega_Man_Zero_3/e-Reader_Functions).
-- Your player rank is based on the average of your best clear in each stage, so replaying a level badly can no longer drag it down.
+- Your player rank is based on the average of your best clear in each stage.
 
 ## Options
 - `required_secret_disks`:  
@@ -54,8 +54,7 @@ Note: Anything you list in `starting_weapons`  begins at step 1. You will still 
 
 ## Known Bugs.
 - There have been repeated issues of trackers reporting currently unobtainable items as obtainable. Be sure to report any instance of that.
-- The item popup only shows one at a time, skipping multiple if they arrive at the same time.
-- The pop up icons shares tile space with whatever the room you're in has loaded. If you ever see a garbled icon or one with messed up colors, tell me which room you were in.
+- The item popup only shows one at a time, skipping multiple if they arrive at the same time, or if you received them during a cutscene.
 - I hope to soon bring this world from unstable to stable, so report anything that seems off, not just bugs!
   
 ## Planned Features.
