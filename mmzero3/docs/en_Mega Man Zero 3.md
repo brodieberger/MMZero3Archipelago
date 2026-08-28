@@ -48,7 +48,7 @@ Note: Anything you list in `starting_weapons`  begins at step 1. You will still 
   How many disks you need to be holding before the final stage will open (In addition to clearing every other level). Default is 120, max is 180.
 
 - `starting_weapons`:  
-  Which of the four you begin with. To give all, use `starting_weapons: ['Buster', 'Z-Saber'. 'Recoil Rod', 'Shield Boomerang]` 
+  Which of the four you begin with. To give all, use `starting_weapons: ['Buster', 'Z-Saber', 'Recoil Rod', 'Shield Boomerang]` 
 
 - `easy_ex_skill`:  
   Always sends the EX Skill location check at the end of a level, whatever your rank was.
