@@ -4,9 +4,11 @@ from typing import List, Dict, Any, ClassVar
 from BaseClasses import Region, Tutorial
 from worlds.AutoWorld import WebWorld, World
 from worlds.generic.Rules import add_rule, set_rule, forbid_item, add_item_rule
-from .Items import (MMZero3Item, STORY_LATE, STORY_MID, item_data_table,
-                    item_table, stage_access_names, stage_names, weapon_ability_level)
-from .Locations import MMZero3Location, location_data_table, location_table, locked_locations
+from .Items import (MMZero3Item, STORY_LATE, STORY_MID, item_data_table, item_name_groups,
+                    item_table, stage_access_names, stage_names, weapon_ability_level,
+                    weapon_names)
+from .Locations import (MMZero3Location, location_data_table, location_name_groups, location_table,
+                        locked_locations)
 from .Options import MMZero3Options
 from .Regions import region_data_table
 from .Rom import MMZero3ProcedurePatch, MMZero3Settings, write_tokens
@@ -45,6 +47,9 @@ class MMZero3World(World):
     item_name_to_id = item_table
     location_name_to_id = location_table
 
+    item_name_groups = item_name_groups
+    location_name_groups = location_name_groups
+
 
     starting_weapons: set
 
@@ -59,12 +64,28 @@ class MMZero3World(World):
             self.starting_weapons = set(passthrough["starting_weapons"])
         else:
             self.starting_weapons = set(self.options.starting_weapons.value)
+
             if not self.starting_weapons:
-                self.starting_weapons = {"Buster"}
+                self.starting_weapons = {self.random.choice(weapon_names)}
+
+        # If it is your only weapon, add another Shield Boomerang so you can actually attack.
+        if self.starting_weapons == {"Shield Boomerang"}:
+            self.multiworld.push_precollected(self.create_item("Progressive Shield Boomerang"))
 
         # Force the first stage access item to be early local
         first_stage_access = self.random.choice(stage_access_names)
         self.multiworld.local_early_items[self.player][first_stage_access] = 1
+
+    def starting_level(self, weapon: str) -> int:
+        """How far up its chain a weapon starts. 0 means the player does not own it.
+
+        This only really exists for the progressive item lambda fucntion.
+        """
+        if weapon not in self.starting_weapons:
+            return 0
+        if self.starting_weapons == {"Shield Boomerang"}:
+            return 2
+        return 1
 
     def create_item(self, name: str) -> MMZero3Item:
         return MMZero3Item(name, item_data_table[name].type, item_data_table[name].code, self.player)

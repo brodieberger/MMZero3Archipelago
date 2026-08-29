@@ -1,4 +1,4 @@
-from typing import Callable, Dict, List, NamedTuple, Optional, TYPE_CHECKING
+from typing import Callable, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
 
 from BaseClasses import Item, ItemClassification
 
@@ -284,7 +284,7 @@ item_data_table: Dict[str, MMZero3ItemData] = {
         f"Progressive {weapon}": MMZero3ItemData(
             code=224 + idx,
             type=ItemClassification.progression,
-            count=lambda world, w=weapon: len(weapon_chains[w]) - (1 if w in world.starting_weapons else 0),
+            count=lambda world, w=weapon: len(weapon_chains[w]) - world.starting_level(w),
         )
         for idx, weapon in enumerate(weapon_names)
     },
@@ -310,6 +310,35 @@ progressive_weapon_names = [f"Progressive {weapon}" for weapon in weapon_names]
 # Story Progress
 STORY_MID = 1   # Mission Set 2 NPCs dialogue
 STORY_LATE = 2  # Mission Set 4 NPCs dialogue
+
+# Item groups for `!hint` and tracker filtering.
+item_categories: Dict[str, range] = {
+    "Secret Disks": range(1, 181),
+    "Head Chips": range(1, 4),
+    "Stage Access": range(181, 196),
+    "Chips": range(197, 206),
+    "Body Chips": range(197, 202),
+    "Foot Chips": range(202, 206),
+    "EX Skills": range(206, 218),
+    "Subtanks": range(221, 223),
+    "Weapons": range(224, 228),
+}
+
+
+def build_item_name_groups() -> Dict[str, Set[str]]:
+    groups: Dict[str, Set[str]] = {}
+
+    for name, data in item_data_table.items():
+        if data.code is None:
+            continue
+        for group, ids in item_categories.items():
+            if data.code in ids:
+                groups.setdefault(group, set()).add(name)
+
+    return groups
+
+
+item_name_groups = build_item_name_groups()
 
 secret_disk_names = [
     name for name, data in item_data_table.items()

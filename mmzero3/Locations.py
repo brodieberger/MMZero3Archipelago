@@ -1,4 +1,4 @@
-from typing import Callable, Dict, NamedTuple, Optional, TYPE_CHECKING
+from typing import Callable, Dict, NamedTuple, Optional, Set, TYPE_CHECKING
 
 from BaseClasses import Location
 
@@ -29,25 +29,25 @@ stage_names = [
 
 location_data_table: Dict[str, MMZero3LocationData] = {
 
-    "Resistance Base 023: Room 02D - Mission Set 2": MMZero3LocationData(region="Resistance Base 2", address=23),
-    "Resistance Base 044: Talk to Rocinolle - Mission Set 4": MMZero3LocationData(region="Resistance Base 3", address=44),
-    "Resistance Base 058: Talk to Right Tower Soldier - Mission Set 1": MMZero3LocationData(region="Resistance Base 1", address=58),
-    "Resistance Base 092: Talk to Cerveau - Mission Set 1": MMZero3LocationData(region="Resistance Base 1", address=92),
+    "Resistance Base 023: Room 02D - 1 Story Progress": MMZero3LocationData(region="Resistance Base 2", address=23),
+    "Resistance Base 044: Talk to Rocinolle - 2 Story Progress": MMZero3LocationData(region="Resistance Base 3", address=44),
+    "Resistance Base 058: Talk to Right Tower Soldier": MMZero3LocationData(region="Resistance Base 1", address=58),
+    "Resistance Base 092: Talk to Cerveau": MMZero3LocationData(region="Resistance Base 1", address=92),
     "Resistance Base 099: Room 03D": MMZero3LocationData(region="Resistance Base 1", address=99),
     "Resistance Base 106: Left Corner of Rooftop": MMZero3LocationData(region="Resistance Base 1", address=106),
-    "Resistance Base 107: Talk to Andrew - Mission Set 2": MMZero3LocationData(region="Resistance Base 2", address=107),
-    "Resistance Base 116: Talk to Alouette - Mission Set 2": MMZero3LocationData(region="Resistance Base 2", address=116),
+    "Resistance Base 107: Talk to Andrew - 1 Story Progress": MMZero3LocationData(region="Resistance Base 2", address=107),
+    "Resistance Base 116: Talk to Alouette - 1 Story Progress": MMZero3LocationData(region="Resistance Base 2", address=116),
     "Resistance Base 165: Near Alouette": MMZero3LocationData(region="Resistance Base 1", address=165),
     "Resistance Base 166: Near Cerveau": MMZero3LocationData(region="Resistance Base 1", address=166),
-    "Resistance Base 167: Talk to Rocinolle - Mission Set 1/2": MMZero3LocationData(region="Resistance Base 1", address=167),
+    "Resistance Base 167: Talk to Rocinolle": MMZero3LocationData(region="Resistance Base 1", address=167),
     "Resistance Base 168: 2nd Floor Hall": MMZero3LocationData(region="Resistance Base 1", address=168),
-    "Resistance Base 169: Talk to Hibou - Mission Set 2/3/4": MMZero3LocationData(region="Resistance Base 2", address=169),
+    "Resistance Base 169: Talk to Hibou - 1 Story Progress": MMZero3LocationData(region="Resistance Base 2", address=169),
     "Resistance Base 170: Near Rocinolle": MMZero3LocationData(region="Resistance Base 1", address=170),
     "Resistance Base 171: Left Room on 1st Floor": MMZero3LocationData(region="Resistance Base 1", address=171),
     "Resistance Base 172: Right Room on 1st Floor": MMZero3LocationData(region="Resistance Base 1", address=172),
-    "Resistance Base 173: Talk to Hirondelle - Mission Set 2": MMZero3LocationData(region="Resistance Base 2", address=173),
-    "Resistance Base 174: Talk to Doigt - Mission Set 2": MMZero3LocationData(region="Resistance Base 2", address=174),
-    "Resistance Base 175: Talk to Menart - Mission Set 1": MMZero3LocationData(region="Resistance Base 1", address=175),
+    "Resistance Base 173: Talk to Hirondelle - 1 Story Progress": MMZero3LocationData(region="Resistance Base 2", address=173),
+    "Resistance Base 174: Talk to Doigt - 1 Story Progress": MMZero3LocationData(region="Resistance Base 2", address=174),
+    "Resistance Base 175: Talk to Menart": MMZero3LocationData(region="Resistance Base 1", address=175),
     "Resistance Base 176: Near Pic": MMZero3LocationData(region="Resistance Base 1", address=176),
 
     "Derelict Spacecraft 133: 5th Grand Cannon Kill": MMZero3LocationData(region="Derelict Spacecraft", address=133),
@@ -276,7 +276,7 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "A+ Rank Clear: Snowy Plains": MMZero3LocationData(region="Snowy Plains", address=217),
     "A+ Rank Clear: Sunken Library": MMZero3LocationData(region="Sunken Library", address=218),
     "A+ Rank Clear: Giant Elevator": MMZero3LocationData(region="Giant Elevator", address=219),
-    "A+ Rank Clear: Sub Arcadia": MMZero3LocationData(region="Giant Elevator", address=220),
+    "A+ Rank Clear: Sub Arcadia": MMZero3LocationData(region="Sub Arcadia", address=220),
 
     # Sub Tanks
     "Old Residential Subtank: Top Left after Pantheon Bombers": MMZero3LocationData(region="Old Residential", address=221),
@@ -298,7 +298,7 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Sub Arcadia 1-UP: Above Exit Door in Spike Room": MMZero3LocationData(region="Sub Arcadia", address=239),
     "Resistance Base 1-UP: In Locked Room by Andrew": MMZero3LocationData(region="Resistance Base 1", address=240),
 
-    # Minibosses.
+    # Minibosses
     "Weapons Repair Factory Miniboss: Bee Server": MMZero3LocationData(region="Weapons Repair Factory", address=242),
     "Oceanic Highway Ruins Miniboss: Modified Pantheon Aqua": MMZero3LocationData(region="Oceanic Highway Ruins", address=243),
     "Old Residential Miniboss: Megamilpa": MMZero3LocationData(region="Old Residential", address=244),
@@ -310,8 +310,41 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Giant Elevator Miniboss: Spearook": MMZero3LocationData(region="Giant Elevator", address=250),
     "Sub Arcadia Miniboss: Phantom": MMZero3LocationData(region="Sub Arcadia", address=251),
     "Aegis Volcano Base Miniboss: Crossbynes": MMZero3LocationData(region="Aegis Volcano Base", address=252),
-
 }
+
+# Location groups for `!hint` and tracker filtering.
+location_categories: Dict[str, range] = {
+    "Secret Disks": range(1, 181),
+    "Stage Clears": range(181, 197),
+    "Chips": range(197, 206),
+    "A+ Rank Clears": range(206, 221),
+    "Subtanks": range(221, 223),
+    "Weapons": range(226, 228),
+    "1-UPs": range(231, 241),
+    "Minibosses": range(242, 253),
+}
+
+
+def build_location_name_groups() -> Dict[str, Set[str]]:
+    """Item Groups. One per stage and one per kind of check."""
+    groups: Dict[str, Set[str]] = {}
+
+    for name, data in location_data_table.items():
+        # The base is three regions since its checks are gated on Story Progress,
+        # but I still feel like a player asking resistance base is asking for all 3 together.
+        stage = "Resistance Base" if data.region.startswith("Resistance Base") else data.region
+        groups.setdefault(stage, set()).add(name)
+
+        if data.address is None:
+            continue
+        for group, ids in location_categories.items():
+            if data.address in ids:
+                groups.setdefault(group, set()).add(name)
+
+    return groups
+
+
+location_name_groups = build_location_name_groups()
 
 location_table = {name: data.address for name, data in location_data_table.items() if data.address is not None}
 locked_locations = {name: data for name, data in location_data_table.items() if data.locked_item}

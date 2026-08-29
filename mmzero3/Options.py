@@ -6,7 +6,10 @@ class RequiredSecretDisks(Range):
     """Number of Secret Disks required to unlock the final stage.
 
     The Abandoned Research Laboratory opens once every other stage has been cleared and
-    you are holding this many disks. Clearing it completes the game."""
+    you are holding this many disks. Clearing it completes the game.
+    Setting it above 170 is not recommended, as it will place a lot of useful items in the final stage, which
+    at that point, the game is basically completed.
+    """
     display_name = "Required Secret Disks"
     range_start = 0
     range_end = 180
@@ -20,7 +23,7 @@ class EasyExSkill(Toggle):
 class StartingWeapons(OptionSet):
     """Which weapons Zero starts with.
     The weapon will still start at its first tier, and progressive unlocks (charge attacks and saber combos) will need to be unlocked.
-    If this is left empty the Buster will be granted automatically. (WIP: will soon be a random weapon)"""
+    If this is left empty, one random weapon is granted instead."""
     display_name = "Starting Weapons"
     valid_keys = {"Buster", "Z-Saber", "Recoil Rod", "Shield Boomerang"}
     default = frozenset({"Buster", "Z-Saber"})
