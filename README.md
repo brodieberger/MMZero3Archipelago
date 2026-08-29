@@ -48,13 +48,29 @@ Note: Anything you list in `starting_weapons`  begins at step 1. You will still 
   How many disks you need to be holding before the final stage will open (In addition to clearing every other level). Default is 120, max is 180.
 
 - `starting_weapons`:  
-  Which of the four you begin with. To give all, use `starting_weapons: ['Buster', 'Z-Saber', 'Recoil Rod', 'Shield Boomerang]` 
+  Which of the four you begin with. To give all, use `starting_weapons: ['Buster', 'Z-Saber', 'Recoil Rod', 'Shield Boomerang']` 
 
 - `easy_ex_skill`:  
   Always sends the EX Skill location check at the end of a level, whatever your rank was.
 
 - `death_link`:  
   Standard DeathLink. Dying sends, and receiving kills you.
+
+## Hinting and Tracking
+
+Items and locations are sorted into groups. Try using `!hint`.
+
+| locations | |
+| --- | --- |
+| per stage | `Resistance Base` (all three mission sets), `Aegis Volcano Base`, `Sunken Library`, and so on |
+| by type | `Secret Disks`, `Stage Clears`, `Chips`, `A+ Rank Clears`, `Subtanks`, `Weapons`, `1-UPs`, `Minibosses` |
+
+| items | |
+| --- | --- |
+| by type | `Secret Disks`, `Stage Access`, `Chips`, `Body Chips`, `Foot Chips`, `Head Chips`, `EX Skills`, `Subtanks`, `Weapons` |
+
+For example: `!hint Stage Access` or `!missing Sub Arcadia`.
+
 
 ## Known Bugs.
 - There have been repeated issues of trackers reporting currently unobtainable items as obtainable. Be sure to report any instance of that.
