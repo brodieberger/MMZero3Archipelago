@@ -23,7 +23,9 @@ class EasyExSkill(Toggle):
 class StartingWeapons(OptionSet):
     """Which weapons Zero starts with.
     The weapon will still start at its first tier, and progressive unlocks (charge attacks and saber combos) will need to be unlocked.
-    If this is left empty, one random weapon is granted instead."""
+    If this is left empty, one random weapon is granted instead.
+    
+    Valid Keys: {"Buster", "Z-Saber", "Recoil Rod", "Shield Boomerang"}"""
     display_name = "Starting Weapons"
     valid_keys = {"Buster", "Z-Saber", "Recoil Rod", "Shield Boomerang"}
     default = frozenset({"Buster", "Z-Saber"})
