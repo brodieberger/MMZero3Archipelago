@@ -65,10 +65,14 @@ def wrap_text(text: str, cols: int, lines: int) -> List[str]:
     out = []
     line = ""
 
+    words = []
     for word in text.split():
-        if len(word) > cols:
-            word = word[:cols]
+        while len(word) > cols:
+            words.append(word[:cols])
+            word = word[cols:]
+        words.append(word)
 
+    for word in words:
         if line == "":
             longer = word
         else:
@@ -88,7 +92,7 @@ def wrap_text(text: str, cols: int, lines: int) -> List[str]:
     return out[:lines]
 
 
-def shop_record(name_lines: List[str], player_lines: List[str], kind: int) -> bytes:
+def shop_record(name_lines: List[str], player_lines: List[str], kind: int, code: int) -> bytes:
     """
     Get data for one shop item. 68 Bytes total: 
     The name lines, the player lines, the kind byte, then padding.
@@ -109,6 +113,9 @@ def shop_record(name_lines: List[str], player_lines: List[str], kind: int) -> by
             out += encode_text("", cols)
 
     out.append(kind)
+    while len(out) % 2 != 0:          # the item code is a u16, so it needs to start on an even byte
+        out.append(0)
+    out += code.to_bytes(2, "little")
     while len(out) < Data.SHOP_ITEMS_SIZE:
         out.append(0)
     return bytes(out)
@@ -123,7 +130,7 @@ def shop_item_records(world: "MMZero3World") -> bytes:
 
     for slot in range(Data.SHOP_ITEMS_COUNT):
         if slot >= world.options.shop_slots.value:
-            out += shop_record([], [], 0)
+            out += shop_record([], [], 0, 0)
             continue
 
         item = world.multiworld.get_location(shop_location_names[slot], world.player).item
@@ -135,18 +142,17 @@ def shop_item_records(world: "MMZero3World") -> bytes:
         else:
             kind = Data.AP_SHOP_KIND_PLAIN
 
-        # TODO render each MMZERO3 item as its own icon.
         if item.player == world.player:
             kind |= Data.AP_SHOP_OWN_WORLD
-            if item.name.startswith("Secret Disk"):
-                kind |= Data.AP_SHOP_IS_DISK
+            code = item.code
             player = ""
         else:
+            code = 0
             player = world.multiworld.get_player_name(item.player)
 
         name_lines = wrap_text(item.name, cols, Data.AP_SHOP_NAME_LINES)
         player_lines = wrap_text(player, cols, Data.AP_SHOP_PLAYER_LINES)
-        out += shop_record(name_lines, player_lines, kind)
+        out += shop_record(name_lines, player_lines, kind, code)
 
     return bytes(out)
 
