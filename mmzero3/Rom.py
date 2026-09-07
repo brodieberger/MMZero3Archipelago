@@ -1,12 +1,14 @@
 import os
-from typing import TYPE_CHECKING
+from typing import List, TYPE_CHECKING
 
 import settings
 import Utils
+from BaseClasses import ItemClassification
 from settings import get_settings
 from worlds.Files import APProcedurePatch, APTokenMixin, APTokenTypes
 
 from . import Data
+from .Locations import shop_location_names
 
 if TYPE_CHECKING:
     from . import MMZero3World
@@ -40,6 +42,115 @@ class MMZero3ProcedurePatch(APProcedurePatch, APTokenMixin):
         return get_base_rom_bytes()
 
 
+def encode_text(text: str, cols: int) -> bytes:
+    """
+    String into a series of bytes the ROM can print using the charmap.
+    
+    For shop's text. Anything not in Data's charmap becomes a ?.
+    """
+    out = bytearray()
+    for letter in text[:cols]:
+        if letter in Data.CHARMAP:
+            out.append(Data.CHARMAP[letter])
+        else:
+            out.append(Data.CHARMAP["?"])
+
+    out.append(Data.AP_SHOP_TEXT_END)
+    while len(out) < cols + 1:
+        out.append(0)
+    return bytes(out)
+
+
+def wrap_text(text: str, cols: int, lines: int) -> List[str]:
+    out = []
+    line = ""
+
+    for word in text.split():
+        if len(word) > cols:
+            word = word[:cols]
+
+        if line == "":
+            longer = word
+        else:
+            longer = line + " " + word
+
+        if len(longer) <= cols:
+            line = longer
+        else:
+            out.append(line)
+            line = word
+
+        if len(out) == lines:
+            return out
+
+    if line != "":
+        out.append(line)
+    return out[:lines]
+
+
+def shop_record(name_lines: List[str], player_lines: List[str], kind: int) -> bytes:
+    """
+    Get data for one shop item. 68 Bytes total: 
+    The name lines, the player lines, the kind byte, then padding.
+    """
+    cols = Data.AP_SHOP_TEXT_COLS
+    out = bytearray()
+
+    for i in range(Data.AP_SHOP_NAME_LINES):
+        if i < len(name_lines):
+            out += encode_text(name_lines[i], cols)
+        else:
+            out += encode_text("", cols)
+
+    for i in range(Data.AP_SHOP_PLAYER_LINES):
+        if i < len(player_lines):
+            out += encode_text(player_lines[i], cols)
+        else:
+            out += encode_text("", cols)
+
+    out.append(kind)
+    while len(out) < Data.SHOP_ITEMS_SIZE:
+        out.append(0)
+    return bytes(out)
+
+
+def shop_item_records(world: "MMZero3World") -> bytes:
+    """
+    Gets all shop item information from world to place into ROM, formatting when needed.
+    """
+    cols = Data.AP_SHOP_TEXT_COLS
+    out = bytearray()
+
+    for slot in range(Data.SHOP_ITEMS_COUNT):
+        if slot >= world.options.shop_slots.value:
+            out += shop_record([], [], 0)
+            continue
+
+        item = world.multiworld.get_location(shop_location_names[slot], world.player).item
+
+        if item.advancement:
+            kind = Data.AP_SHOP_KIND_PROGRESSION
+        elif item.classification == ItemClassification.trap:
+            kind = Data.AP_SHOP_KIND_TRAP
+        else:
+            kind = Data.AP_SHOP_KIND_PLAIN
+
+        # TODO render each MMZERO3 item as its own icon.
+        if item.player == world.player:
+            kind |= Data.AP_SHOP_OWN_WORLD
+            if item.name.startswith("Secret Disk"):
+                kind |= Data.AP_SHOP_IS_DISK
+            player = ""
+        else:
+            player = world.multiworld.get_player_name(item.player)
+
+        name_lines = wrap_text(item.name, cols, Data.AP_SHOP_NAME_LINES)
+        player_lines = wrap_text(player, cols, Data.AP_SHOP_PLAYER_LINES)
+        out += shop_record(name_lines, player_lines, kind)
+
+    return bytes(out)
+
+
 def write_tokens(world: "MMZero3World", patch: MMZero3ProcedurePatch) -> None:
     """Write this seed's settings over ApSeedConfig in the ROM.
 
@@ -48,6 +159,11 @@ def write_tokens(world: "MMZero3World", patch: MMZero3ProcedurePatch) -> None:
         u8  startingWeapons;
         u8  easyExSkill;
     };
+
+    Theres also gApShopPrices, one u16 per shop slot: 
+    what that slot costs, or 0 for a slot this seed does not stock
+
+    And gApShopItems, one record a slot saying what is in it.
     """
     starting_weapons = 0
     for name in world.starting_weapons:
@@ -64,6 +180,18 @@ def write_tokens(world: "MMZero3World", patch: MMZero3ProcedurePatch) -> None:
         seed_config[offset:offset + size] = values[name].to_bytes(size, "little")
 
     patch.write_token(APTokenTypes.WRITE, Data.SEED_CONFIG_ROM_OFFSET, bytes(seed_config))
+
+    prices = bytearray()
+    for slot in range(Data.SHOP_PRICES_COUNT):
+        if slot < len(world.shop_prices):
+            price = world.shop_prices[slot]
+        else:
+            price = 0
+        prices += price.to_bytes(Data.SHOP_PRICES_ELEMENT_SIZE, "little")
+    patch.write_token(APTokenTypes.WRITE, Data.SHOP_PRICES_ROM_OFFSET, bytes(prices))
+
+    patch.write_token(APTokenTypes.WRITE, Data.SHOP_ITEMS_ROM_OFFSET, shop_item_records(world))
+
     patch.write_file("token_data.bin", patch.get_token_binary())
 
 

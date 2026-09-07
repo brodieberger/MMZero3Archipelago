@@ -8,7 +8,7 @@ from .Items import (MMZero3Item, STORY_LATE, STORY_MID, item_data_table, item_na
                     item_table, stage_access_names, stage_names, weapon_ability_level,
                     weapon_names)
 from .Locations import (MMZero3Location, location_data_table, location_name_groups, location_table,
-                        locked_locations)
+                        locked_locations, shop_location_names)
 from .Options import MMZero3Options
 from .Regions import region_data_table
 from .Rom import MMZero3ProcedurePatch, MMZero3Settings, write_tokens
@@ -54,6 +54,8 @@ class MMZero3World(World):
     starting_weapons: set
 
     def generate_early(self) -> None:
+        self.roll_shop_prices()
+
         # Inform the Universal Tracker what the starting items are
         passthrough = None
         if hasattr(self.multiworld, "re_gen_passthrough"):
@@ -146,6 +148,22 @@ class MMZero3World(World):
             "death_link": self.options.death_link.value,
         }
 
+    ELF_PRICE_COSTS = (70, 100, 150, 200, 250, 300, 400, 500, 700)
+
+    def roll_shop_prices(self) -> None:
+        self.shop_prices = []
+        for _ in range(self.options.shop_slots.value):
+            price = self.random.choice(self.ELF_PRICE_COSTS)
+            price = price * self.options.shop_price_scale.value // 100
+            price = price // 10 * 10        # every vanilla elf cost is a round ten
+
+            if price < 10:
+                price = 10
+            if price > 9990:
+                price = 9990
+
+            self.shop_prices.append(price)
+
     def set_rules(self) -> None:
         def has_weapon_at(state, weapon: str, ability: str) -> bool:
             copies_needed = weapon_ability_level(weapon, ability)
@@ -175,6 +193,13 @@ class MMZero3World(World):
             set_rule(
                 self.multiworld.get_entrance(f"To {stage_name}", self.player),
                 lambda state, item=f"{stage_name} Access": state.has(item, self.player),
+            )
+
+        # Cerveau's shop.
+        for slot in range(self.options.shop_slots.value):
+            set_rule(
+                self.multiworld.get_location(shop_location_names[slot], self.player),
+                lambda state: state.has_any(stage_access_names, self.player),
             )
 
         # The base's later mission sets.

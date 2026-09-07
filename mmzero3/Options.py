@@ -30,9 +30,30 @@ class StartingWeapons(OptionSet):
     valid_keys = {"Buster", "Z-Saber", "Recoil Rod", "Shield Boomerang"}
     default = frozenset({"Buster", "Z-Saber"})
 
+class ShopSlots(Range):
+    """How many slots Cerveau's shop stocks."""
+    display_name = "Shop Slots"
+    range_start = 0
+    range_end = 48
+    default = 16
+
+
+class ShopPriceScale(Range):
+    """How expensive Cerveau's shop is, as a percentage.
+
+    Items range from 70 to 700 eCrystals, with most being in the 100 to 300 range.
+    """
+    display_name = "Shop Price Scale"
+    range_start = 25
+    range_end = 400
+    default = 100
+
+
 @dataclass
 class MMZero3Options(PerGameCommonOptions):
     required_secret_disks: RequiredSecretDisks
     easy_ex_skill: EasyExSkill
     starting_weapons: StartingWeapons
+    shop_slots: ShopSlots
+    shop_price_scale: ShopPriceScale
     death_link: DeathLink
