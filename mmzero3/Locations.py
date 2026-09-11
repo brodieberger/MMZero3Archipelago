@@ -318,27 +318,27 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Derelict Spacecraft Energy: Ledge After Entrance": MMZero3LocationData(region="Derelict Spacecraft", address=302),
 
     "Aegis Volcano Base E-Crystal (1): Ledge Above Lava": MMZero3LocationData(region="Aegis Volcano Base", address=303),
-    "Aegis Volcano Base Energy: Platform Above First Room": MMZero3LocationData(region="Aegis Volcano Base", address=304),
-    "Aegis Volcano Base E-Crystal (2): Push 1st Container": MMZero3LocationData(region="Aegis Volcano Base", address=305),
-    "Aegis Volcano Base E-Crystal (3): Push 1st Container": MMZero3LocationData(region="Aegis Volcano Base", address=306),
+    "Aegis Volcano Base Energy: Platform Above First Room": MMZero3LocationData(region="Aegis Volcano Base", address=304), #mobility
+    "Aegis Volcano Base E-Crystal (2): Push 1st Container": MMZero3LocationData(region="Aegis Volcano Base", address=305), #recoil
+    "Aegis Volcano Base E-Crystal (3): Push 1st Container": MMZero3LocationData(region="Aegis Volcano Base", address=306), #recoil
     "Aegis Volcano Base E-Crystal (4): After Mini Boss": MMZero3LocationData(region="Aegis Volcano Base", address=307),
     "Aegis Volcano Base E-Crystal (5): Ascent After Mini Boss": MMZero3LocationData(region="Aegis Volcano Base", address=308),
     "Aegis Volcano Base E-Crystal (6): After Second Lava Blocks": MMZero3LocationData(region="Aegis Volcano Base", address=309),
 
-    "Oceanic Highway Ruins E-Crystal (1): 1st Pit Breakable": MMZero3LocationData(region="Oceanic Highway Ruins", address=310),
-    "Oceanic Highway Ruins E-Crystal (2): 1st Pit Breakable": MMZero3LocationData(region="Oceanic Highway Ruins", address=311),
+    "Oceanic Highway Ruins E-Crystal (1): 1st Pit Breakable": MMZero3LocationData(region="Oceanic Highway Ruins", address=310), #recoil
+    "Oceanic Highway Ruins E-Crystal (2): 1st Pit Breakable": MMZero3LocationData(region="Oceanic Highway Ruins", address=311), #recoil
     "Oceanic Highway Ruins E-Crystal (3): 1st Underwater Pit": MMZero3LocationData(region="Oceanic Highway Ruins", address=312),
     "Oceanic Highway Ruins E-Crystal (4): 1st Underwater Pit": MMZero3LocationData(region="Oceanic Highway Ruins", address=313),
     "Oceanic Highway Ruins E-Crystal (5): Above Cyber Door": MMZero3LocationData(region="Oceanic Highway Ruins", address=314),
     "Oceanic Highway Ruins E-Crystal (6): Above Cyber Door": MMZero3LocationData(region="Oceanic Highway Ruins", address=315),
     "Oceanic Highway Ruins Energy (1): 1st Section Floating Platforms": MMZero3LocationData(region="Oceanic Highway Ruins", address=316),
-    "Oceanic Highway Ruins Energy (2): Locked Box Before 2nd Pressure Pad": MMZero3LocationData(region="Oceanic Highway Ruins", address=317),
+    "Oceanic Highway Ruins Energy (2): Destroy Box Using Boss": MMZero3LocationData(region="Oceanic Highway Ruins", address=317),
     "Oceanic Highway Ruins Energy (3): Floating Platform after 2nd Pressure Pad": MMZero3LocationData(region="Oceanic Highway Ruins", address=318),
     "Oceanic Highway Ruins E-Crystal (7): Spiked Platforms": MMZero3LocationData(region="Oceanic Highway Ruins", address=319),
 
     "Weapons Repair Factory Energy (1): Before 1st Junk Pit": MMZero3LocationData(region="Weapons Repair Factory", address=320),
-    "Weapons Repair Factory E-Crystal (1): Hit 3rd Hammer": MMZero3LocationData(region="Weapons Repair Factory", address=321),
-    "Weapons Repair Factory E-Crystal (2): Hit 3rd Hammer": MMZero3LocationData(region="Weapons Repair Factory", address=322),
+    "Weapons Repair Factory E-Crystal (1): Hit 3rd Hammer": MMZero3LocationData(region="Weapons Repair Factory", address=321), #recoil
+    "Weapons Repair Factory E-Crystal (2): Hit 3rd Hammer": MMZero3LocationData(region="Weapons Repair Factory", address=322), #recoil
     "Weapons Repair Factory Energy (2): In Junk Pit": MMZero3LocationData(region="Weapons Repair Factory", address=323),
     "Weapons Repair Factory E-Crystal (3): Before Mini Boss Door": MMZero3LocationData(region="Weapons Repair Factory", address=324),
     "Weapons Repair Factory E-Crystal (4): Before Mini Boss Door": MMZero3LocationData(region="Weapons Repair Factory", address=325),
@@ -347,13 +347,13 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Weapons Repair Factory E-Crystal (6): Before Conveyor Descent": MMZero3LocationData(region="Weapons Repair Factory", address=328),
     "Weapons Repair Factory E-Crystal (7): Ladder Into Junk": MMZero3LocationData(region="Weapons Repair Factory", address=329),
 
-    "Old Residential E-Crystal (1): Stump Door": MMZero3LocationData(region="Old Residential", address=330),
-    "Old Residential Energy (1): Stump Door": MMZero3LocationData(region="Old Residential", address=331),
-    "Old Residential E-Crystal (2): Above 1st Door": MMZero3LocationData(region="Old Residential", address=332), #CHECK THESE
-    "Old Residential E-Crystal (3): Above 1st Door": MMZero3LocationData(region="Old Residential", address=333), #CHECK THESE
-    "Old Residential E-Crystal (4): Door after Cutscene": MMZero3LocationData(region="Old Residential", address=334),
-    "Old Residential E-Crystal (5): Door after Cutscene": MMZero3LocationData(region="Old Residential", address=335),
-    "Old Residential E-Crystal (6): Door after Cutscene": MMZero3LocationData(region="Old Residential", address=336),
+    "Old Residential E-Crystal (1): Stump Door": MMZero3LocationData(region="Old Residential", address=330), #fire
+    "Old Residential Energy (1): Stump Door": MMZero3LocationData(region="Old Residential", address=331), #fire
+    "Old Residential E-Crystal (2): Above 1st Door": MMZero3LocationData(region="Old Residential", address=332),
+    "Old Residential E-Crystal (3): Above 1st Door": MMZero3LocationData(region="Old Residential", address=333),
+    "Old Residential E-Crystal (4): Covered Door after Cutscene": MMZero3LocationData(region="Old Residential", address=334), #fire
+    "Old Residential E-Crystal (5): Covered Door after Cutscene": MMZero3LocationData(region="Old Residential", address=335), #fire
+    "Old Residential E-Crystal (6): Covered Door after Cutscene": MMZero3LocationData(region="Old Residential", address=336), #fire
     "Old Residential Energy (2): Top Right Secret Door": MMZero3LocationData(region="Old Residential", address=337),
     "Old Residential E-Crystal (7): Top Right Secret Door": MMZero3LocationData(region="Old Residential", address=338),
     "Old Residential E-Crystal (8): Top Right Secret Door": MMZero3LocationData(region="Old Residential", address=339),
@@ -362,7 +362,7 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Old Residential E-Crystal (10): Falling Platforms": MMZero3LocationData(region="Old Residential", address=342),
     "Old Residential E-Crystal (11): Falling Platforms": MMZero3LocationData(region="Old Residential", address=343),
     "Old Residential E-Crystal (12): Falling Platforms": MMZero3LocationData(region="Old Residential", address=344),
-    "Old Residential E-Crystal (13): Top Left Pantheon Bombers": MMZero3LocationData(region="Old Residential", address=345),
+    "Old Residential E-Crystal (13): Top Left Pantheon Bombers": MMZero3LocationData(region="Old Residential", address=345), #mobility
     "Old Residential Energy (4): Climb after Miniboss": MMZero3LocationData(region="Old Residential", address=346),
     "Old Residential Energy (5): Before Top Right Secret Door": MMZero3LocationData(region="Old Residential", address=347),
     "Old Residential Energy (6): Breakable Blocks by Bombers": MMZero3LocationData(region="Old Residential", address=348),
@@ -371,15 +371,15 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Missile Factory E-Crystal (2): Pit Under Ladder": MMZero3LocationData(region="Missile Factory", address=350),
     "Missile Factory E-Crystal (3): Missile Top Path": MMZero3LocationData(region="Missile Factory", address=351),
     "Missile Factory Energy (1): Missile Bottom Path": MMZero3LocationData(region="Missile Factory", address=352),
-    "Missile Factory Energy (2): Missile Top Right": MMZero3LocationData(region="Missile Factory", address=353),
+    "Missile Factory Energy (2): Missile Top Right": MMZero3LocationData(region="Missile Factory", address=353), #Technically nothing, but double jump anyway
 
     "Twilight Desert Energy: Above 2nd Pillar Cannon": MMZero3LocationData(region="Twilight Desert", address=354),
 
-    "Forest of Anatre Energy (1): Treetops Above Generator Cannon": MMZero3LocationData(region="Forest of Anatre", address=355),
+    "Forest of Anatre Energy (1): Treetops Above Generator Cannon": MMZero3LocationData(region="Forest of Anatre", address=355), # fire
     "Forest of Anatre Energy (2): 7th Button Upper Path": MMZero3LocationData(region="Forest of Anatre", address=356),
-    "Forest of Anatre Energy (3): Breakables Below Boss Room": MMZero3LocationData(region="Forest of Anatre", address=357),
+    "Forest of Anatre Energy (3): Breakables Below Boss Room": MMZero3LocationData(region="Forest of Anatre", address=357), # recoil
 
-    "Frontline Ice Base Energy: Top Route Tower": MMZero3LocationData(region="Frontline Ice Base", address=358),
+    "Frontline Ice Base Energy: Top Route Tower": MMZero3LocationData(region="Frontline Ice Base", address=358), # splash
     "Frontline Ice Base E-Crystal (1): Bottom Route Cave": MMZero3LocationData(region="Frontline Ice Base", address=359),
     "Frontline Ice Base E-Crystal (2): Bottom Route Cave": MMZero3LocationData(region="Frontline Ice Base", address=360),
     "Frontline Ice Base E-Crystal (3): Ledge After 2nd Door": MMZero3LocationData(region="Frontline Ice Base", address=361),

@@ -225,6 +225,13 @@ class MMZero3World(World):
             "Forest of Anatre (8) 040: Breakables Below Boss Room",
             "Giant Elevator (2) 041: 1st Passage High Ledges",
             "Giant Elevator (6) 027: 1st Descent Bottom Left Breakable",
+            "Aegis Volcano Base E-Crystal (2): Push 1st Container",
+            "Aegis Volcano Base E-Crystal (3): Push 1st Container",
+            "Oceanic Highway Ruins E-Crystal (1): 1st Pit Breakable",
+            "Oceanic Highway Ruins E-Crystal (2): 1st Pit Breakable",
+            "Weapons Repair Factory E-Crystal (1): Hit 3rd Hammer",
+            "Weapons Repair Factory E-Crystal (2): Hit 3rd Hammer",
+            "Forest of Anatre Energy (3): Breakables Below Boss Room",
         ]:
             add_rule(self.multiworld.get_location(loc_name, self.player), has_rod)
 
@@ -234,7 +241,9 @@ class MMZero3World(World):
             "Aegis Volcano Base (5) 073: Push Container Before Miniboss, Platform After",
             "Old Residential Subtank: Top Left after Pantheon Bombers",
             "Forest of Anatre (7) 076: Above 9th Button",
-            "Giant Elevator 1-UP: 1st Passage High Ledges"
+            "Giant Elevator 1-UP: 1st Passage High Ledges",
+            "Aegis Volcano Base Energy: Platform Above First Room",
+            "Old Residential E-Crystal (13): Top Left Pantheon Bombers",
         ]:
             add_rule(self.multiworld.get_location(loc_name, self.player), has_mobility)
 
@@ -245,7 +254,13 @@ class MMZero3World(World):
             "Forest of Anatre (2) 002: Ledge Above 1st Door",
             "Old Residential 1-UP (1): Right of Fork",
             "Old Residential 1-UP (2): Left Fork Door",
-            "Forest of Anatre 1-UP: In Tree Near Start"
+            "Forest of Anatre 1-UP: In Tree Near Start",
+            "Old Residential E-Crystal (1): Stump Door",
+            "Old Residential Energy (1): Stump Door",
+            "Old Residential E-Crystal (4): Covered Door after Cutscene",
+            "Old Residential E-Crystal (5): Covered Door after Cutscene",
+            "Old Residential E-Crystal (6): Covered Door after Cutscene",
+            "Forest of Anatre Energy (1): Treetops Above Generator Cannon",
         ]:
             add_rule(self.multiworld.get_location(loc_name, self.player), has_flame)
 
@@ -253,9 +268,17 @@ class MMZero3World(World):
         add_rule(self.multiworld.get_location("Old Residential (2) 001: Stump Door", self.player),
                  lambda state: has_flame(state) and has_rod(state))
 
-        # Mobility OR Frog Foot Chip
-        add_rule(self.multiworld.get_location("Frontline Ice Base (1) 066: Top Route Tower", self.player),
-                    lambda state: state.has("Secret Disk 004: Frog Foot Chip", self.player) or has_mobility(state))
+        # Mobility OR Splash Foot Chip
+        for loc_name in [
+            "Frontline Ice Base (1) 066: Top Route Tower",
+            "Frontline Ice Base Energy: Top Route Tower",
+        ]:
+            add_rule(self.multiworld.get_location(loc_name, self.player),
+                     lambda state: state.has("Secret Disk 005: Splash Foot Chip", self.player) or has_mobility(state))
+
+        # Technically reachable without
+        add_rule(self.multiworld.get_location("Missile Factory Energy (2): Missile Top Right", self.player),
+                 lambda state: state.has("Double Jump Foot Chip", self.player))
 
         # Double Mobility: Double Jump Foot Chip + Recoil Rod
         add_rule(self.multiworld.get_location("Giant Elevator (1) 045: 1st Passage High Ledges", self.player),
