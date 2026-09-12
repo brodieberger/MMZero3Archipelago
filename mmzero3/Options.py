@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from Options import Range, Toggle, OptionSet, DeathLink, PerGameCommonOptions
+from Options import Range, Toggle, DefaultOnToggle, OptionSet, DeathLink, PerGameCommonOptions
 
 
 class RequiredSecretDisks(Range):
@@ -30,6 +30,27 @@ class StartingWeapons(OptionSet):
     valid_keys = {"Buster", "Z-Saber", "Recoil Rod", "Shield Boomerang"}
     default = frozenset({"Buster", "Z-Saber"})
 
+class Itemsanity(Toggle):
+    """Makes every static energy and E-Crystal pickup a location check (82 in total).
+
+    Unchecked items are displayed in game with the Archipelago logo floating above them.
+    """
+    display_name = "Itemsanity"
+
+
+class ExtraLifeSanity(DefaultOnToggle):
+    """Makes every 1-UP pickup a location check (10 in total).
+
+    Unchecked items are displayed in game with the Archipelago logo floating above them.
+    """
+    display_name = "Extra Life Sanity"
+
+
+class RandomizedPalettes(Toggle):
+    """Every stage is drawn in a randomly chosen color scheme."""
+    display_name = "Randomized Palettes"
+
+
 class ShopSlots(Range):
     """How many slots Cerveau's shop stocks."""
     display_name = "Shop Slots"
@@ -54,6 +75,9 @@ class MMZero3Options(PerGameCommonOptions):
     required_secret_disks: RequiredSecretDisks
     easy_ex_skill: EasyExSkill
     starting_weapons: StartingWeapons
+    itemsanity: Itemsanity
+    extra_life_sanity: ExtraLifeSanity
+    randomized_palettes: RandomizedPalettes
     shop_slots: ShopSlots
     shop_price_scale: ShopPriceScale
     death_link: DeathLink

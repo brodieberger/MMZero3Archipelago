@@ -2,6 +2,7 @@ import math
 from typing import List, Dict, Any, ClassVar
 
 from BaseClasses import Region, Tutorial
+from Options import OptionError
 from worlds.AutoWorld import WebWorld, World
 from worlds.generic.Rules import add_rule, set_rule, forbid_item, add_item_rule
 from .Items import (MMZero3Item, STORY_LATE, STORY_MID, item_data_table, item_name_groups,
@@ -12,6 +13,7 @@ from .Locations import (MMZero3Location, location_data_table, location_name_grou
 from .Options import MMZero3Options
 from .Regions import region_data_table
 from .Rom import MMZero3ProcedurePatch, MMZero3Settings, write_tokens
+from . import Data, Palettes
 from .Client import MMZero3Client
 
 import pkgutil
@@ -55,6 +57,7 @@ class MMZero3World(World):
 
     def generate_early(self) -> None:
         self.roll_shop_prices()
+        self.roll_palettes()
 
         # Inform the Universal Tracker what the starting items are
         passthrough = None
@@ -110,6 +113,11 @@ class MMZero3World(World):
         ])
 
         filler_count = free_location_count - len(item_pool)
+        if filler_count < 0:
+            raise OptionError(
+                f"Mega Man Zero 3 ({self.player_name}): {len(item_pool)} items for "
+                f"{free_location_count} locations. Turn on extra_life_sanity or itemsanity, "
+                f"or stock more shop_slots.")
         for _ in range(filler_count):
             self.multiworld.itempool.append(self.create_item(self.get_filler_item_name()))
 
@@ -145,6 +153,8 @@ class MMZero3World(World):
             "required_secret_disks": self.options.required_secret_disks.value,
             "easy_ex_skill": self.options.easy_ex_skill.value,
             "starting_weapons": sorted(self.starting_weapons),
+            "itemsanity": self.options.itemsanity.value,
+            "extra_life_sanity": self.options.extra_life_sanity.value,
             "death_link": self.options.death_link.value,
         }
 
@@ -163,6 +173,19 @@ class MMZero3World(World):
                 price = 9990
 
             self.shop_prices.append(price)
+
+    def add_location_rule(self, loc_name: str, rule) -> None:
+        """add_rule, but skips a location disabled by seed's options."""
+        if location_data_table[loc_name].can_create(self):
+            add_rule(self.multiworld.get_location(loc_name, self.player), rule)
+
+    def roll_palettes(self) -> None:
+        """Decide on the palette preset that each stage will be drawn on."""
+        self.stage_palettes = {}
+        if not self.options.randomized_palettes.value:
+            return
+        for stage_id in Data.STAGE_PALETTES:
+            self.stage_palettes[stage_id] = self.random.choice(list(Palettes.PRESETS))
 
     def set_rules(self) -> None:
         def has_weapon_at(state, weapon: str, ability: str) -> bool:
@@ -233,7 +256,7 @@ class MMZero3World(World):
             "Weapons Repair Factory E-Crystal (2): Hit 3rd Hammer",
             "Forest of Anatre Energy (3): Breakables Below Boss Room",
         ]:
-            add_rule(self.multiworld.get_location(loc_name, self.player), has_rod)
+            self.add_location_rule(loc_name, has_rod)
 
         # Location rules: Mobility required (Double Jump or Recoil Rod)
         for loc_name in [
@@ -245,7 +268,7 @@ class MMZero3World(World):
             "Aegis Volcano Base Energy: Platform Above First Room",
             "Old Residential E-Crystal (13): Top Left Pantheon Bombers",
         ]:
-            add_rule(self.multiworld.get_location(loc_name, self.player), has_mobility)
+            self.add_location_rule(loc_name, has_mobility)
 
         # Location rules: Flame Body Chip required
         for loc_name in [
@@ -262,31 +285,32 @@ class MMZero3World(World):
             "Old Residential E-Crystal (6): Covered Door after Cutscene",
             "Forest of Anatre Energy (1): Treetops Above Generator Cannon",
         ]:
-            add_rule(self.multiworld.get_location(loc_name, self.player), has_flame)
+            self.add_location_rule(loc_name, has_flame)
 
         # Flame Body Chip + Recoil Rod
-        add_rule(self.multiworld.get_location("Old Residential (2) 001: Stump Door", self.player),
-                 lambda state: has_flame(state) and has_rod(state))
+        self.add_location_rule("Old Residential (2) 001: Stump Door",
+                               lambda state: has_flame(state) and has_rod(state))
 
         # Mobility OR Splash Foot Chip
         for loc_name in [
             "Frontline Ice Base (1) 066: Top Route Tower",
             "Frontline Ice Base Energy: Top Route Tower",
         ]:
-            add_rule(self.multiworld.get_location(loc_name, self.player),
-                     lambda state: state.has("Secret Disk 005: Splash Foot Chip", self.player) or has_mobility(state))
+            self.add_location_rule(
+                loc_name,
+                lambda state: state.has("Secret Disk 005: Splash Foot Chip", self.player) or has_mobility(state))
 
         # Technically reachable without
-        add_rule(self.multiworld.get_location("Missile Factory Energy (2): Missile Top Right", self.player),
-                 lambda state: state.has("Double Jump Foot Chip", self.player))
+        self.add_location_rule("Missile Factory Energy (2): Missile Top Right",
+                               lambda state: state.has("Double Jump Foot Chip", self.player))
 
         # Double Mobility: Double Jump Foot Chip + Recoil Rod
-        add_rule(self.multiworld.get_location("Giant Elevator (1) 045: 1st Passage High Ledges", self.player),
-                 lambda state: state.has("Double Jump Foot Chip", self.player) and has_rod(state))
+        self.add_location_rule("Giant Elevator (1) 045: 1st Passage High Ledges",
+                               lambda state: state.has("Double Jump Foot Chip", self.player) and has_rod(state))
 
         # Collectable 1-UP spawns in the new room
-        add_rule(self.multiworld.get_location("Resistance Base 1-UP: In Locked Room by Andrew", self.player),
-                 lambda state: state.has("Secret Disk 120: New Room Near Andrew", self.player))
+        self.add_location_rule("Resistance Base 1-UP: In Locked Room by Andrew",
+                               lambda state: state.has("Secret Disk 120: New Room Near Andrew", self.player))
 
         # Completion condition
         self.multiworld.completion_condition[self.player] = lambda state: state.has("Victory", self.player)

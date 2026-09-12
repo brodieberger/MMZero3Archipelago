@@ -28,6 +28,11 @@ stage_names = [
     "Sunken Library", "Giant Elevator", "Sub Arcadia"
 ]
 
+def extra_life_sanity_on(world: "MMZero3World") -> bool:
+    return world.options.extra_life_sanity.value
+
+def itemsanity_on(world: "MMZero3World") -> bool:
+    return world.options.itemsanity.value
 
 location_data_table: Dict[str, MMZero3LocationData] = {
 
@@ -289,16 +294,16 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Collect Shield Boomerang": MMZero3LocationData(region="Resistance Base 1", address=227),
 
     # Extra Lives
-    "Oceanic Highway Ruins 1-UP: 1st Section Floating Platforms": MMZero3LocationData(region="Oceanic Highway Ruins", address=231),
-    "Old Residential 1-UP (1): Right of Fork": MMZero3LocationData(region="Old Residential", address=232),
-    "Old Residential 1-UP (2): Left Fork Door": MMZero3LocationData(region="Old Residential", address=233),
-    "Missile Factory 1-UP: Towards End Of Missile": MMZero3LocationData(region="Missile Factory", address=234),
-    "Forest of Anatre 1-UP: In Tree Near Start": MMZero3LocationData(region="Forest of Anatre", address=235),
-    "Energy Facility 1-UP: Girder Maze Top Left": MMZero3LocationData(region="Energy Facility", address=236),
-    "Snowy Plains 1-UP: Pit Before 2nd Rail Set": MMZero3LocationData(region="Snowy Plains", address=237), 
-    "Giant Elevator 1-UP: 1st Passage High Ledges": MMZero3LocationData(region="Giant Elevator", address=238),
-    "Sub Arcadia 1-UP: Above Exit Door in Spike Room": MMZero3LocationData(region="Sub Arcadia", address=239),
-    "Resistance Base 1-UP: In Locked Room by Andrew": MMZero3LocationData(region="Resistance Base 1", address=240),
+    "Oceanic Highway Ruins 1-UP: 1st Section Floating Platforms": MMZero3LocationData(region="Oceanic Highway Ruins", address=231, can_create=extra_life_sanity_on),
+    "Old Residential 1-UP (1): Right of Fork": MMZero3LocationData(region="Old Residential", address=232, can_create=extra_life_sanity_on),
+    "Old Residential 1-UP (2): Left Fork Door": MMZero3LocationData(region="Old Residential", address=233, can_create=extra_life_sanity_on),
+    "Missile Factory 1-UP: Towards End Of Missile": MMZero3LocationData(region="Missile Factory", address=234, can_create=extra_life_sanity_on),
+    "Forest of Anatre 1-UP: In Tree Near Start": MMZero3LocationData(region="Forest of Anatre", address=235, can_create=extra_life_sanity_on),
+    "Energy Facility 1-UP: Girder Maze Top Left": MMZero3LocationData(region="Energy Facility", address=236, can_create=extra_life_sanity_on),
+    "Snowy Plains 1-UP: Pit Before 2nd Rail Set": MMZero3LocationData(region="Snowy Plains", address=237, can_create=extra_life_sanity_on), 
+    "Giant Elevator 1-UP: 1st Passage High Ledges": MMZero3LocationData(region="Giant Elevator", address=238, can_create=extra_life_sanity_on),
+    "Sub Arcadia 1-UP: Above Exit Door in Spike Room": MMZero3LocationData(region="Sub Arcadia", address=239, can_create=extra_life_sanity_on),
+    "Resistance Base 1-UP: In Locked Room by Andrew": MMZero3LocationData(region="Resistance Base 1", address=240, can_create=extra_life_sanity_on),
 
     # Minibosses
     "Weapons Repair Factory Miniboss: Bee Server": MMZero3LocationData(region="Weapons Repair Factory", address=242),
@@ -314,101 +319,101 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Aegis Volcano Base Miniboss: Crossbynes": MMZero3LocationData(region="Aegis Volcano Base", address=252),
 
     # Itemsanity:
-    "Derelict Spacecraft E-Crystal: Ice Side Room": MMZero3LocationData(region="Derelict Spacecraft", address=301),
-    "Derelict Spacecraft Energy: Ledge After Entrance": MMZero3LocationData(region="Derelict Spacecraft", address=302),
+    "Derelict Spacecraft E-Crystal: Ice Side Room": MMZero3LocationData(region="Derelict Spacecraft", address=301, can_create=itemsanity_on),
+    "Derelict Spacecraft Energy: Ledge After Entrance": MMZero3LocationData(region="Derelict Spacecraft", address=302, can_create=itemsanity_on),
 
-    "Aegis Volcano Base E-Crystal (1): Ledge Above Lava": MMZero3LocationData(region="Aegis Volcano Base", address=303),
-    "Aegis Volcano Base Energy: Platform Above First Room": MMZero3LocationData(region="Aegis Volcano Base", address=304), #mobility
-    "Aegis Volcano Base E-Crystal (2): Push 1st Container": MMZero3LocationData(region="Aegis Volcano Base", address=305), #recoil
-    "Aegis Volcano Base E-Crystal (3): Push 1st Container": MMZero3LocationData(region="Aegis Volcano Base", address=306), #recoil
-    "Aegis Volcano Base E-Crystal (4): After Mini Boss": MMZero3LocationData(region="Aegis Volcano Base", address=307),
-    "Aegis Volcano Base E-Crystal (5): Ascent After Mini Boss": MMZero3LocationData(region="Aegis Volcano Base", address=308),
-    "Aegis Volcano Base E-Crystal (6): After Second Lava Blocks": MMZero3LocationData(region="Aegis Volcano Base", address=309),
+    "Aegis Volcano Base E-Crystal (1): Ledge Above Lava": MMZero3LocationData(region="Aegis Volcano Base", address=303, can_create=itemsanity_on),
+    "Aegis Volcano Base Energy: Platform Above First Room": MMZero3LocationData(region="Aegis Volcano Base", address=304, can_create=itemsanity_on), #mobility
+    "Aegis Volcano Base E-Crystal (2): Push 1st Container": MMZero3LocationData(region="Aegis Volcano Base", address=305, can_create=itemsanity_on), #recoil
+    "Aegis Volcano Base E-Crystal (3): Push 1st Container": MMZero3LocationData(region="Aegis Volcano Base", address=306, can_create=itemsanity_on), #recoil
+    "Aegis Volcano Base E-Crystal (4): After Mini Boss": MMZero3LocationData(region="Aegis Volcano Base", address=307, can_create=itemsanity_on),
+    "Aegis Volcano Base E-Crystal (5): Ascent After Mini Boss": MMZero3LocationData(region="Aegis Volcano Base", address=308, can_create=itemsanity_on),
+    "Aegis Volcano Base E-Crystal (6): After Second Lava Blocks": MMZero3LocationData(region="Aegis Volcano Base", address=309, can_create=itemsanity_on),
 
-    "Oceanic Highway Ruins E-Crystal (1): 1st Pit Breakable": MMZero3LocationData(region="Oceanic Highway Ruins", address=310), #recoil
-    "Oceanic Highway Ruins E-Crystal (2): 1st Pit Breakable": MMZero3LocationData(region="Oceanic Highway Ruins", address=311), #recoil
-    "Oceanic Highway Ruins E-Crystal (3): 1st Underwater Pit": MMZero3LocationData(region="Oceanic Highway Ruins", address=312),
-    "Oceanic Highway Ruins E-Crystal (4): 1st Underwater Pit": MMZero3LocationData(region="Oceanic Highway Ruins", address=313),
-    "Oceanic Highway Ruins E-Crystal (5): Above Cyber Door": MMZero3LocationData(region="Oceanic Highway Ruins", address=314),
-    "Oceanic Highway Ruins E-Crystal (6): Above Cyber Door": MMZero3LocationData(region="Oceanic Highway Ruins", address=315),
-    "Oceanic Highway Ruins Energy (1): 1st Section Floating Platforms": MMZero3LocationData(region="Oceanic Highway Ruins", address=316),
-    "Oceanic Highway Ruins Energy (2): Destroy Box Using Boss": MMZero3LocationData(region="Oceanic Highway Ruins", address=317),
-    "Oceanic Highway Ruins Energy (3): Floating Platform after 2nd Pressure Pad": MMZero3LocationData(region="Oceanic Highway Ruins", address=318),
-    "Oceanic Highway Ruins E-Crystal (7): Spiked Platforms": MMZero3LocationData(region="Oceanic Highway Ruins", address=319),
+    "Oceanic Highway Ruins E-Crystal (1): 1st Pit Breakable": MMZero3LocationData(region="Oceanic Highway Ruins", address=310, can_create=itemsanity_on), #recoil
+    "Oceanic Highway Ruins E-Crystal (2): 1st Pit Breakable": MMZero3LocationData(region="Oceanic Highway Ruins", address=311, can_create=itemsanity_on), #recoil
+    "Oceanic Highway Ruins E-Crystal (3): 1st Underwater Pit": MMZero3LocationData(region="Oceanic Highway Ruins", address=312, can_create=itemsanity_on),
+    "Oceanic Highway Ruins E-Crystal (4): 1st Underwater Pit": MMZero3LocationData(region="Oceanic Highway Ruins", address=313, can_create=itemsanity_on),
+    "Oceanic Highway Ruins E-Crystal (5): Above Cyber Door": MMZero3LocationData(region="Oceanic Highway Ruins", address=314, can_create=itemsanity_on),
+    "Oceanic Highway Ruins E-Crystal (6): Above Cyber Door": MMZero3LocationData(region="Oceanic Highway Ruins", address=315, can_create=itemsanity_on),
+    "Oceanic Highway Ruins Energy (1): 1st Section Floating Platforms": MMZero3LocationData(region="Oceanic Highway Ruins", address=316, can_create=itemsanity_on),
+    "Oceanic Highway Ruins Energy (2): Destroy Box Using Boss": MMZero3LocationData(region="Oceanic Highway Ruins", address=317, can_create=itemsanity_on),
+    "Oceanic Highway Ruins Energy (3): Floating Platform after 2nd Pressure Pad": MMZero3LocationData(region="Oceanic Highway Ruins", address=318, can_create=itemsanity_on),
+    "Oceanic Highway Ruins E-Crystal (7): Spiked Platforms": MMZero3LocationData(region="Oceanic Highway Ruins", address=319, can_create=itemsanity_on),
 
-    "Weapons Repair Factory Energy (1): Before 1st Junk Pit": MMZero3LocationData(region="Weapons Repair Factory", address=320),
-    "Weapons Repair Factory E-Crystal (1): Hit 3rd Hammer": MMZero3LocationData(region="Weapons Repair Factory", address=321), #recoil
-    "Weapons Repair Factory E-Crystal (2): Hit 3rd Hammer": MMZero3LocationData(region="Weapons Repair Factory", address=322), #recoil
-    "Weapons Repair Factory Energy (2): In Junk Pit": MMZero3LocationData(region="Weapons Repair Factory", address=323),
-    "Weapons Repair Factory E-Crystal (3): Before Mini Boss Door": MMZero3LocationData(region="Weapons Repair Factory", address=324),
-    "Weapons Repair Factory E-Crystal (4): Before Mini Boss Door": MMZero3LocationData(region="Weapons Repair Factory", address=325),
-    "Weapons Repair Factory Energy (3): After Mini Boss": MMZero3LocationData(region="Weapons Repair Factory", address=326),
-    "Weapons Repair Factory E-Crystal (5): Before Conveyor Descent": MMZero3LocationData(region="Weapons Repair Factory", address=327),
-    "Weapons Repair Factory E-Crystal (6): Before Conveyor Descent": MMZero3LocationData(region="Weapons Repair Factory", address=328),
-    "Weapons Repair Factory E-Crystal (7): Ladder Into Junk": MMZero3LocationData(region="Weapons Repair Factory", address=329),
+    "Weapons Repair Factory Energy (1): Before 1st Junk Pit": MMZero3LocationData(region="Weapons Repair Factory", address=320, can_create=itemsanity_on),
+    "Weapons Repair Factory E-Crystal (1): Hit 3rd Hammer": MMZero3LocationData(region="Weapons Repair Factory", address=321, can_create=itemsanity_on), #recoil
+    "Weapons Repair Factory E-Crystal (2): Hit 3rd Hammer": MMZero3LocationData(region="Weapons Repair Factory", address=322, can_create=itemsanity_on), #recoil
+    "Weapons Repair Factory Energy (2): In Junk Pit": MMZero3LocationData(region="Weapons Repair Factory", address=323, can_create=itemsanity_on),
+    "Weapons Repair Factory E-Crystal (3): Before Mini Boss Door": MMZero3LocationData(region="Weapons Repair Factory", address=324, can_create=itemsanity_on),
+    "Weapons Repair Factory E-Crystal (4): Before Mini Boss Door": MMZero3LocationData(region="Weapons Repair Factory", address=325, can_create=itemsanity_on),
+    "Weapons Repair Factory Energy (3): After Mini Boss": MMZero3LocationData(region="Weapons Repair Factory", address=326, can_create=itemsanity_on),
+    "Weapons Repair Factory E-Crystal (5): Before Conveyor Descent": MMZero3LocationData(region="Weapons Repair Factory", address=327, can_create=itemsanity_on),
+    "Weapons Repair Factory E-Crystal (6): Before Conveyor Descent": MMZero3LocationData(region="Weapons Repair Factory", address=328, can_create=itemsanity_on),
+    "Weapons Repair Factory E-Crystal (7): Ladder Into Junk": MMZero3LocationData(region="Weapons Repair Factory", address=329, can_create=itemsanity_on),
 
-    "Old Residential E-Crystal (1): Stump Door": MMZero3LocationData(region="Old Residential", address=330), #fire
-    "Old Residential Energy (1): Stump Door": MMZero3LocationData(region="Old Residential", address=331), #fire
-    "Old Residential E-Crystal (2): Above 1st Door": MMZero3LocationData(region="Old Residential", address=332),
-    "Old Residential E-Crystal (3): Above 1st Door": MMZero3LocationData(region="Old Residential", address=333),
-    "Old Residential E-Crystal (4): Covered Door after Cutscene": MMZero3LocationData(region="Old Residential", address=334), #fire
-    "Old Residential E-Crystal (5): Covered Door after Cutscene": MMZero3LocationData(region="Old Residential", address=335), #fire
-    "Old Residential E-Crystal (6): Covered Door after Cutscene": MMZero3LocationData(region="Old Residential", address=336), #fire
-    "Old Residential Energy (2): Top Right Secret Door": MMZero3LocationData(region="Old Residential", address=337),
-    "Old Residential E-Crystal (7): Top Right Secret Door": MMZero3LocationData(region="Old Residential", address=338),
-    "Old Residential E-Crystal (8): Top Right Secret Door": MMZero3LocationData(region="Old Residential", address=339),
-    "Old Residential Energy (3): Falling Platforms": MMZero3LocationData(region="Old Residential", address=340),
-    "Old Residential E-Crystal (9): Falling Platforms": MMZero3LocationData(region="Old Residential", address=341),
-    "Old Residential E-Crystal (10): Falling Platforms": MMZero3LocationData(region="Old Residential", address=342),
-    "Old Residential E-Crystal (11): Falling Platforms": MMZero3LocationData(region="Old Residential", address=343),
-    "Old Residential E-Crystal (12): Falling Platforms": MMZero3LocationData(region="Old Residential", address=344),
-    "Old Residential E-Crystal (13): Top Left Pantheon Bombers": MMZero3LocationData(region="Old Residential", address=345), #mobility
-    "Old Residential Energy (4): Climb after Miniboss": MMZero3LocationData(region="Old Residential", address=346),
-    "Old Residential Energy (5): Before Top Right Secret Door": MMZero3LocationData(region="Old Residential", address=347),
-    "Old Residential Energy (6): Breakable Blocks by Bombers": MMZero3LocationData(region="Old Residential", address=348),
+    "Old Residential E-Crystal (1): Stump Door": MMZero3LocationData(region="Old Residential", address=330, can_create=itemsanity_on), #fire
+    "Old Residential Energy (1): Stump Door": MMZero3LocationData(region="Old Residential", address=331, can_create=itemsanity_on), #fire
+    "Old Residential E-Crystal (2): Above 1st Door": MMZero3LocationData(region="Old Residential", address=332, can_create=itemsanity_on),
+    "Old Residential E-Crystal (3): Above 1st Door": MMZero3LocationData(region="Old Residential", address=333, can_create=itemsanity_on),
+    "Old Residential E-Crystal (4): Covered Door after Cutscene": MMZero3LocationData(region="Old Residential", address=334, can_create=itemsanity_on), #fire
+    "Old Residential E-Crystal (5): Covered Door after Cutscene": MMZero3LocationData(region="Old Residential", address=335, can_create=itemsanity_on), #fire
+    "Old Residential E-Crystal (6): Covered Door after Cutscene": MMZero3LocationData(region="Old Residential", address=336, can_create=itemsanity_on), #fire
+    "Old Residential Energy (2): Top Right Secret Door": MMZero3LocationData(region="Old Residential", address=337, can_create=itemsanity_on),
+    "Old Residential E-Crystal (7): Top Right Secret Door": MMZero3LocationData(region="Old Residential", address=338, can_create=itemsanity_on),
+    "Old Residential E-Crystal (8): Top Right Secret Door": MMZero3LocationData(region="Old Residential", address=339, can_create=itemsanity_on),
+    "Old Residential Energy (3): Falling Platforms": MMZero3LocationData(region="Old Residential", address=340, can_create=itemsanity_on),
+    "Old Residential E-Crystal (9): Falling Platforms": MMZero3LocationData(region="Old Residential", address=341, can_create=itemsanity_on),
+    "Old Residential E-Crystal (10): Falling Platforms": MMZero3LocationData(region="Old Residential", address=342, can_create=itemsanity_on),
+    "Old Residential E-Crystal (11): Falling Platforms": MMZero3LocationData(region="Old Residential", address=343, can_create=itemsanity_on),
+    "Old Residential E-Crystal (12): Falling Platforms": MMZero3LocationData(region="Old Residential", address=344, can_create=itemsanity_on),
+    "Old Residential E-Crystal (13): Top Left Pantheon Bombers": MMZero3LocationData(region="Old Residential", address=345, can_create=itemsanity_on), #mobility
+    "Old Residential Energy (4): Climb after Miniboss": MMZero3LocationData(region="Old Residential", address=346, can_create=itemsanity_on),
+    "Old Residential Energy (5): Before Top Right Secret Door": MMZero3LocationData(region="Old Residential", address=347, can_create=itemsanity_on),
+    "Old Residential Energy (6): Breakable Blocks by Bombers": MMZero3LocationData(region="Old Residential", address=348, can_create=itemsanity_on),
 
-    "Missile Factory E-Crystal (1): Pit Under Ladder": MMZero3LocationData(region="Missile Factory", address=349),
-    "Missile Factory E-Crystal (2): Pit Under Ladder": MMZero3LocationData(region="Missile Factory", address=350),
-    "Missile Factory E-Crystal (3): Missile Top Path": MMZero3LocationData(region="Missile Factory", address=351),
-    "Missile Factory Energy (1): Missile Bottom Path": MMZero3LocationData(region="Missile Factory", address=352),
-    "Missile Factory Energy (2): Missile Top Right": MMZero3LocationData(region="Missile Factory", address=353), #Technically nothing, but double jump anyway
+    "Missile Factory E-Crystal (1): Pit Under Ladder": MMZero3LocationData(region="Missile Factory", address=349, can_create=itemsanity_on),
+    "Missile Factory E-Crystal (2): Pit Under Ladder": MMZero3LocationData(region="Missile Factory", address=350, can_create=itemsanity_on),
+    "Missile Factory E-Crystal (3): Missile Top Path": MMZero3LocationData(region="Missile Factory", address=351, can_create=itemsanity_on),
+    "Missile Factory Energy (1): Missile Bottom Path": MMZero3LocationData(region="Missile Factory", address=352, can_create=itemsanity_on),
+    "Missile Factory Energy (2): Missile Top Right": MMZero3LocationData(region="Missile Factory", address=353, can_create=itemsanity_on), #Technically nothing, but double jump anyway
 
-    "Twilight Desert Energy: Above 2nd Pillar Cannon": MMZero3LocationData(region="Twilight Desert", address=354),
+    "Twilight Desert Energy: Above 2nd Pillar Cannon": MMZero3LocationData(region="Twilight Desert", address=354, can_create=itemsanity_on),
 
-    "Forest of Anatre Energy (1): Treetops Above Generator Cannon": MMZero3LocationData(region="Forest of Anatre", address=355), # fire
-    "Forest of Anatre Energy (2): 7th Button Upper Path": MMZero3LocationData(region="Forest of Anatre", address=356),
-    "Forest of Anatre Energy (3): Breakables Below Boss Room": MMZero3LocationData(region="Forest of Anatre", address=357), # recoil
+    "Forest of Anatre Energy (1): Treetops Above Generator Cannon": MMZero3LocationData(region="Forest of Anatre", address=355, can_create=itemsanity_on), # fire
+    "Forest of Anatre Energy (2): 7th Button Upper Path": MMZero3LocationData(region="Forest of Anatre", address=356, can_create=itemsanity_on),
+    "Forest of Anatre Energy (3): Breakables Below Boss Room": MMZero3LocationData(region="Forest of Anatre", address=357, can_create=itemsanity_on), # recoil
 
-    "Frontline Ice Base Energy: Top Route Tower": MMZero3LocationData(region="Frontline Ice Base", address=358), # splash
-    "Frontline Ice Base E-Crystal (1): Bottom Route Cave": MMZero3LocationData(region="Frontline Ice Base", address=359),
-    "Frontline Ice Base E-Crystal (2): Bottom Route Cave": MMZero3LocationData(region="Frontline Ice Base", address=360),
-    "Frontline Ice Base E-Crystal (3): Ledge After 2nd Door": MMZero3LocationData(region="Frontline Ice Base", address=361),
+    "Frontline Ice Base Energy: Top Route Tower": MMZero3LocationData(region="Frontline Ice Base", address=358, can_create=itemsanity_on), # splash
+    "Frontline Ice Base E-Crystal (1): Bottom Route Cave": MMZero3LocationData(region="Frontline Ice Base", address=359, can_create=itemsanity_on),
+    "Frontline Ice Base E-Crystal (2): Bottom Route Cave": MMZero3LocationData(region="Frontline Ice Base", address=360, can_create=itemsanity_on),
+    "Frontline Ice Base E-Crystal (3): Ledge After 2nd Door": MMZero3LocationData(region="Frontline Ice Base", address=361, can_create=itemsanity_on),
 
-    "Area X-2 Energy (1): 1st Descent Ledge": MMZero3LocationData(region="Area X-2", address=362),
-    "Area X-2 Energy (2): 1st Ascent Left": MMZero3LocationData(region="Area X-2", address=363),
-    "Area X-2 Energy (3): Spiky Ascent Middle": MMZero3LocationData(region="Area X-2", address=364),
-    "Area X-2 Energy (4): Spiky Ascent Top": MMZero3LocationData(region="Area X-2", address=365),
+    "Area X-2 Energy (1): 1st Descent Ledge": MMZero3LocationData(region="Area X-2", address=362, can_create=itemsanity_on),
+    "Area X-2 Energy (2): 1st Ascent Left": MMZero3LocationData(region="Area X-2", address=363, can_create=itemsanity_on),
+    "Area X-2 Energy (3): Spiky Ascent Middle": MMZero3LocationData(region="Area X-2", address=364, can_create=itemsanity_on),
+    "Area X-2 Energy (4): Spiky Ascent Top": MMZero3LocationData(region="Area X-2", address=365, can_create=itemsanity_on),
 
-    "Energy Facility Energy (1): 1st Ascent Right Path": MMZero3LocationData(region="Energy Facility", address=366),
-    "Energy Facility Energy (2): Ladder Descent": MMZero3LocationData(region="Energy Facility", address=367),
-    "Energy Facility Energy (3): Ascent After 1st Reactor": MMZero3LocationData(region="Energy Facility", address=368),
-    "Energy Facility E-Crystal (1): Ascent After 1st Reactor": MMZero3LocationData(region="Energy Facility", address=369),
-    "Energy Facility E-Crystal (2): Ascent After 1st Reactor": MMZero3LocationData(region="Energy Facility", address=370),
-    "Energy Facility Energy (4): Before Second Reactor": MMZero3LocationData(region="Energy Facility", address=371),
+    "Energy Facility Energy (1): 1st Ascent Right Path": MMZero3LocationData(region="Energy Facility", address=366, can_create=itemsanity_on),
+    "Energy Facility Energy (2): Ladder Descent": MMZero3LocationData(region="Energy Facility", address=367, can_create=itemsanity_on),
+    "Energy Facility Energy (3): Ascent After 1st Reactor": MMZero3LocationData(region="Energy Facility", address=368, can_create=itemsanity_on),
+    "Energy Facility E-Crystal (1): Ascent After 1st Reactor": MMZero3LocationData(region="Energy Facility", address=369, can_create=itemsanity_on),
+    "Energy Facility E-Crystal (2): Ascent After 1st Reactor": MMZero3LocationData(region="Energy Facility", address=370, can_create=itemsanity_on),
+    "Energy Facility Energy (4): Before Second Reactor": MMZero3LocationData(region="Energy Facility", address=371, can_create=itemsanity_on),
 
-    "Sunken Library Energy (1): Ledge Above First Pool": MMZero3LocationData(region="Sunken Library", address=372),
-    "Sunken Library Energy (2): Incorrect Room": MMZero3LocationData(region="Sunken Library", address=373),
-    "Sunken Library E-Crystal (1): Incorrect Room": MMZero3LocationData(region="Sunken Library", address=374),
-    "Sunken Library Energy (3): Incorrect Room": MMZero3LocationData(region="Sunken Library", address=375),
-    "Sunken Library E-Crystal (2): Incorrect Room": MMZero3LocationData(region="Sunken Library", address=376),
-    "Sunken Library E-Crystal (3): Incorrect Room": MMZero3LocationData(region="Sunken Library", address=377),
+    "Sunken Library Energy (1): Ledge Above First Pool": MMZero3LocationData(region="Sunken Library", address=372, can_create=itemsanity_on),
+    "Sunken Library Energy (2): Incorrect Room": MMZero3LocationData(region="Sunken Library", address=373, can_create=itemsanity_on),
+    "Sunken Library E-Crystal (1): Incorrect Room": MMZero3LocationData(region="Sunken Library", address=374, can_create=itemsanity_on),
+    "Sunken Library Energy (3): Incorrect Room": MMZero3LocationData(region="Sunken Library", address=375, can_create=itemsanity_on),
+    "Sunken Library E-Crystal (2): Incorrect Room": MMZero3LocationData(region="Sunken Library", address=376, can_create=itemsanity_on),
+    "Sunken Library E-Crystal (3): Incorrect Room": MMZero3LocationData(region="Sunken Library", address=377, can_create=itemsanity_on),
 
-    "Giant Elevator E-Crystal (1): 1st Passage High Ledges": MMZero3LocationData(region="Giant Elevator", address=378),
-    "Giant Elevator E-Crystal (2): 1st Descent Ledge": MMZero3LocationData(region="Giant Elevator", address=379),
-    "Giant Elevator Energy: Final Descent Ledge": MMZero3LocationData(region="Giant Elevator", address=380),
+    "Giant Elevator E-Crystal (1): 1st Passage High Ledges": MMZero3LocationData(region="Giant Elevator", address=378, can_create=itemsanity_on),
+    "Giant Elevator E-Crystal (2): 1st Descent Ledge": MMZero3LocationData(region="Giant Elevator", address=379, can_create=itemsanity_on),
+    "Giant Elevator Energy: Final Descent Ledge": MMZero3LocationData(region="Giant Elevator", address=380, can_create=itemsanity_on),
 
-    "Sub Arcadia E-Crystal: Pit Near Start": MMZero3LocationData(region="Sub Arcadia", address=381),
-    "Sub Arcadia Energy: Final Descent Near Top": MMZero3LocationData(region="Sub Arcadia", address=382),
+    "Sub Arcadia E-Crystal: Pit Near Start": MMZero3LocationData(region="Sub Arcadia", address=381, can_create=itemsanity_on),
+    "Sub Arcadia Energy: Final Descent Near Top": MMZero3LocationData(region="Sub Arcadia", address=382, can_create=itemsanity_on),
 }
 
 # Cerveau's shop
@@ -438,7 +443,7 @@ location_categories: Dict[str, range] = {
     "A+ Rank Clears": range(206, 221),
     "Subtanks": range(221, 223),
     "Weapons": range(226, 228),
-    "1-UPs": range(231, 241),
+    "1-UPs": range(Data.AP_LOC_EXLIFE_FIRST, Data.AP_LOC_EXLIFE_FIRST + Data.AP_EXLIFE_COUNT),
     "Minibosses": range(242, 253),
     "Itemsanity": range(Data.AP_LOC_ITEMSANITY_FIRST,
                                           Data.AP_LOC_ITEMSANITY_FIRST
