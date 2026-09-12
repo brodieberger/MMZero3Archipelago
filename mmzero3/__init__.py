@@ -10,7 +10,7 @@ from .Items import (MMZero3Item, STORY_LATE, STORY_MID, item_data_table, item_na
                     weapon_names)
 from .Locations import (MMZero3Location, location_data_table, location_name_groups, location_table,
                         locked_locations, shop_location_names)
-from .Options import MMZero3Options
+from .Options import MMZero3Options, mmzero3_option_groups
 from .Regions import region_data_table
 from .Rom import MMZero3ProcedurePatch, MMZero3Settings, write_tokens
 from . import Data, Palettes
@@ -24,6 +24,7 @@ from worlds.Files import APProcedurePatch
 class MMZero3WebWorld(WebWorld):
     theme = "ice"
     bug_report_page = "https://github.com/brodieberger/ZeroArchipelago/"
+    option_groups = mmzero3_option_groups
     setup_en = Tutorial(
         "Multiworld Setup Guide",
         "A guide to setting up the Mega Man Zero 3 Randomizer connected to an Archipelago Multiworld.",

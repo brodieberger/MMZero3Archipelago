@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from Options import Choice, Range, Toggle, DefaultOnToggle, OptionSet, DeathLink, PerGameCommonOptions
+from Options import (Choice, Range, Toggle, DefaultOnToggle, OptionSet, DeathLink, OptionGroup,
+                     PerGameCommonOptions)
 
 from . import Data
 
@@ -84,6 +85,27 @@ class ShopPriceScale(Range):
     range_start = 25
     range_end = 400
     default = 100
+
+mmzero3_option_groups = [
+    OptionGroup("Goal Options", [
+        RequiredSecretDisks,
+    ]),
+    OptionGroup("Sanity Options", [
+        ExtraLifeSanity,
+        Itemsanity,
+        ShopSlots,
+        ShopPriceScale,
+    ]),
+    OptionGroup("Gameplay", [
+        StartingWeapons,
+        SelectButton,
+        EasyExSkill,
+        DeathLink,
+    ]),
+    OptionGroup("Aesthetics", [
+        RandomizedPalettes,
+    ]),
+]
 
 
 @dataclass
