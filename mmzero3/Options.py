@@ -63,6 +63,17 @@ class SelectButton(Choice):
     default = option_cycle_sub_weapon
 
 
+class WeaponDamageUpgrades(DefaultOnToggle):
+    """Whether the last three steps of each progressive weapon raise its damage.
+
+    A few players disliked this feature since it departed the gameplay from vanilla.
+
+    WIP: Disabling this still keeps the extra three progressive weapon items in the pool, 
+    they just dont provde any bonuses.
+    """
+    display_name = "Weapon Damage Upgrades"
+
+
 class RandomizedPalettes(Toggle):
     """Every stage is drawn in a randomly chosen color scheme."""
     display_name = "Randomized Palettes"
@@ -98,6 +109,7 @@ mmzero3_option_groups = [
     ]),
     OptionGroup("Gameplay", [
         StartingWeapons,
+        WeaponDamageUpgrades,
         SelectButton,
         EasyExSkill,
         DeathLink,
@@ -117,6 +129,7 @@ class MMZero3Options(PerGameCommonOptions):
     extra_life_sanity: ExtraLifeSanity
     randomized_palettes: RandomizedPalettes
     select_button: SelectButton
+    weapon_damage_upgrades: WeaponDamageUpgrades
     shop_slots: ShopSlots
     shop_price_scale: ShopPriceScale
     death_link: DeathLink

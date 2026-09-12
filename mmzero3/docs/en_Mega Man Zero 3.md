@@ -67,6 +67,9 @@ Cerveau now has a shop, visit it by pressing L or R on his secret disk analysis 
 - `select_button`:  
   The select button's functionality. Choose between Cycling the sub weapon (default), the main weapon, the head, body or foot chip, or use the fullest subtank.
 
+- `weapon_damage_upgrades`:  
+  On by default. Off, the last three steps of each progressive weapon (the damage increases) do nothing when received. The items stay in the pool.
+
 - `randomized_palettes`:  
   Every stage is drawn in a randomly chosen color scheme.
 

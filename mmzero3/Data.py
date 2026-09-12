@@ -63,12 +63,12 @@ KILL_REQUEST = 0x0003EF10
 CAN_ACCEPT_ITEMS = 0x0003EF11
 
 # gApShopPrices, ROM data: one u16 per shop slot
-SHOP_PRICES_ROM_OFFSET = 0x00803018
+SHOP_PRICES_ROM_OFFSET = 0x0080305C
 SHOP_PRICES_COUNT = 48
 SHOP_PRICES_ELEMENT_SIZE = 2
 
 # gApShopItems, ROM data: one fixed record a slot
-SHOP_ITEMS_ROM_OFFSET = 0x00803078
+SHOP_ITEMS_ROM_OFFSET = 0x008030BC
 SHOP_ITEMS_COUNT = 48
 SHOP_ITEMS_SIZE = 68
 
@@ -161,7 +161,7 @@ CHARMAP = {
 }
 
 # gApSeedConfig, ROM data
-SEED_CONFIG_ROM_OFFSET = 0x0080179C
+SEED_CONFIG_ROM_OFFSET = 0x008017E0
 SEED_CONFIG_SIZE = 8
 SEED_CONFIG_FIELDS = {   # ap.h name: (offset, size)
     "requiredDisks": (0, 2),
@@ -170,7 +170,7 @@ SEED_CONFIG_FIELDS = {   # ap.h name: (offset, size)
     "itemsanity": (4, 1),
     "exLifeSanity": (5, 1),
     "selectButton": (6, 1),
-    "unused": (7, 1),
+    "damageUpgrades": (7, 1),
 }
 
 # Stage id: the ROM offset and byte size of each BG palette
