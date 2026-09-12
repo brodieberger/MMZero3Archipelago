@@ -41,7 +41,7 @@ Cerveau now has a shop, visit it by pressing L or R on his secret disk analysis 
 - The pause menu shows you how many secret disks are required to collect in order to unlock the final stage.
 - All skippable cutscenes are skippable by default.
 - You can leave any level at any time.
-- Pressing SELECT during gameplay swaps your sub weapon to the next one you own.
+- Pressing SELECT during gameplay does one thing of your choosing. By default it swaps sub weapons, configurable by an option.
 - When Archipelago gives you an item, a small icon pops up over Zero's head with a unique icon displayed for each item.
 - Collecting certain lore related secret disks will simultaneously unlock a random e-Reader graphical change. A full list can be seen [here](https://tcrf.net/Mega_Man_Zero_3/e-Reader_Functions).
 - Your player rank is based on the average of your best clear in each stage.
@@ -63,6 +63,9 @@ Cerveau now has a shop, visit it by pressing L or R on his secret disk analysis 
 - `itemsanity`:  
   The game's 82 static life capsules and E-Crystals become location checks. Unchecked ones
   display in game with the Archipelago logo.
+
+- `select_button`:  
+  The select button's functionality. Choose between Cycling the sub weapon (default), the main weapon, the head, body or foot chip, or use the fullest subtank.
 
 - `randomized_palettes`:  
   Every stage is drawn in a randomly chosen color scheme.

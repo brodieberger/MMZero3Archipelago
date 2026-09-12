@@ -74,7 +74,7 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Aegis Volcano Base (2) 102: 1st Box Inside": MMZero3LocationData(region="Aegis Volcano Base", address=102),
     "Aegis Volcano Base (3) 026: Platform Above First Room": MMZero3LocationData(region="Aegis Volcano Base", address=26),
     "Aegis Volcano Base (4) 114: Push 1st Container": MMZero3LocationData(region="Aegis Volcano Base", address=114),
-    "Aegis Volcano Base (5) 073: Push Container Before Miniboss, Platform After": MMZero3LocationData(region="Aegis Volcano Base", address=73),
+    "Aegis Volcano Base (5) 073: Platform After Pushed Container": MMZero3LocationData(region="Aegis Volcano Base", address=73),
     "Aegis Volcano Base (6) 152: 10th Crossbyne Kill (Miniboss)": MMZero3LocationData(region="Aegis Volcano Base", address=152),
     "Aegis Volcano Base (7) 072: Lamplort Box": MMZero3LocationData(region="Aegis Volcano Base", address=72),
     "Aegis Volcano Base (8) 008: Top Gabyoall Box": MMZero3LocationData(region="Aegis Volcano Base", address=8),
@@ -217,7 +217,7 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Sub Arcadia (1) 036: 1st Descent Ledge": MMZero3LocationData(region="Sub Arcadia", address=36),
     "Sub Arcadia (2) 081: Platforms Room Under Start": MMZero3LocationData(region="Sub Arcadia", address=81),
     "Sub Arcadia (3) 038: Platforms Room Top Left": MMZero3LocationData(region="Sub Arcadia", address=38),
-    "Sub Arcadia (4) 006: Phantom Kill (Platforms Top Left, in Cyberspace)": MMZero3LocationData(region="Sub Arcadia", address=6),
+    "Sub Arcadia (4) 006: Phantom Kill, Cyberspace Top Left": MMZero3LocationData(region="Sub Arcadia", address=6),
     "Sub Arcadia (5) 180: Platforms Room Bottom": MMZero3LocationData(region="Sub Arcadia", address=180),
     "Sub Arcadia (6) 087: Box Past 1st Door": MMZero3LocationData(region="Sub Arcadia", address=87),
     "Sub Arcadia (7) 083: Final Descent Left": MMZero3LocationData(region="Sub Arcadia", address=83),
@@ -286,7 +286,7 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "A+ Rank Clear: Sub Arcadia": MMZero3LocationData(region="Sub Arcadia", address=220),
 
     # Sub Tanks
-    "Old Residential Subtank: Top Left after Pantheon Bombers": MMZero3LocationData(region="Old Residential", address=221),
+    "Old Residential Subtank: Top Left Past Bombers": MMZero3LocationData(region="Old Residential", address=221),
     "Forest of Anatre Subtank: Climb Extending Wall": MMZero3LocationData(region="Forest of Anatre", address=222),
 
     # Weapons
@@ -294,7 +294,7 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Collect Shield Boomerang": MMZero3LocationData(region="Resistance Base 1", address=227),
 
     # Extra Lives
-    "Oceanic Highway Ruins 1-UP: 1st Section Floating Platforms": MMZero3LocationData(region="Oceanic Highway Ruins", address=231, can_create=extra_life_sanity_on),
+    "Oceanic Highway Ruins 1-UP: 1st Section Platforms": MMZero3LocationData(region="Oceanic Highway Ruins", address=231, can_create=extra_life_sanity_on),
     "Old Residential 1-UP (1): Right of Fork": MMZero3LocationData(region="Old Residential", address=232, can_create=extra_life_sanity_on),
     "Old Residential 1-UP (2): Left Fork Door": MMZero3LocationData(region="Old Residential", address=233, can_create=extra_life_sanity_on),
     "Missile Factory 1-UP: Towards End Of Missile": MMZero3LocationData(region="Missile Factory", address=234, can_create=extra_life_sanity_on),
@@ -336,9 +336,9 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Oceanic Highway Ruins E-Crystal (4): 1st Underwater Pit": MMZero3LocationData(region="Oceanic Highway Ruins", address=313, can_create=itemsanity_on),
     "Oceanic Highway Ruins E-Crystal (5): Above Cyber Door": MMZero3LocationData(region="Oceanic Highway Ruins", address=314, can_create=itemsanity_on),
     "Oceanic Highway Ruins E-Crystal (6): Above Cyber Door": MMZero3LocationData(region="Oceanic Highway Ruins", address=315, can_create=itemsanity_on),
-    "Oceanic Highway Ruins Energy (1): 1st Section Floating Platforms": MMZero3LocationData(region="Oceanic Highway Ruins", address=316, can_create=itemsanity_on),
+    "Oceanic Highway Ruins Energy (1): 1st Section Platforms": MMZero3LocationData(region="Oceanic Highway Ruins", address=316, can_create=itemsanity_on),
     "Oceanic Highway Ruins Energy (2): Destroy Box Using Boss": MMZero3LocationData(region="Oceanic Highway Ruins", address=317, can_create=itemsanity_on),
-    "Oceanic Highway Ruins Energy (3): Floating Platform after 2nd Pressure Pad": MMZero3LocationData(region="Oceanic Highway Ruins", address=318, can_create=itemsanity_on),
+    "Oceanic Highway Ruins Energy (3): Platform after 2nd Pressure Pad": MMZero3LocationData(region="Oceanic Highway Ruins", address=318, can_create=itemsanity_on),
     "Oceanic Highway Ruins E-Crystal (7): Spiked Platforms": MMZero3LocationData(region="Oceanic Highway Ruins", address=319, can_create=itemsanity_on),
 
     "Weapons Repair Factory Energy (1): Before 1st Junk Pit": MMZero3LocationData(region="Weapons Repair Factory", address=320, can_create=itemsanity_on),
@@ -356,9 +356,9 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Old Residential Energy (1): Stump Door": MMZero3LocationData(region="Old Residential", address=331, can_create=itemsanity_on), #fire
     "Old Residential E-Crystal (2): Above 1st Door": MMZero3LocationData(region="Old Residential", address=332, can_create=itemsanity_on),
     "Old Residential E-Crystal (3): Above 1st Door": MMZero3LocationData(region="Old Residential", address=333, can_create=itemsanity_on),
-    "Old Residential E-Crystal (4): Covered Door after Cutscene": MMZero3LocationData(region="Old Residential", address=334, can_create=itemsanity_on), #fire
-    "Old Residential E-Crystal (5): Covered Door after Cutscene": MMZero3LocationData(region="Old Residential", address=335, can_create=itemsanity_on), #fire
-    "Old Residential E-Crystal (6): Covered Door after Cutscene": MMZero3LocationData(region="Old Residential", address=336, can_create=itemsanity_on), #fire
+    "Old Residential E-Crystal (4): Door after Cutscene": MMZero3LocationData(region="Old Residential", address=334, can_create=itemsanity_on), #fire
+    "Old Residential E-Crystal (5): Door after Cutscene": MMZero3LocationData(region="Old Residential", address=335, can_create=itemsanity_on), #fire
+    "Old Residential E-Crystal (6): Door after Cutscene": MMZero3LocationData(region="Old Residential", address=336, can_create=itemsanity_on), #fire
     "Old Residential Energy (2): Top Right Secret Door": MMZero3LocationData(region="Old Residential", address=337, can_create=itemsanity_on),
     "Old Residential E-Crystal (7): Top Right Secret Door": MMZero3LocationData(region="Old Residential", address=338, can_create=itemsanity_on),
     "Old Residential E-Crystal (8): Top Right Secret Door": MMZero3LocationData(region="Old Residential", address=339, can_create=itemsanity_on),
@@ -367,10 +367,10 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Old Residential E-Crystal (10): Falling Platforms": MMZero3LocationData(region="Old Residential", address=342, can_create=itemsanity_on),
     "Old Residential E-Crystal (11): Falling Platforms": MMZero3LocationData(region="Old Residential", address=343, can_create=itemsanity_on),
     "Old Residential E-Crystal (12): Falling Platforms": MMZero3LocationData(region="Old Residential", address=344, can_create=itemsanity_on),
-    "Old Residential E-Crystal (13): Top Left Pantheon Bombers": MMZero3LocationData(region="Old Residential", address=345, can_create=itemsanity_on), #mobility
+    "Old Residential E-Crystal (13): Top Left Past Bombers": MMZero3LocationData(region="Old Residential", address=345, can_create=itemsanity_on), #mobility
     "Old Residential Energy (4): Climb after Miniboss": MMZero3LocationData(region="Old Residential", address=346, can_create=itemsanity_on),
     "Old Residential Energy (5): Before Top Right Secret Door": MMZero3LocationData(region="Old Residential", address=347, can_create=itemsanity_on),
-    "Old Residential Energy (6): Breakable Blocks by Bombers": MMZero3LocationData(region="Old Residential", address=348, can_create=itemsanity_on),
+    "Old Residential Energy (6): Breakable Blocks by Bombers": MMZero3LocationData(region="Old Residential", address=348, can_create=itemsanity_on), # rod
 
     "Missile Factory E-Crystal (1): Pit Under Ladder": MMZero3LocationData(region="Missile Factory", address=349, can_create=itemsanity_on),
     "Missile Factory E-Crystal (2): Pit Under Ladder": MMZero3LocationData(region="Missile Factory", address=350, can_create=itemsanity_on),

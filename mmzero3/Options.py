@@ -1,5 +1,7 @@
 from dataclasses import dataclass
-from Options import Range, Toggle, DefaultOnToggle, OptionSet, DeathLink, PerGameCommonOptions
+from Options import Choice, Range, Toggle, DefaultOnToggle, OptionSet, DeathLink, PerGameCommonOptions
+
+from . import Data
 
 
 class RequiredSecretDisks(Range):
@@ -31,19 +33,33 @@ class StartingWeapons(OptionSet):
     default = frozenset({"Buster", "Z-Saber"})
 
 class Itemsanity(Toggle):
-    """Makes every static energy and E-Crystal pickup a location check (82 in total).
-
-    Unchecked items are displayed in game with the Archipelago logo floating above them.
-    """
+    """Makes every static energy and E-Crystal pickup a location check (82 in total)."""
     display_name = "Itemsanity"
 
 
 class ExtraLifeSanity(DefaultOnToggle):
-    """Makes every 1-UP pickup a location check (10 in total).
-
-    Unchecked items are displayed in game with the Archipelago logo floating above them.
-    """
+    """Makes every 1-UP pickup a location check (10 in total)."""
     display_name = "Extra Life Sanity"
+
+
+class SelectButton(Choice):
+    """Select buttons functionality.
+
+    Cycle Sub Weapon (Default)
+    Cycle Main Weapon
+    Cycle Head Chip
+    Cycle Body Chip
+    Cycle Foot Chip
+    Use Subtank (Uses fullest Subtank)
+    """
+    display_name = "Select Button"
+    option_cycle_sub_weapon = Data.AP_SELECT_CYCLE_SUB_WEAPON
+    option_cycle_main_weapon = Data.AP_SELECT_CYCLE_MAIN_WEAPON
+    option_cycle_head_chip = Data.AP_SELECT_CYCLE_HEAD_CHIP
+    option_cycle_body_chip = Data.AP_SELECT_CYCLE_BODY_CHIP
+    option_cycle_foot_chip = Data.AP_SELECT_CYCLE_FOOT_CHIP
+    option_use_subtank = Data.AP_SELECT_USE_SUBTANK
+    default = option_cycle_sub_weapon
 
 
 class RandomizedPalettes(Toggle):
@@ -78,6 +94,7 @@ class MMZero3Options(PerGameCommonOptions):
     itemsanity: Itemsanity
     extra_life_sanity: ExtraLifeSanity
     randomized_palettes: RandomizedPalettes
+    select_button: SelectButton
     shop_slots: ShopSlots
     shop_price_scale: ShopPriceScale
     death_link: DeathLink

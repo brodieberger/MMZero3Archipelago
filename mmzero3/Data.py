@@ -17,6 +17,12 @@ AP_ITEM_DISK_LAST = 180
 AP_DISK_BYTES = 45
 AP_UNLOCK_BYTE = 12
 AP_MAX_LOCATION_ID = 382
+AP_SELECT_CYCLE_SUB_WEAPON = 0
+AP_SELECT_CYCLE_MAIN_WEAPON = 1
+AP_SELECT_CYCLE_HEAD_CHIP = 2
+AP_SELECT_CYCLE_BODY_CHIP = 3
+AP_SELECT_CYCLE_FOOT_CHIP = 4
+AP_SELECT_USE_SUBTANK = 5
 AP_LOC_EXLIFE_FIRST = 231
 AP_EXLIFE_COUNT = 10
 AP_LOC_ITEMSANITY_FIRST = 301
@@ -57,12 +63,12 @@ KILL_REQUEST = 0x0003EF10
 CAN_ACCEPT_ITEMS = 0x0003EF11
 
 # gApShopPrices, ROM data: one u16 per shop slot
-SHOP_PRICES_ROM_OFFSET = 0x00802D9C
+SHOP_PRICES_ROM_OFFSET = 0x00803018
 SHOP_PRICES_COUNT = 48
 SHOP_PRICES_ELEMENT_SIZE = 2
 
 # gApShopItems, ROM data: one fixed record a slot
-SHOP_ITEMS_ROM_OFFSET = 0x00802DFC
+SHOP_ITEMS_ROM_OFFSET = 0x00803078
 SHOP_ITEMS_COUNT = 48
 SHOP_ITEMS_SIZE = 68
 
@@ -155,7 +161,7 @@ CHARMAP = {
 }
 
 # gApSeedConfig, ROM data
-SEED_CONFIG_ROM_OFFSET = 0x00801638
+SEED_CONFIG_ROM_OFFSET = 0x0080179C
 SEED_CONFIG_SIZE = 8
 SEED_CONFIG_FIELDS = {   # ap.h name: (offset, size)
     "requiredDisks": (0, 2),
@@ -163,7 +169,8 @@ SEED_CONFIG_FIELDS = {   # ap.h name: (offset, size)
     "easyExSkill": (3, 1),
     "itemsanity": (4, 1),
     "exLifeSanity": (5, 1),
-    "unused": (6, 1),
+    "selectButton": (6, 1),
+    "unused": (7, 1),
 }
 
 # Stage id: the ROM offset and byte size of each BG palette

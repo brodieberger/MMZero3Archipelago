@@ -65,9 +65,6 @@ def encode_text(text: str, cols: int) -> bytes:
 
 
 def wrap_text(text: str, cols: int, lines: int) -> List[str]:
-    out = []
-    line = ""
-
     words = []
     for word in text.split():
         while len(word) > cols:
@@ -75,24 +72,25 @@ def wrap_text(text: str, cols: int, lines: int) -> List[str]:
             word = word[cols:]
         words.append(word)
 
+    out = []
+    line = ""
     for word in words:
-        if line == "":
-            longer = word
-        else:
-            longer = line + " " + word
-
+        longer = word if line == "" else line + " " + word
         if len(longer) <= cols:
             line = longer
         else:
             out.append(line)
             line = word
-
-        if len(out) == lines:
-            return out
-
     if line != "":
         out.append(line)
-    return out[:lines]
+
+    if len(out) > lines:
+        out = out[:lines]
+        last = out[-1]
+        if len(last) + 3 > cols:
+            last = last[:cols - 3].rstrip()
+        out[-1] = last + "..."
+    return out
 
 
 class MMZero3PatchExtensions(APPatchExtension):
@@ -188,7 +186,8 @@ def write_tokens(world: "MMZero3World", patch: MMZero3ProcedurePatch) -> None:
         u8  easyExSkill;
         u8  itemsanity;
         u8  exLifeSanity;
-        u8  unused[2];
+        u8  selectButton;
+        u8  unused;
     };
 
     Theres also gApShopPrices, one u16 per shop slot: 
@@ -206,6 +205,7 @@ def write_tokens(world: "MMZero3World", patch: MMZero3ProcedurePatch) -> None:
         "easyExSkill": 1 if world.options.easy_ex_skill.value else 0,
         "itemsanity": 1 if world.options.itemsanity.value else 0,
         "exLifeSanity": 1 if world.options.extra_life_sanity.value else 0,
+        "selectButton": world.options.select_button.value,
         "unused": 0,
     }
 
