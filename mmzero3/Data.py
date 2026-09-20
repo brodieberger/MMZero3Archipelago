@@ -23,6 +23,9 @@ AP_SELECT_CYCLE_HEAD_CHIP = 2
 AP_SELECT_CYCLE_BODY_CHIP = 3
 AP_SELECT_CYCLE_FOOT_CHIP = 4
 AP_SELECT_USE_SUBTANK = 5
+AP_ELVES_VANILLA = 0
+AP_ELVES_NO_PENALTY = 1
+AP_ELVES_AUTO = 2
 AP_LOC_EXLIFE_FIRST = 231
 AP_EXLIFE_COUNT = 10
 AP_LOC_ITEMSANITY_FIRST = 301
@@ -63,12 +66,12 @@ KILL_REQUEST = 0x0003EF10
 CAN_ACCEPT_ITEMS = 0x0003EF11
 
 # gApShopPrices, ROM data: one u16 per shop slot
-SHOP_PRICES_ROM_OFFSET = 0x0080305C
+SHOP_PRICES_ROM_OFFSET = 0x00804264
 SHOP_PRICES_COUNT = 48
 SHOP_PRICES_ELEMENT_SIZE = 2
 
 # gApShopItems, ROM data: one fixed record a slot
-SHOP_ITEMS_ROM_OFFSET = 0x008030BC
+SHOP_ITEMS_ROM_OFFSET = 0x008042C4
 SHOP_ITEMS_COUNT = 48
 SHOP_ITEMS_SIZE = 68
 
@@ -161,8 +164,8 @@ CHARMAP = {
 }
 
 # gApSeedConfig, ROM data
-SEED_CONFIG_ROM_OFFSET = 0x008017E0
-SEED_CONFIG_SIZE = 8
+SEED_CONFIG_ROM_OFFSET = 0x0080190C
+SEED_CONFIG_SIZE = 12
 SEED_CONFIG_FIELDS = {   # ap.h name: (offset, size)
     "requiredDisks": (0, 2),
     "startingWeapons": (2, 1),
@@ -171,6 +174,9 @@ SEED_CONFIG_FIELDS = {   # ap.h name: (offset, size)
     "exLifeSanity": (5, 1),
     "selectButton": (6, 1),
     "damageUpgrades": (7, 1),
+    "cyberElves": (8, 1),
+    "diskNamePopup": (9, 1),
+    "unused": (10, 1),
 }
 
 # Stage id: the ROM offset and byte size of each BG palette

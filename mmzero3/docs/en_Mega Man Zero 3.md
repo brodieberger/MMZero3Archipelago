@@ -42,7 +42,7 @@ Cerveau now has a shop, visit it by pressing L or R on his secret disk analysis 
 - All skippable cutscenes are skippable by default.
 - You can leave any level at any time.
 - Pressing SELECT during gameplay does one thing of your choosing. By default it swaps sub weapons, configurable by an option.
-- When Archipelago gives you an item, a small icon pops up over Zero's head with a unique icon displayed for each item.
+- When Archipelago gives you an item, a small icon pops up over Zero's head with a unique icon displayed for each item, and for a secret disk the game's own message box describes it along the bottom of the screen.
 - Collecting certain lore related secret disks will simultaneously unlock a random e-Reader graphical change. A full list can be seen [here](https://tcrf.net/Mega_Man_Zero_3/e-Reader_Functions).
 - Your player rank is based on the average of your best clear in each stage.
 - Pressing select on the secret disk analysis screen will open all of the disks that you own.
@@ -70,11 +70,24 @@ Cerveau now has a shop, visit it by pressing L or R on his secret disk analysis 
 - `weapon_damage_upgrades`:  
   On by default. Off, the last three steps of each progressive weapon (the damage increases) do nothing when received. The items stay in the pool.
 
+- `cyber_elves`:  
+  Modifications to Cyber Elf usage. Satellite elves remain unmodified.
+
+  - Vanilla: Unmodified Vanilla.
+  - No Penalty: Fusing an elf does not affect rank.
+  - Auto: Every passive elf received via disk is automatically opened and applied. Does not affect rank. Gives the game a nice sense of progresion, but makes it a lot easier.
+
+- `disk_name_popup`:  
+  On by default. When a Secret Disk arrives from Archipelago, a small message box names it for a moment.
+
 - `randomized_palettes`:  
   Every stage is drawn in a randomly chosen color scheme.
 
 - `shop_slots` / `shop_price_scale`:  
   How many slots Cerveau's shop has (default 16, max 48) and how expensive they are, as a percentage.
+
+- `start_inventory_from_pool`:  
+  Starting inventory but the items don't appear in the pool.
 
 - `death_link`:  
   Standard DeathLink. Dying sends, and receiving kills you.

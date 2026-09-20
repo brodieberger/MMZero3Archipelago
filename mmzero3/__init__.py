@@ -186,7 +186,8 @@ class MMZero3World(World):
         if not self.options.randomized_palettes.value:
             return
         for stage_id in Data.STAGE_PALETTES:
-            self.stage_palettes[stage_id] = self.random.choice(list(Palettes.PRESETS))
+            choices = Palettes.HUES + Palettes.STAGE_THEMES[stage_id]
+            self.stage_palettes[stage_id] = self.random.choice(choices)
 
     def set_rules(self) -> None:
         def has_weapon_at(state, weapon: str, ability: str) -> bool:

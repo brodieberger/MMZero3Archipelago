@@ -299,7 +299,7 @@ class MMZero3Client(BizHawkClient):
         """
         if ctx.finished_game:
             return
-        if (FINAL_STAGE_LOCATION not in ctx.checked_locations and FINAL_STAGE_LOCATION not in self.locations_reported):
+        if FINAL_STAGE_LOCATION not in self.locations_reported:
             return
 
         await ctx.send_msgs([

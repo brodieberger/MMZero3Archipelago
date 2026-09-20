@@ -36,6 +36,31 @@ PRESETS = {
     "hue300": Preset(hue=300, sat=1.6, val=0.95),
 }
 
+# The hue shift looks good on every stage so I keep them all.
+HUES = ["hue60", "hue120", "hue180", "hue240", "hue300"]
+
+# Which stages can have which themes. Some stages simply looked better or worse, so they have
+# been hand selected to not have specific palettes that looked bad.
+STAGE_THEMES = {
+    1:  ["desert", "dusk"],             # Derelict Spacecraft
+    2:  ["snowy", "desert", "dusk"],    # Aegis Volcano Base
+    3:  ["desert", "dusk"],             # Oceanic Highway Ruins
+    4:  ["dusk"],                       # Weapons Repair Factory
+    5:  ["snowy", "desert", "dusk"],    # Old Residential
+    6:  ["snowy", "desert", "dusk"],    # Missile Factory
+    7:  [],                             # Twilight Desert
+    8:  [],                             # Forest of Anatre
+    9:  ["desert", "dusk"],             # Frontline Ice Base
+    10: ["desert", "dusk"],             # Area X-2
+    11: ["snowy", "desert", "dusk"],    # Energy Facility
+    12: ["desert", "dusk"],             # Snowy Plains
+    13: ["desert", "dusk"],             # Sunken Library
+    14: ["dusk"],                       # Giant Elevator
+    15: ["snowy", "desert", "dusk"],    # Sub Arcadia
+    16: ["snowy", "desert", "dusk"],    # Abandoned Research Laboratory
+    17: [],                             # Resistance Base
+}
+
 
 def recolor(palette: bytes, preset: Preset) -> bytes:
     out = bytearray(len(palette))
