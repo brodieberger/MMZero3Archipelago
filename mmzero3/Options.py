@@ -64,11 +64,11 @@ class SelectButton(Choice):
 
 
 class CyberElves(Choice):
-    """Modifications to Cyber Elf usage. Satellite elves remain unmodified.
+    """Modifications to fusion Cyber Elves. Satellite elves remain unmodified.
 
     Vanilla: Unmodified Vanilla. Upgrading elves cost eCrystals, fusion elves decrease rank.
     No Penalty: Fusing an elf does not affect rank.
-    Auto: Every passive elf received via disk is automatically opened and applied, and Artan and Zictan arrive as their sub tanks. Does not affect rank. Gives the game a nice sense of progression, but makes it a lot easier.
+    Auto: Every passive elf received via disk is automatically opened and applied. Does not affect rank. Gives the game a nice sense of progression, but makes it a lot easier.
     """
     display_name = "Cyber-elves"
     option_vanilla = Data.AP_ELVES_VANILLA
