@@ -134,6 +134,7 @@ mmzero3_option_groups = [
         StartingWeapons,
         WeaponDamageUpgrades,
         SelectButton,
+        CyberElves,
         EasyExSkill,
         DeathLink,
     ]),
