@@ -7,7 +7,7 @@ Welcome to my project. Things are still under development, but here you will fin
 </div>
 
 ## General Information (IMPORTANT)
-- **Locations:** All 180 secret disks, stage clears, an A+ rank clear in each of the 15 stages, the nine armor chips, both sub tanks, Cerveau's Recoil Rod and Shield Boomerang, ten extra life pickups, and eleven miniboss fights.
+- **Locations:** All 180 secret disks, stage clears, an A+ rank clear in each of the 15 stages, the nine armor chips, both sub tanks, Cerveau's Recoil Rod and Shield Boomerang, and eleven miniboss fights. Optionally 10 extra life pickups, 82 itemsanity items, and a configurable number of shop slots.
 - **Item pool:** 180 secret disks, the four weapons as progressive upgrade unlocks, nine armor chips, twelve EX Skills, two sub tanks, fifteen stage access items and two Story Progress items. E-Crystals are filler.
 - There's a modified mission select screen, which allows you to select from any level as long as you have its access item.
   - Boss portraits are in groups of four like in vanilla, but now you can tab between the pages with left and right on the d-pad (the shoulder buttons work too).
@@ -41,8 +41,8 @@ Cerveau now has a shop, visit it by pressing L or R on his secret disk analysis 
 - The pause menu shows you how many secret disks are required to collect in order to unlock the final stage.
 - All skippable cutscenes are skippable by default.
 - You can leave any level at any time.
-- Pressing SELECT during gameplay swaps your sub weapon to the next one you own.
-- When Archipelago gives you an item, a small icon pops up over Zero's head with a unique icon displayed for each item.
+- Pressing SELECT during gameplay does one thing of your choosing. By default it swaps sub weapons, configurable by an option.
+- When Archipelago gives you an item, a small icon pops up over Zero's head with a unique icon displayed for each item, and for a secret disk the game's own message box describes it along the bottom of the screen.
 - Collecting certain lore related secret disks will simultaneously unlock a random e-Reader graphical change. A full list can be seen [here](https://tcrf.net/Mega_Man_Zero_3/e-Reader_Functions).
 - Your player rank is based on the average of your best clear in each stage.
 - Pressing select on the secret disk analysis screen will open all of the disks that you own.
@@ -64,11 +64,30 @@ Cerveau now has a shop, visit it by pressing L or R on his secret disk analysis 
   The game's 82 static life capsules and E-Crystals become location checks. Unchecked ones
   display in game with the Archipelago logo.
 
+- `select_button`:  
+  The select button's functionality. Choose between Cycling the sub weapon (default), the main weapon, the head, body or foot chip, or use the fullest subtank.
+
+- `weapon_damage_upgrades`:  
+  On by default. Off, the last three steps of each progressive weapon (the damage increases) do nothing when received. The items stay in the pool.
+
+- `cyber_elves`:  
+  Modifications to Cyber Elf usage. Satellite elves remain unmodified.
+
+  - Vanilla: Unmodified Vanilla.
+  - No Penalty: Fusing an elf does not affect rank.
+  - Auto: Every passive elf received via disk is automatically opened and applied. Does not affect rank. Gives the game a nice sense of progresion, but makes it a lot easier.
+
+- `disk_name_popup`:  
+  On by default. When a Secret Disk arrives from Archipelago, a small message box names it for a moment.
+
 - `randomized_palettes`:  
   Every stage is drawn in a randomly chosen color scheme.
 
 - `shop_slots` / `shop_price_scale`:  
   How many slots Cerveau's shop has (default 16, max 48) and how expensive they are, as a percentage.
+
+- `start_inventory_from_pool`:  
+  Starting inventory but the items don't appear in the pool.
 
 - `death_link`:  
   Standard DeathLink. Dying sends, and receiving kills you.
@@ -95,7 +114,7 @@ For example: `!hint Stage Access` or `!missing Sub Arcadia`.
 - I hope to soon bring this world from unstable to stable, so report anything that seems off, not just bugs!
   
 ## Planned Features.
-- A weapon wheel on SELECT for swapping chips and weapons without opening the menu. Right now it just cycles sub weapons.
+- A weapon wheel on SELECT for swapping chips and weapons without opening the menu. Right now you can only select one at once.
 - Breakable containers and other collectables as location checks.
 - Level geometry, enemy, or entrance randomization.
   - Enemy Randomization is currently being worked on.
