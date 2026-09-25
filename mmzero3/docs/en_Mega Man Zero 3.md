@@ -77,8 +77,11 @@ Cerveau now has a shop, visit it by pressing L or R on his secret disk analysis 
   - No Penalty: Fusing an elf does not affect rank.
   - Auto: Every passive elf received via disk is automatically opened and applied. Does not affect rank. Gives the game a nice sense of progresion, but makes it a lot easier.
 
+- `infinite_lives`:  
+  Infinite Lives.
+
 - `disk_name_popup`:  
-  On by default. When a Secret Disk arrives from Archipelago, a small message box names it for a moment.
+  On by default. When a Secret Disk arrives from Archipelago, a small message box appears to describe it.
 
 - `randomized_palettes`:  
   Every stage is drawn in a randomly chosen color scheme.

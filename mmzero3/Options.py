@@ -64,7 +64,7 @@ class SelectButton(Choice):
 
 
 class CyberElves(Choice):
-    """Modifications to fusion Cyber Elves. Satellite elves remain unmodified.
+    """Modifications to fusion Cyber Elf usage. Satellite elves remain unmodified.
 
     Vanilla: Unmodified Vanilla. Upgrading elves cost eCrystals, fusion elves decrease rank.
     No Penalty: Fusing an elf does not affect rank.
@@ -102,6 +102,10 @@ class DiskNamePopup(DefaultOnToggle):
     display_name = "Disk Name Popup"
 
 
+class InfiniteLives(Toggle):
+    display_name = "Infinite Lives"
+
+
 class ShopSlots(Range):
     """How many slots Cerveau's shop stocks."""
     display_name = "Shop Slots"
@@ -136,6 +140,7 @@ mmzero3_option_groups = [
         SelectButton,
         CyberElves,
         EasyExSkill,
+        InfiniteLives,
         DeathLink,
     ]),
     OptionGroup("Aesthetics", [
@@ -157,6 +162,7 @@ class MMZero3Options(PerGameCommonOptions):
     weapon_damage_upgrades: WeaponDamageUpgrades
     cyber_elves: CyberElves
     disk_name_popup: DiskNamePopup
+    infinite_lives: InfiniteLives
     start_inventory_from_pool: StartInventoryPool
     shop_slots: ShopSlots
     shop_price_scale: ShopPriceScale
