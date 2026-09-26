@@ -152,7 +152,8 @@ class MMZero3World(World):
     def fill_slot_data(self) -> Dict[str, Any]:
         return {
             "required_secret_disks": self.options.required_secret_disks.value,
-            "easy_ex_skill": self.options.easy_ex_skill.value,
+            "ex_skill_rank": self.options.ex_skill_rank.value,
+            "final_stage_rank": self.options.final_stage_rank.value,
             "starting_weapons": sorted(self.starting_weapons),
             "itemsanity": self.options.itemsanity.value,
             "extra_life_sanity": self.options.extra_life_sanity.value,

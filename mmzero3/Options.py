@@ -18,10 +18,39 @@ class RequiredSecretDisks(Range):
     range_end = 180
     default = 120
 
-class EasyExSkill(Toggle):
-    """Rewards player with EX-Skill at the end of a level regardless of ranking."""
-    display_name = "Always reward EX-Skill"
-    
+class ExSkillRank(Choice):
+    """The rank a stage clear needs in order to send that stage's EX Skill check. In the vanilla game it would be an A.
+
+    The rank is for the mission just finished, not your overall rank. F sends the check on any clear.
+    """
+    display_name = "EX Skill Rank"
+    option_s = Data.RANK_S
+    option_a = Data.RANK_A
+    option_b = Data.RANK_B
+    option_c = Data.RANK_C
+    option_d = Data.RANK_D
+    option_e = Data.RANK_E
+    option_f = Data.RANK_F
+    default = Data.RANK_A
+
+
+class FinalStageRank(Choice):
+    """The rank you need to get on each stage for the final stage to open, in addition to the required disks.
+
+    F means that clearing each stage will automatically unlock the boss.
+    None means no stage has to be cleared at all, and the final stage opens as soon as you hold the required secret disks.
+    """
+    display_name = "Final Stage Rank"
+    option_s = Data.RANK_S
+    option_a = Data.RANK_A
+    option_b = Data.RANK_B
+    option_c = Data.RANK_C
+    option_d = Data.RANK_D
+    option_e = Data.RANK_E
+    option_f = Data.RANK_F
+    option_none = Data.AP_FINAL_RANK_NONE
+    default = Data.RANK_F
+
 
 class StartingWeapons(OptionSet):
     """Which weapons Zero starts with.
@@ -64,11 +93,11 @@ class SelectButton(Choice):
 
 
 class CyberElves(Choice):
-    """Modifications to fusion Cyber Elf usage. Satellite elves remain unmodified.
+    """Modifications to Cyber Elf usage. Satellite elves remain unmodified.
 
     Vanilla: Unmodified Vanilla. Upgrading elves cost eCrystals, fusion elves decrease rank.
     No Penalty: Fusing an elf does not affect rank.
-    Auto: Every passive elf received via disk is automatically opened and applied. Does not affect rank. Gives the game a nice sense of progression, but makes it a lot easier.
+    Auto: Every passive elf received via disk is automatically opened and applied, and Artan and Zictan arrive as their sub tanks. Does not affect rank. Gives the game a nice sense of progression, but makes it a lot easier.
     """
     display_name = "Cyber-elves"
     option_vanilla = Data.AP_ELVES_VANILLA
@@ -127,6 +156,7 @@ class ShopPriceScale(Range):
 mmzero3_option_groups = [
     OptionGroup("Goal Options", [
         RequiredSecretDisks,
+        FinalStageRank,
     ]),
     OptionGroup("Sanity Options", [
         ExtraLifeSanity,
@@ -139,7 +169,7 @@ mmzero3_option_groups = [
         WeaponDamageUpgrades,
         SelectButton,
         CyberElves,
-        EasyExSkill,
+        ExSkillRank,
         InfiniteLives,
         DeathLink,
     ]),
@@ -153,7 +183,8 @@ mmzero3_option_groups = [
 @dataclass
 class MMZero3Options(PerGameCommonOptions):
     required_secret_disks: RequiredSecretDisks
-    easy_ex_skill: EasyExSkill
+    ex_skill_rank: ExSkillRank
+    final_stage_rank: FinalStageRank
     starting_weapons: StartingWeapons
     itemsanity: Itemsanity
     extra_life_sanity: ExtraLifeSanity

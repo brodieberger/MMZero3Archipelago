@@ -3,9 +3,9 @@
 
 # gAp.ready reads AP_READY once the game has booted, and gAp.version reads AP_VERSION.
 AP_READY = 0x335A5041      # Spells out 'APZ3' in little endian
-AP_VERSION = 23
+AP_VERSION = 24
 
-# Constants from ap.h
+# Constants from ap.h and constants/constants.h
 AP_KILL_REQUESTED = 1
 AP_TAKEN_BYTE = 8
 AP_TAKEN_SUBTANK1 = 1
@@ -44,6 +44,14 @@ AP_ITEM_STORY_MID = 229
 AP_ITEM_STORY_LATE = 230
 AP_ITEM_WEAPON_LEVEL_FIRST = 400
 AP_ITEM_CODES_PER_WEAPON = 8
+RANK_F = 0
+RANK_E = 1
+RANK_D = 2
+RANK_C = 3
+RANK_B = 4
+RANK_A = 5
+RANK_S = 6
+AP_FINAL_RANK_NONE = 255
 
 # gAp
 GAP = 0x0003EE80
@@ -164,38 +172,39 @@ CHARMAP = {
 }
 
 # gApSeedConfig, ROM data
-SEED_CONFIG_ROM_OFFSET = 0x000FFB74
+SEED_CONFIG_ROM_OFFSET = 0x000FFB94
 SEED_CONFIG_SIZE = 12
 SEED_CONFIG_FIELDS = {   # ap.h name: (offset, size)
     "requiredDisks": (0, 2),
     "startingWeapons": (2, 1),
-    "easyExSkill": (3, 1),
+    "exSkillRank": (3, 1),
     "itemsanity": (4, 1),
     "exLifeSanity": (5, 1),
     "selectButton": (6, 1),
     "damageUpgrades": (7, 1),
     "cyberElves": (8, 1),
     "diskNamePopup": (9, 1),
-    "unused": (10, 1),
+    "infiniteLives": (10, 1),
+    "finalStageRank": (11, 1),
 }
 
 # Stage id: the ROM offset and byte size of each BG palette
 STAGE_PALETTES = {
-    1: [(0x759DA8, 96), (0x75C908, 128), (0x7603C8, 192), (0x762F48, 192), (0x7650DC, 128)],
-    2: [(0x7773AC, 192), (0x77B06C, 192), (0x77EAEC, 192), (0x782B2C, 224), (0x784B38, 192), (0x786ACC, 192), (0x788090, 96)],
-    3: [(0x78B02C, 192), (0x78D04C, 224), (0x78F8E8, 224), (0x7913D0, 160)],
-    4: [(0x798FDC, 224), (0x79CFBC, 128), (0x7A067C, 32), (0x7A469C, 192), (0x7A875C, 224)],
-    5: [(0x7AB6EC, 160), (0x7AE000, 192), (0x7B0D3C, 160), (0x7B32F0, 96)],
-    6: [(0x7B5050, 192), (0x7B6DFC, 192), (0x7B8554, 64), (0x7B9BC4, 224), (0x7BB2A8, 224), (0x7BDE9C, 192), (0x7BF1D0, 224)],
-    7: [(0x7C1834, 224), (0x7C5614, 224), (0x7C6534, 32), (0x7C6FEC, 32)],
-    8: [(0x7C9978, 224), (0x7CCCA8, 192), (0x7CE778, 224), (0x7D05B4, 224)],
-    9: [(0x7D1D60, 224), (0x7D4BF0, 224), (0x7D71B4, 224), (0x7D8D68, 224), (0x7DB0A0, 192)],
-    10: [(0x7DD484, 192), (0x7DF224, 224), (0x7E140C, 160), (0x7E2FC0, 96)],
-    11: [(0x7E7084, 224), (0x7EA5E4, 224), (0x7EDD04, 192), (0x7F0884, 128), (0x7F4904, 224)],
-    12: [(0x759DA8, 96), (0x76911C, 96), (0x76C9FC, 64), (0x77063C, 160), (0x7732E0, 64)],
-    13: [(0x78D04C, 224), (0x792F8C, 224), (0x7949A4, 224), (0x79670C, 224)],
-    14: [(0x7F6EAC, 160), (0x7F91AC, 96), (0x7FBCBC, 96), (0x7FE068, 96), (0x800D3C, 96)],
-    15: [(0x803020, 224), (0x8052BC, 160), (0x806A2C, 128), (0x8091F4, 224)],
-    16: [(0x80B484, 224), (0x80E0FC, 192), (0x80F0F8, 160), (0x8119B4, 224), (0x8155A0, 192), (0x818A08, 224)],
-    17: [(0x81A364, 224), (0x81BF30, 224), (0x820010, 224), (0x8240F0, 224), (0x8261B0, 224), (0x827544, 160)],
+    1: [(0x712CF4, 96), (0x715854, 128), (0x719314, 192), (0x71BE94, 192), (0x71E028, 128)],
+    2: [(0x7302F8, 192), (0x733FB8, 192), (0x737A38, 192), (0x73BA78, 224), (0x73DA84, 192), (0x73FA18, 192), (0x740FDC, 96)],
+    3: [(0x743F78, 192), (0x745F98, 224), (0x748834, 224), (0x74A31C, 160)],
+    4: [(0x751F28, 224), (0x755F08, 128), (0x7595C8, 32), (0x75D5E8, 192), (0x7616A8, 224)],
+    5: [(0x764638, 160), (0x766F4C, 192), (0x769C88, 160), (0x76C23C, 96)],
+    6: [(0x76DF9C, 192), (0x76FD48, 192), (0x7714A0, 64), (0x772B10, 224), (0x7741F4, 224), (0x776DE8, 192), (0x77811C, 224)],
+    7: [(0x77A780, 224), (0x77E560, 224), (0x77F480, 32), (0x77FF38, 32)],
+    8: [(0x7828C4, 224), (0x785BF4, 192), (0x7876C4, 224), (0x789500, 224)],
+    9: [(0x78ACAC, 224), (0x78DB3C, 224), (0x790100, 224), (0x791CB4, 224), (0x793FEC, 192)],
+    10: [(0x7963D0, 192), (0x798170, 224), (0x79A358, 160), (0x79BF0C, 96)],
+    11: [(0x79FFD0, 224), (0x7A3530, 224), (0x7A6C50, 192), (0x7A97D0, 128), (0x7AD850, 224)],
+    12: [(0x712CF4, 96), (0x722068, 96), (0x725948, 64), (0x729588, 160), (0x72C22C, 64)],
+    13: [(0x745F98, 224), (0x74BED8, 224), (0x74D8F0, 224), (0x74F658, 224)],
+    14: [(0x7AFDF8, 160), (0x7B20F8, 96), (0x7B4C08, 96), (0x7B6FB4, 96), (0x7B9C88, 96)],
+    15: [(0x7BBF6C, 224), (0x7BE208, 160), (0x7BF978, 128), (0x7C2140, 224)],
+    16: [(0x7C43D0, 224), (0x7C7048, 192), (0x7C8044, 160), (0x7CA900, 224), (0x7CE4EC, 192), (0x7D1954, 224)],
+    17: [(0x7D32B0, 224), (0x7D4E7C, 224), (0x7D8F5C, 224), (0x7DD03C, 224), (0x7DF0FC, 224), (0x7E0490, 160)],
 }

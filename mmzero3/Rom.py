@@ -183,7 +183,7 @@ def write_tokens(world: "MMZero3World", patch: MMZero3ProcedurePatch) -> None:
     struct ApSeedConfig {
         u16 requiredDisks;
         u8  startingWeapons;
-        u8  easyExSkill;
+        u8  exSkillRank;
         u8  itemsanity;
         u8  exLifeSanity;
         u8  selectButton;
@@ -191,7 +191,7 @@ def write_tokens(world: "MMZero3World", patch: MMZero3ProcedurePatch) -> None:
         u8  cyberElves;
         u8  diskNamePopup;
         u8  infiniteLives;
-        u8  unused[1];
+        u8  finalStageRank;
     };
 
     Theres also gApShopPrices, one u16 per shop slot: 
@@ -206,7 +206,7 @@ def write_tokens(world: "MMZero3World", patch: MMZero3ProcedurePatch) -> None:
     values = {
         "requiredDisks": world.options.required_secret_disks.value,
         "startingWeapons": starting_weapons,
-        "easyExSkill": 1 if world.options.easy_ex_skill.value else 0,
+        "exSkillRank": world.options.ex_skill_rank.value,
         "itemsanity": 1 if world.options.itemsanity.value else 0,
         "exLifeSanity": 1 if world.options.extra_life_sanity.value else 0,
         "selectButton": world.options.select_button.value,
@@ -214,7 +214,7 @@ def write_tokens(world: "MMZero3World", patch: MMZero3ProcedurePatch) -> None:
         "cyberElves": world.options.cyber_elves.value,
         "diskNamePopup": 1 if world.options.disk_name_popup.value else 0,
         "infiniteLives": 1 if world.options.infinite_lives.value else 0,
-        "unused": 0,
+        "finalStageRank": world.options.final_stage_rank.value,
     }
 
     seed_config = bytearray(Data.SEED_CONFIG_SIZE)
