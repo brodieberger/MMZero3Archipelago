@@ -85,6 +85,15 @@ Cerveau now has a shop, visit it by pressing L or R on his secret disk analysis 
 - `infinite_lives`:  
   Infinite Lives.
 
+- `randomize_enemies`:  
+    Randomize each enemy spawn location. Also includes the spawning of mettaur and Battle Network 3 enemies!
+    If an enemy is randomized into a position where the occupant in the vanilla game would have more health, then multiple enemies would be set to spawn there.
+    So expect a lot of chaos!
+    WARNING: VERY EARLY WORK IN PROGRESS. DO NOT TAKE INTO BIG MULTIWORLDS!
+
+- `trap_percentage`:  
+  The percentage of filler items replaced with traps. Default 0. `enabled_traps` picks which ones may appear (all three by default), for example `enabled_traps: ['Earthquake', 'Slippery Floor']`. Currently implemented traps are Earthquake, Pixelate, and Slippery Floor.
+
 - `disk_name_popup`:  
   On by default. When a Secret Disk arrives from Archipelago, a small message box appears to describe it.
 
@@ -111,7 +120,7 @@ Items and locations are sorted into groups. Try using `!hint`.
 
 | items | |
 | --- | --- |
-| by type | `Secret Disks`, `Stage Access`, `Chips`, `Body Chips`, `Foot Chips`, `Head Chips`, `EX Skills`, `Subtanks`, `Weapons` |
+| by type | `Secret Disks`, `Stage Access`, `Chips`, `Body Chips`, `Foot Chips`, `Head Chips`, `EX Skills`, `Subtanks`, `Weapons`, `Traps` |
 
 For example: `!hint Stage Access` or `!missing Sub Arcadia`.
 
@@ -124,8 +133,7 @@ For example: `!hint Stage Access` or `!missing Sub Arcadia`.
 ## Planned Features.
 - A weapon wheel on SELECT for swapping chips and weapons without opening the menu. Right now you can only select one at once.
 - Breakable containers and other collectables as location checks.
-- Level geometry, enemy, or entrance randomization.
-  - Enemy Randomization is currently being worked on.
+- Level geometry or entrance randomization.
 - Something to do with the minigames.
 
 ---

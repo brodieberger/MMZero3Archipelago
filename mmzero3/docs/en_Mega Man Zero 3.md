@@ -134,7 +134,6 @@ For example: `!hint Stage Access` or `!missing Sub Arcadia`.
 - A weapon wheel on SELECT for swapping chips and weapons without opening the menu. Right now you can only select one at once.
 - Breakable containers and other collectables as location checks.
 - Level geometry or entrance randomization.
-- Option to change the rank required to earn an Ex Skill check (higher or lower).
 - Something to do with the minigames.
 
 ---
