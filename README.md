@@ -126,7 +126,6 @@ For example: `!hint Stage Access` or `!missing Sub Arcadia`.
 - Breakable containers and other collectables as location checks.
 - Level geometry, enemy, or entrance randomization.
   - Enemy Randomization is currently being worked on.
-- Option to change the rank required to earn an Ex Skill check (higher or lower).
 - Something to do with the minigames.
 
 ---
