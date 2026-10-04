@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from Options import (Choice, Range, Toggle, DefaultOnToggle, OptionSet, DeathLink, OptionGroup, StartInventoryPool,
-                     PerGameCommonOptions)
+                     PerGameCommonOptions, Visibility)
 
 from . import Data
 
@@ -122,6 +122,27 @@ class RandomizedPalettes(Toggle):
     display_name = "Randomized Palettes"
 
 
+class RandomizeEnemies(Toggle):
+    """
+    Randomize each enemy spawn location.
+    WARNING: VERY EARLY WORK IN PROGRESS. DO NOT TAKE INTO BIG MULTIWORLDS!
+    """
+    display_name = "Randomize Enemies"
+
+
+class DebugEnemyDifficulty(Choice):
+    """
+    Place more enemies in the spot for one, based off of the health of the spot being replaced.
+    Needs more work. Currently left at chaos mode.
+    """
+    display_name = "DEBUG: Enemy Difficulty"
+    visibility = Visibility.none
+    option_normal = 0
+    option_chaos = 1
+    option_debug = 2
+    default = 1
+
+
 class DiskNamePopup(DefaultOnToggle):
     """
     When a Secret Disk arrives from Archipelago, a message box prints its contents.
@@ -153,6 +174,24 @@ class ShopPriceScale(Range):
     range_end = 400
     default = 100
 
+class TrapPercentage(Range):
+    """The percentage of filler items that are replaced with traps."""
+    display_name = "Trap Percentage"
+    range_start = 0
+    range_end = 100
+    default = 0
+
+
+class EnabledTraps(OptionSet):
+    """
+    Which traps may be placed. Right now, all are currently visual only.
+    Valid Keys: {"Earthquake", "Pixelate", "Slippery Floor"}
+    """
+    display_name = "Enabled Traps"
+    valid_keys = {"Earthquake", "Pixelate", "Slippery Floor"}
+    default = frozenset(valid_keys)
+
+
 mmzero3_option_groups = [
     OptionGroup("Goal Options", [
         RequiredSecretDisks,
@@ -171,7 +210,12 @@ mmzero3_option_groups = [
         CyberElves,
         ExSkillRank,
         InfiniteLives,
+        RandomizeEnemies,
         DeathLink,
+    ]),
+    OptionGroup("Traps", [
+        TrapPercentage,
+        EnabledTraps,
     ]),
     OptionGroup("Aesthetics", [
         RandomizedPalettes,
@@ -194,7 +238,11 @@ class MMZero3Options(PerGameCommonOptions):
     cyber_elves: CyberElves
     disk_name_popup: DiskNamePopup
     infinite_lives: InfiniteLives
+    randomize_enemies: RandomizeEnemies
+    debug_enemy_difficulty: DebugEnemyDifficulty
     start_inventory_from_pool: StartInventoryPool
     shop_slots: ShopSlots
     shop_price_scale: ShopPriceScale
+    trap_percentage: TrapPercentage
+    enabled_traps: EnabledTraps
     death_link: DeathLink

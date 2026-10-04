@@ -133,9 +133,15 @@ class MMZero3Client(BizHawkClient):
         rom_version = int.from_bytes(version, "little")
         if rom_version != Data.AP_VERSION:
             self.version_mismatch = True
+            if rom_version < Data.AP_VERSION:
+                reason = ("Your mmzero3.apworld is NEWER than the one this seed was generated with. "
+                          "Install the apworld version the host used, you may need to downgrade.")
+            else:
+                reason = ("Your mmzero3.apworld is OLDER than the one this seed was generated with. "
+                          "Update to the apworld version the host used.")
             message = (f"ROM/client version mismatch: the ROM is version "
                        f"{rom_version}, this apworld is version {Data.AP_VERSION}. "
-                       f"Please generate a new game/ROM!")
+                       f"{reason} Then restart the client.")
             logger.error("MMZero3: %s", message)
             await ctx.send_msgs([{"cmd": "Say", "text": f"[MMZ3] {message}"}])
             return None

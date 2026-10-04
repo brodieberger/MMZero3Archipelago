@@ -9,6 +9,7 @@ from settings import get_settings
 from worlds.Files import APPatchExtension, APProcedurePatch, APTokenMixin, APTokenTypes
 
 from . import Data
+from . import EnemyRando
 from . import Palettes
 from .Locations import shop_location_names
 
@@ -38,6 +39,7 @@ class MMZero3ProcedurePatch(APProcedurePatch, APTokenMixin):
         ("apply_bsdiff4", ["basepatch.bsdiff4"]),
         ("apply_tokens", ["token_data.bin"]),
         ("recolor_palettes", ["palettes.json"]),
+        ("recolor_enemies", ["enemies.json"]),
     ]
 
     @classmethod
@@ -109,6 +111,18 @@ class MMZero3PatchExtensions(APPatchExtension):
         for offset, (size, preset) in by_offset.items():
             rom[offset:offset + size] = Palettes.recolor(rom[offset:offset + size],
                                                           Palettes.PRESETS[preset])
+        return bytes(rom)
+
+    @staticmethod
+    def recolor_enemies(caller: APProcedurePatch, rom: bytes, flag_file: str) -> bytes:
+        """
+        Redraw each enemies sheets to match the correct palettes.
+        Used for Randomized enemies.
+        """
+        if not json.loads(caller.get_file(flag_file).decode("utf-8")):
+            return rom
+        rom = bytearray(rom)
+        EnemyRando.recolor(rom)
         return bytes(rom)
 
 
@@ -234,9 +248,14 @@ def write_tokens(world: "MMZero3World", patch: MMZero3ProcedurePatch) -> None:
 
     patch.write_token(APTokenTypes.WRITE, Data.SHOP_ITEMS_ROM_OFFSET, shop_item_records(world))
 
+    if world.enemies:
+        for offset, data in EnemyRando.writes(world.enemies):
+            patch.write_token(APTokenTypes.WRITE, offset, data)
+
     patch.write_file("token_data.bin", patch.get_token_binary())
 
     patch.write_file("palettes.json", json.dumps(world.stage_palettes).encode("utf-8"))
+    patch.write_file("enemies.json", json.dumps(bool(world.enemies)).encode("utf-8"))
 
 
 class MMZero3Settings(settings.Group):

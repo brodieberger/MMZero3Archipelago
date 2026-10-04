@@ -13,7 +13,7 @@ from .Locations import (MMZero3Location, location_data_table, location_name_grou
 from .Options import MMZero3Options, mmzero3_option_groups
 from .Regions import region_data_table
 from .Rom import MMZero3ProcedurePatch, MMZero3Settings, write_tokens
-from . import Data, Palettes
+from . import Data, EnemyRando, Palettes
 from .Client import MMZero3Client
 
 import pkgutil
@@ -59,6 +59,9 @@ class MMZero3World(World):
     def generate_early(self) -> None:
         self.roll_shop_prices()
         self.roll_palettes()
+        difficulty = (1.0, 1.5, 2.0)[self.options.debug_enemy_difficulty.value]
+        self.enemies = EnemyRando.randomize(self.random, difficulty) \
+            if self.options.randomize_enemies else {}
 
         # Inform the Universal Tracker what the starting items are
         passthrough = None
@@ -68,6 +71,7 @@ class MMZero3World(World):
 
         if passthrough:
             self.starting_weapons = set(passthrough["starting_weapons"])
+            self.options.randomize_enemies.value = passthrough.get("randomize_enemies", 0)
         else:
             self.starting_weapons = set(self.options.starting_weapons.value)
 
@@ -147,6 +151,9 @@ class MMZero3World(World):
             self.get_location(location_name).place_locked_item(locked_item)
 
     def get_filler_item_name(self) -> str:
+        traps = sorted(self.options.enabled_traps.value)
+        if traps and self.random.randrange(100) < self.options.trap_percentage.value:
+            return f"{self.random.choice(traps)} Trap"
         return "100 Energy Crystals"
     
     def fill_slot_data(self) -> Dict[str, Any]:
@@ -158,6 +165,7 @@ class MMZero3World(World):
             "itemsanity": self.options.itemsanity.value,
             "extra_life_sanity": self.options.extra_life_sanity.value,
             "death_link": self.options.death_link.value,
+            "randomize_enemies": self.options.randomize_enemies.value,
         }
 
     ELF_PRICE_COSTS = (70, 100, 150, 200, 250, 300, 400, 500, 700)
@@ -311,6 +319,15 @@ class MMZero3World(World):
         # Double Mobility: Double Jump Foot Chip + Recoil Rod
         self.add_location_rule("Giant Elevator (1) 045: 1st Passage High Ledges",
                                lambda state: state.has("Double Jump Foot Chip", self.player) and has_rod(state))
+
+        # You need to pogo off enemies for these ones.
+        if self.options.randomize_enemies:
+            for loc_name in [
+                "Old Residential Subtank: Top Left Past Bombers",
+                "Old Residential E-Crystal (13): Top Left Past Bombers",
+            ]:
+                self.add_location_rule(
+                    loc_name, lambda state: state.has("Double Jump Foot Chip", self.player) and has_rod(state))
 
         # Collectable 1-UP spawns in the new room
         self.add_location_rule("Resistance Base 1-UP: In Locked Room by Andrew",
