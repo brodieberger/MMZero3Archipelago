@@ -23,7 +23,7 @@ from worlds.Files import APProcedurePatch
 
 class MMZero3WebWorld(WebWorld):
     theme = "ice"
-    bug_report_page = "https://github.com/brodieberger/ZeroArchipelago/"
+    bug_report_page = "https://github.com/brodieberger/MMZero3Archipelago/issues"
     option_groups = mmzero3_option_groups
     setup_en = Tutorial(
         "Multiworld Setup Guide",
@@ -37,7 +37,7 @@ class MMZero3WebWorld(WebWorld):
 
 class MMZero3World(World):
     """
-    Play as Zero, kill the robots and save the day
+    Play as Zero and fight through Neo Arcadia's Mutos Reploids to defeat Omega and stop Dr. Weil.
     """
 
     game = "Mega Man Zero 3"

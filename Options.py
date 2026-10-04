@@ -112,7 +112,7 @@ class WeaponDamageUpgrades(DefaultOnToggle):
     A few players disliked this feature since it departed the gameplay from vanilla.
 
     WIP: Disabling this still keeps the extra three progressive weapon items in the pool, 
-    they just dont provde any bonuses.
+    they just don't provide any bonuses.
     """
     display_name = "Weapon Damage Upgrades"
 
@@ -153,6 +153,7 @@ class DiskNamePopup(DefaultOnToggle):
 
 
 class InfiniteLives(Toggle):
+    """Get infinite lives."""
     display_name = "Infinite Lives"
 
 
