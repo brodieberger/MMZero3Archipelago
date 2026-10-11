@@ -10,8 +10,6 @@ class RequiredSecretDisks(Range):
 
     The Abandoned Research Laboratory opens once every other stage has been cleared and
     you are holding this many disks. Clearing it completes the game.
-    Setting it above 170 is not recommended, as it will place a lot of useful items in the final stage, which
-    at that point, the game is basically completed.
     """
     display_name = "Required Secret Disks"
     range_start = 0

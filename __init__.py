@@ -59,7 +59,7 @@ class MMZero3World(World):
     def generate_early(self) -> None:
         self.roll_shop_prices()
         self.roll_palettes()
-        difficulty = (1.0, 1.5, 2.0)[self.options.enemy_difficulty.value]
+        difficulty = (1.0, 1.5, 2.0)[self.options.debug_enemy_difficulty.value]
         self.enemies = EnemyRando.randomize(self.random, difficulty) \
             if self.options.randomize_enemies else {}
 
@@ -248,6 +248,9 @@ class MMZero3World(World):
             self.multiworld.get_entrance("To Abandoned Research Laboratory", self.player),
             lambda state: state.has_all(stage_access_names, self.player),
         )
+        # Since its lame that important items could spawn here, prevent progressive items
+        for location in self.multiworld.get_region("Abandoned Research Laboratory", self.player).locations:
+            add_item_rule(location, lambda item: not item.advancement)
 
         # Location rules: Recoil Rod required
         for loc_name in [
