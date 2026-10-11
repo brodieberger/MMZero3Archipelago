@@ -59,7 +59,7 @@ class MMZero3World(World):
     def generate_early(self) -> None:
         self.roll_shop_prices()
         self.roll_palettes()
-        difficulty = (1.0, 1.5, 2.0)[self.options.debug_enemy_difficulty.value]
+        difficulty = (1.0, 1.5, 2.0)[self.options.enemy_difficulty.value]
         self.enemies = EnemyRando.randomize(self.random, difficulty) \
             if self.options.randomize_enemies else {}
 

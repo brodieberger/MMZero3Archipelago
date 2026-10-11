@@ -97,7 +97,8 @@ class CyberElves(Choice):
 
     Vanilla: Unmodified Vanilla. Upgrading elves cost eCrystals, fusion elves decrease rank.
     No Penalty: Fusing an elf does not affect rank.
-    Auto: Every passive elf received via disk is automatically opened and applied, and Artan and Zictan arrive as their sub tanks. Does not affect rank. Gives the game a nice sense of progression, but makes it a lot easier.
+    Auto: Every passive elf received via disk is automatically opened and applied. 
+    Does not affect rank. Gives the game a nice sense of progression, but makes it a lot easier.
     """
     display_name = "Cyber-elves"
     option_vanilla = Data.AP_ELVES_VANILLA
@@ -126,21 +127,23 @@ class RandomizeEnemies(Toggle):
     """
     Randomize each enemy spawn location.
     WARNING: VERY EARLY WORK IN PROGRESS. DO NOT TAKE INTO BIG MULTIWORLDS!
+    This mode is very buggy, see the readme section to know what to expect.
     """
-    display_name = "Randomize Enemies"
+    display_name = "Randomize Enemies (WIP)"
 
 
-class DebugEnemyDifficulty(Choice):
+class EnemyDifficulty(Choice):
     """
     Place more enemies in the spot for one, based off of the health of the spot being replaced.
-    Needs more work. Currently left at chaos mode.
+    Minimal: Tries to match enemy placements by health. If a less health enemy replaces one with more health, place multiple copies at that location.
+    Chaos: Places multiple enemies around every spawnpoint. Leads to more enemies per stage. Developer's choice!
+    Insanity: Places as many enemies as possible. Tries to place enemies with higher healthbars first. Expect many shield enemies in tight quarters.
     """
-    display_name = "DEBUG: Enemy Difficulty"
-    visibility = Visibility.none
-    option_normal = 0
+    display_name = "Randomized Enemy Difficulty (WIP)"
+    option_minimal = 0
     option_chaos = 1
-    option_debug = 2
-    default = 1
+    option_insanity = 2
+    default = 0
 
 
 class DiskNamePopup(DefaultOnToggle):
@@ -204,6 +207,10 @@ mmzero3_option_groups = [
         ShopSlots,
         ShopPriceScale,
     ]),
+    OptionGroup("Optional Randomization", [
+        RandomizeEnemies,
+        EnemyDifficulty,
+    ]),
     OptionGroup("Gameplay", [
         StartingWeapons,
         WeaponDamageUpgrades,
@@ -211,7 +218,6 @@ mmzero3_option_groups = [
         CyberElves,
         ExSkillRank,
         InfiniteLives,
-        RandomizeEnemies,
         DeathLink,
     ]),
     OptionGroup("Traps", [
@@ -240,7 +246,7 @@ class MMZero3Options(PerGameCommonOptions):
     disk_name_popup: DiskNamePopup
     infinite_lives: InfiniteLives
     randomize_enemies: RandomizeEnemies
-    debug_enemy_difficulty: DebugEnemyDifficulty
+    enemy_difficulty: EnemyDifficulty
     start_inventory_from_pool: StartInventoryPool
     shop_slots: ShopSlots
     shop_price_scale: ShopPriceScale
