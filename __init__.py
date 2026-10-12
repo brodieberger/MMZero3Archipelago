@@ -13,7 +13,8 @@ from .Locations import (MMZero3Location, location_data_table, location_name_grou
 from .Options import MMZero3Options, mmzero3_option_groups
 from .Regions import region_data_table
 from .Rom import MMZero3ProcedurePatch, MMZero3Settings, write_tokens
-from . import Data, EnemyRando, Palettes
+from .data import Data
+from .randomizers import EnemyRando, Palettes
 from .Client import MMZero3Client
 
 import pkgutil
@@ -59,7 +60,7 @@ class MMZero3World(World):
     def generate_early(self) -> None:
         self.roll_shop_prices()
         self.roll_palettes()
-        difficulty = (1.0, 1.5, 2.0)[self.options.debug_enemy_difficulty.value]
+        difficulty = (1.0, 1.5, 2.0)[self.options.enemy_difficulty.value]
         self.enemies = EnemyRando.randomize(self.random, difficulty) \
             if self.options.randomize_enemies else {}
 
@@ -341,7 +342,7 @@ class MMZero3World(World):
         
     def generate_output(self, output_directory: str) -> None:
         patch = MMZero3ProcedurePatch(player=self.player, player_name=self.player_name)
-        patch.write_file("basepatch.bsdiff4", pkgutil.get_data(__name__, "basepatch.bsdiff4"))
+        patch.write_file("basepatch.bsdiff4", pkgutil.get_data(__name__, "data/basepatch.bsdiff4"))
         write_tokens(self, patch)
         out_file_name = self.multiworld.get_out_file_name_base(self.player)
         patch.write(os.path.join(output_directory, f"{out_file_name}{patch.patch_file_ending}"))

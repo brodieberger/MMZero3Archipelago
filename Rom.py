@@ -8,9 +8,8 @@ from BaseClasses import ItemClassification
 from settings import get_settings
 from worlds.Files import APPatchExtension, APProcedurePatch, APTokenMixin, APTokenTypes
 
-from . import Data
-from . import EnemyRando
-from . import Palettes
+from .data import Data
+from .randomizers import EnemyRando, Palettes
 from .Locations import shop_location_names
 
 if TYPE_CHECKING:

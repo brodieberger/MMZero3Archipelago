@@ -6,7 +6,7 @@ from NetUtils import ClientStatus
 import worlds._bizhawk as bizhawk
 from worlds._bizhawk.client import BizHawkClient
 
-from . import Data
+from .data import Data
 from .Items import item_table, progressive_weapon_names, weapon_chains, weapon_names
 from .Locations import location_data_table
 

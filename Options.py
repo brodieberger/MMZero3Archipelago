@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from Options import (Choice, Range, Toggle, DefaultOnToggle, OptionSet, DeathLink, OptionGroup, StartInventoryPool,
                      PerGameCommonOptions, Visibility)
 
-from . import Data
+from .data import Data
 
 
 class RequiredSecretDisks(Range):
