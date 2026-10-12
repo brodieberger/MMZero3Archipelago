@@ -83,6 +83,7 @@ This works a lot like the weapon level system from Zero 1 and 2, with your progr
 - Pressing SELECT on the secret disk analysis screen opens every disk you own.
 - The pause menu shows how many secret disks you need for the final stage.
 - All skippable cutscenes can be skipped.
+- Enemies that can drop disks are marked with the AP logo.
 - Pressing SELECT during gameplay does one thing of your choice. By default it swaps sub weapons.
 - EX skills are awarded based on your score on the stage you just cleared. Your overall rank is the average of your best clear on each stage.
 - Some lore secret disks also unlock a random e-Reader graphics change. The full list is

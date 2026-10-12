@@ -126,16 +126,17 @@ class RandomizeEnemies(Toggle):
     Randomize each enemy spawn location.
     WARNING: VERY EARLY WORK IN PROGRESS. DO NOT TAKE INTO BIG MULTIWORLDS!
     This mode is very buggy, see the readme section to know what to expect.
+    Recommended to enable enemy disk markers!
     """
     display_name = "Randomize Enemies (WIP)"
 
 
 class EnemyDifficulty(Choice):
     """
-    Place more enemies in the spot for one, based off of the health of the spot being replaced.
+    Only applies if `randomize_enemies` is enabled. Higher difficulties put more enemies in the spot for one, based off of the health of the spot being replaced.
     Minimal: Tries to match enemy placements by health. If a less health enemy replaces one with more health, place multiple copies at that location.
-    Chaos: Places multiple enemies around every spawnpoint. Leads to more enemies per stage. Developer's choice!
-    Insanity: Places as many enemies as possible. Tries to place enemies with higher healthbars first. Expect many shield enemies in tight quarters.
+    Chaos: Places multiple enemies around every spawnpoint regardless of HP or enemy type. Leads to many more enemies per stage. Developer's choice!
+    Insanity: Places as many enemies as possible. Tries to prioritize enemies with higher HP. Expect many shield enemies in tight quarters. Good luck!
     """
     display_name = "Randomized Enemy Difficulty (WIP)"
     option_minimal = 0
@@ -151,6 +152,14 @@ class DiskNamePopup(DefaultOnToggle):
     The visual is slightly screen obscuring, so it is kept optional.
     """
     display_name = "Disk Name Popup"
+
+
+class EnemyDiskMarkers(DefaultOnToggle):
+    """
+    Show a small Archipelago logo above enemies that can drop disks.
+    Recommended with enemy randomizer!
+    """
+    display_name = "Enemy Disk Markers"
 
 
 class InfiniteLives(Toggle):
@@ -225,6 +234,7 @@ mmzero3_option_groups = [
     OptionGroup("Aesthetics", [
         RandomizedPalettes,
         DiskNamePopup,
+        EnemyDiskMarkers,
     ]),
 ]
 
@@ -242,6 +252,7 @@ class MMZero3Options(PerGameCommonOptions):
     weapon_damage_upgrades: WeaponDamageUpgrades
     cyber_elves: CyberElves
     disk_name_popup: DiskNamePopup
+    enemy_disk_markers: EnemyDiskMarkers
     infinite_lives: InfiniteLives
     randomize_enemies: RandomizeEnemies
     enemy_difficulty: EnemyDifficulty

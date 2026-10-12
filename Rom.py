@@ -206,6 +206,8 @@ def write_tokens(world: "MMZero3World", patch: MMZero3ProcedurePatch) -> None:
         u8  diskNamePopup;
         u8  infiniteLives;
         u8  finalStageRank;
+        u8  enemyDiskMarkers;
+        u8  unused[3];
     };
 
     Theres also gApShopPrices, one u16 per shop slot: 
@@ -229,6 +231,8 @@ def write_tokens(world: "MMZero3World", patch: MMZero3ProcedurePatch) -> None:
         "diskNamePopup": 1 if world.options.disk_name_popup.value else 0,
         "infiniteLives": 1 if world.options.infinite_lives.value else 0,
         "finalStageRank": world.options.final_stage_rank.value,
+        "enemyDiskMarkers": 1 if world.options.enemy_disk_markers.value else 0,
+        "unused": 0,
     }
 
     seed_config = bytearray(Data.SEED_CONFIG_SIZE)

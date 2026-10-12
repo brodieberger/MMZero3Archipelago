@@ -89,7 +89,18 @@ Cerveau now has a shop, visit it by pressing L or R on his secret disk analysis 
     Randomize each enemy spawn location. Also includes the spawning of mettaur and Battle Network 3 enemies!
     If an enemy is randomized into a position where the occupant in the vanilla game would have more health, then multiple enemies would be set to spawn there.
     So expect a lot of chaos!
-    WARNING: VERY EARLY WORK IN PROGRESS. DO NOT TAKE INTO BIG MULTIWORLDS!
+    WARNING: VERY EARLY WORK IN PROGRESS. DO NOT TAKE INTO BIG MULTIWORLDS! See the "Known bugs" part of the readme for more information!
+
+- `enemy_difficulty`:
+    Only applies if `randomize_enemies` is enabled. Higher difficulties put more enemies in the spot for one, based off of the health of the spot being replaced.
+    
+    Minimal: Tries to match enemy placements by health. If a less health enemy replaces one with more health, place multiple copies at that location.
+    Chaos: Places multiple enemies around every spawnpoint regardless of HP or enemy type. Leads to many more enemies per stage. Developer's choice!
+    Insanity: Places as many enemies as possible. Tries to place enemies with higher HP size first. Expect many shield enemies in tight quarters. Good luck!
+
+- `enemy_disk_markers`:
+    Show a small Archipelago logo above enemies that can drop disks.
+    Recommended with enemy randomizer!
 
 - `trap_percentage`:  
   The percentage of filler items replaced with traps. Default 0. `enabled_traps` picks which ones may appear (all three by default), for example `enabled_traps: ['Earthquake', 'Slippery Floor']`. Currently implemented traps are Earthquake, Pixelate, and Slippery Floor.
@@ -126,9 +137,18 @@ For example: `!hint Stage Access` or `!missing Sub Arcadia`.
 
 
 ## Known Bugs.
-- There have been repeated issues of trackers reporting currently unobtainable items as obtainable. Be sure to report any instance of that.
+- The enemy randomizer is an early work in progress, with many bugs attached to it. Feel free to report any more, this feature is not fully stable yet.
+  - Some enemies intentionally have fewer animation frames. Mostly death animations and kill gibs were cut. 
+    - Most of the Pantheons were the hardest hit, with the Lamports also being heavily affected.
+    - These will be updated later, once engine changes are made.
+  - Missile Factory: the enemies that spawn onconveyor belt sometimes don't appear. They sometimes fall through the floor to other rooms.
+  - Petatrias can act strangely when spawned on certain walls.
+  - Twilight Desert: after the boss, some flying enemies spawn far too high up to hit.
+  - Giant Elevator: on some seeds the top-left item is very hard to reach, because the jump needs an enemy there. 
+    - This item is a pain in the ass in the normal game too. I'll probably just add some kind of block there.
+  - Abandoned Research Laboratory: the last part of the level lacks enemies. I don't know why yet.
+  - Oceanic Highway Ruins: an enemy near the start can look scrambled during the opening cutscene with Childre.
 - The item popup only shows one at a time, skipping multiple if they arrive at the same time, or if you received them during a cutscene.
-- I hope to soon bring this world from unstable to stable, so report anything that seems off, not just bugs!
   
 ## Planned Features.
 - A weapon wheel on SELECT for swapping chips and weapons without opening the menu. Right now you can only select one at once.
