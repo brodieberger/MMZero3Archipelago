@@ -115,12 +115,12 @@ class MMZero3PatchExtensions(APPatchExtension):
     @staticmethod
     def recolor_enemies(caller: APProcedurePatch, rom: bytes, flag_file: str) -> bytes:
         """
-        Redraw each enemies sheets to match the correct palettes.
-        Used for Randomized enemies.
+        Trim and redraw each enemy sheets to match the correct palettes. Used for Randomized enemies.
         """
         if not json.loads(caller.get_file(flag_file).decode("utf-8")):
             return rom
         rom = bytearray(rom)
+        EnemyRando.trim_sheets(rom)
         EnemyRando.recolor(rom)
         return bytes(rom)
 

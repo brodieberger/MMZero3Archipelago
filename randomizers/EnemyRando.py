@@ -24,6 +24,7 @@ I also use these names interchangably by mistake, but for the enemy spawning:
     These are where the randomizer actually puts enemies. Each enemy uses one specific spawn spot based on its spawn requirements.
 """
 
+import struct
 from typing import Dict, List, Set, Tuple
 
 from . import EnemyData as D
@@ -820,6 +821,18 @@ def writes(result: dict) -> List[Tuple[int, bytes]]:
             drops += field.to_bytes(2, "little")
     out.append((D.DROPS_OFFSET, bytes(drops)))
     return out
+
+
+def trim_sheets(rom: bytearray) -> None:
+    """Copy the trimmed enemy sprite sheets over the vanilla"""
+    at = D.SHEET_TRIMS
+    while True:
+        dst, src, size = struct.unpack_from("<3I", rom, at)
+        if dst == 0:
+            return
+        dst, src = dst - 0x08000000, src - 0x08000000
+        rom[dst:dst + size] = rom[src:src + size]
+        at += 12
 
 
 def recolor(rom: bytearray) -> None:
