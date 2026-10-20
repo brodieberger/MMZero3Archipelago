@@ -22,12 +22,6 @@ mission again, with the boss included, for another try at the A+ rank check.
 Clear the Abandoned Research Laboratory and defeat Omega. The stage only opens once you have cleared every other stage and are holding enough
 secret disks, (120 by default).
 
-## Legacy stages
-
-With `legacy_stages` on, the seed will add stages from Mega Man Zero 2. Right now, only Zero 2's Crystal Cave is included.
-
-You need your own Mega Man Zero 2 (USA) ROM to patch a seed with legacy stages. See the setup guide.
-
 ## What items and locations get shuffled?
 
 Locations:
