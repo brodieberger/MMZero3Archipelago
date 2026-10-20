@@ -36,11 +36,6 @@ The upgrade progress is shown in game as stars in the pause menu, like in Zero 1
 
 Note: Anything you list in `starting_weapons`  begins at step 1. You will still have to collect the progressive items in order to upgrade it.
 
-## Legacy Stages
-With `legacy_stages` on, your seed also gets stages from other Mega Man Zero games. Right now only Zero 2's Crystal Cave is implemented. Soon there will be more stages, with an option to shuffle them into the stage pool.
-
-Requires a Mega Man Zero 2 US ROM in order to pull the necessary data.
-
 ## Cerveau Shop
 Cerveau now has a shop, visit it by pressing L or R on his secret disk analysis screen. Items are purchasable by using e-Crystals. Prices and amount of items are configurable using YAML options.
 
@@ -118,9 +113,6 @@ Cerveau now has a shop, visit it by pressing L or R on his secret disk analysis 
 
 - `shop_slots` / `shop_price_scale`:  
   How many slots Cerveau's shop has (default 16, max 48) and how expensive they are, as a percentage.
-
-- `legacy_stages`:  
-  Adds stages from other Zero games, currently only Zero 2's Crystal Cave. Needs a Zero 2 ROM.
 
 - `start_inventory_from_pool`:  
   Starting inventory but the items don't appear in the pool.
