@@ -2,6 +2,8 @@ from typing import Callable, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKIN
 
 from BaseClasses import Item, ItemClassification
 
+from .data import Data
+
 if TYPE_CHECKING:
     from . import MMZero3World
 
@@ -243,6 +245,12 @@ item_data_table: Dict[str, MMZero3ItemData] = {
         )
         for idx, stage in enumerate(stage_names)
     },
+    # Stages from other Zero games, only Crystal Cave for now.
+    "Z2 Crystal Cave Access": MMZero3ItemData(
+        code=196,  # TODO AP_ITEM_IMPORT_ACCESS
+        type=ItemClassification.progression,
+        can_create=lambda world: world.options.legacy_stages.value,
+    ),
     
     # Chips
     "Ice Body Chip": MMZero3ItemData(code=197, type=ItemClassification.useful),
@@ -324,7 +332,7 @@ STORY_LATE = 2  # Mission Set 4 NPCs dialogue
 item_categories: Dict[str, range] = {
     "Secret Disks": range(1, 181),
     "Head Chips": range(1, 4),
-    "Stage Access": range(181, 196),
+    "Stage Access": range(181, Data.AP_ITEM_IMPORT_ACCESS + 1),
     "Chips": range(197, 206),
     "Body Chips": range(197, 202),
     "Foot Chips": range(202, 206),

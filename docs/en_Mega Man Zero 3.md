@@ -22,6 +22,12 @@ mission again, with the boss included, for another try at the A+ rank check.
 Clear the Abandoned Research Laboratory and defeat Omega. The stage only opens once you have cleared every other stage and are holding enough
 secret disks, (120 by default).
 
+## Legacy stages
+
+With `legacy_stages` on, the seed will add stages from Mega Man Zero 2. Right now, only Zero 2's Crystal Cave is included.
+
+You need your own Mega Man Zero 2 (USA) ROM to patch a seed with legacy stages. See the setup guide.
+
 ## What items and locations get shuffled?
 
 Locations:
@@ -35,6 +41,7 @@ Locations:
 - Optionally, the ten 1-UPs placed in stages (`extra_life_sanity`, on by default)
 - Optionally, the 82 life capsules and E-Crystals placed in stages (`itemsanity`)
 - Optionally, the slots in Cerveau's shop (`shop_slots`)
+- Optionally, the legacy stages' locations (`legacy_stages`, see above)
 
 Items:
 - 180 secret disks
@@ -42,7 +49,7 @@ Items:
 - Nine armor chips
 - Twelve EX skills
 - Two sub tanks
-- Fifteen stage access items
+- Fifteen stage access items, plus one per legacy stage with `legacy_stages`
 - Two Story Progress items
 - E-Crystals as filler, and traps if `trap_percentage` is enabled.
 
@@ -96,7 +103,7 @@ These work with `!hint`, for example `!hint Stage Access` or `!missing Sub Arcad
 | Locations | |
 | --- | --- |
 | Per stage | `Resistance Base` (all three mission sets), `Aegis Volcano Base`, `Sunken Library`, and so on |
-| By type | `Secret Disks`, `Stage Clears`, `Chips`, `A+ Rank Clears`, `Subtanks`, `Weapons`, `1-UPs`, `Minibosses`, `Itemsanity`, `Shop` |
+| By type | `Secret Disks`, `Stage Clears`, `Chips`, `A+ Rank Clears`, `Subtanks`, `Weapons`, `1-UPs`, `Minibosses`, `Itemsanity`, `Shop`, `Cyber Elves` |
 
 | Items | |
 | --- | --- |

@@ -9,7 +9,7 @@ There's a PopTracker pack for this world made by ambibii. [Get it here!](https:/
 </div>
 
 ## General Information (IMPORTANT)
-- **Locations:** All 180 secret disks, stage clears, an A+ rank clear in each of the 15 stages, the nine armor chips, both sub tanks, Cerveau's Recoil Rod and Shield Boomerang, and eleven miniboss fights. Optionally 10 extra life pickups, 82 itemsanity items, and a configurable number of shop slots.
+- **Locations:** All 180 secret disks, stage clears, an A+ rank clear in each of the 15 stages, the nine armor chips, both sub tanks, Cerveau's Recoil Rod and Shield Boomerang, and eleven miniboss fights. Optionally 10 extra life pickups, 82 itemsanity items, a configurable number of shop slots, and the legacy stages' checks.
 - **Item pool:** 180 secret disks, the four weapons as progressive upgrade unlocks, nine armor chips, twelve EX Skills, two sub tanks, fifteen stage access items and two Story Progress items. E-Crystals are filler.
 - There's a modified mission select screen, which allows you to select from any level as long as you have its access item.
   - Boss portraits are in groups of four like in vanilla, but now you can tab between the pages with left and right on the d-pad (the shoulder buttons work too).
@@ -35,6 +35,11 @@ The upgrade progress is shown in game as stars in the pause menu, like in Zero 1
 | Shield Boomerang | weapon, charged throw,  damage (+1, +2, +3) |
 
 Note: Anything you list in `starting_weapons`  begins at step 1. You will still have to collect the progressive items in order to upgrade it.
+
+## Legacy Stages
+With `legacy_stages` on, your seed also gets stages from other Mega Man Zero games. Right now only Zero 2's Crystal Cave is implemented. Soon there will be more stages, with an option to shuffle them into the stage pool.
+
+Requires a Mega Man Zero 2 US ROM in order to pull the necessary data.
 
 ## Cerveau Shop
 Cerveau now has a shop, visit it by pressing L or R on his secret disk analysis screen. Items are purchasable by using e-Crystals. Prices and amount of items are configurable using YAML options.
@@ -114,6 +119,9 @@ Cerveau now has a shop, visit it by pressing L or R on his secret disk analysis 
 - `shop_slots` / `shop_price_scale`:  
   How many slots Cerveau's shop has (default 16, max 48) and how expensive they are, as a percentage.
 
+- `legacy_stages`:  
+  Adds stages from other Zero games, currently only Zero 2's Crystal Cave. Needs a Zero 2 ROM.
+
 - `start_inventory_from_pool`:  
   Starting inventory but the items don't appear in the pool.
 
@@ -126,8 +134,8 @@ Items and locations are sorted into groups. Try using `!hint`.
 
 | locations | |
 | --- | --- |
-| per stage | `Resistance Base` (all three mission sets), `Aegis Volcano Base`, `Sunken Library`, and so on |
-| by type | `Secret Disks`, `Stage Clears`, `Chips`, `A+ Rank Clears`, `Subtanks`, `Weapons`, `1-UPs`, `Minibosses`, `Itemsanity`, `Shop` |
+| per stage | `Resistance Base` (all three mission sets), `Aegis Volcano Base`, `Sunken Library`, `Z2 Crystal Cave`, and so on |
+| by type | `Secret Disks`, `Stage Clears`, `Chips`, `A+ Rank Clears`, `Subtanks`, `Weapons`, `1-UPs`, `Minibosses`, `Itemsanity`, `Shop`, `Cyber Elves` |
 
 | items | |
 | --- | --- |

@@ -1,4 +1,4 @@
-from typing import Callable, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
+from typing import Callable, Container, Dict, List, NamedTuple, Optional, Set, TYPE_CHECKING
 
 from BaseClasses import Location
 
@@ -33,6 +33,9 @@ def extra_life_sanity_on(world: "MMZero3World") -> bool:
 
 def itemsanity_on(world: "MMZero3World") -> bool:
     return world.options.itemsanity.value
+
+def legacy_stages_on(world: "MMZero3World") -> bool:
+    return world.options.legacy_stages.value
 
 location_data_table: Dict[str, MMZero3LocationData] = {
 
@@ -250,6 +253,7 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Complete Sunken Library": MMZero3LocationData(region="Sunken Library", address=193),
     "Complete Giant Elevator": MMZero3LocationData(region="Giant Elevator", address=194),
     "Complete Sub Arcadia": MMZero3LocationData(region="Sub Arcadia", address=195),
+    "Complete Z2 Crystal Cave": MMZero3LocationData(region="Z2 Crystal Cave", address=389, can_create=legacy_stages_on),
 
     "Complete Abandoned Research Laboratory": MMZero3LocationData(
         region="Abandoned Research Laboratory",
@@ -284,6 +288,7 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "A+ Rank Clear: Sunken Library": MMZero3LocationData(region="Sunken Library", address=218),
     "A+ Rank Clear: Giant Elevator": MMZero3LocationData(region="Giant Elevator", address=219),
     "A+ Rank Clear: Sub Arcadia": MMZero3LocationData(region="Sub Arcadia", address=220),
+    "A+ Rank Clear: Z2 Crystal Cave": MMZero3LocationData(region="Z2 Crystal Cave", address=390, can_create=legacy_stages_on),
 
     # Sub Tanks
     "Old Residential Subtank: Top Left Past Bombers": MMZero3LocationData(region="Old Residential", address=221),
@@ -414,6 +419,14 @@ location_data_table: Dict[str, MMZero3LocationData] = {
 
     "Sub Arcadia E-Crystal: Pit Near Start": MMZero3LocationData(region="Sub Arcadia", address=381, can_create=itemsanity_on),
     "Sub Arcadia Energy: Final Descent Near Top": MMZero3LocationData(region="Sub Arcadia", address=382, can_create=itemsanity_on),
+
+    # Legacy stages
+    "Crystal Cave Cyber Elf (4) Itemass: Behind Golem Type E": MMZero3LocationData(region="Z2 Crystal Cave", address=383, can_create=legacy_stages_on),
+    "Crystal Cave Cyber Elf (1) Charnue: Hidden Passage in Chasm": MMZero3LocationData(region="Z2 Crystal Cave", address=384, can_create=legacy_stages_on),
+    "Crystal Cave Cyber Elf (3) Clocsule: Ledge Above Spikes": MMZero3LocationData(region="Z2 Crystal Cave", address=385, can_create=legacy_stages_on),
+    "Crystal Cave Cyber Elf (2) Miloppe: Top of the Cliff": MMZero3LocationData(region="Z2 Crystal Cave", address=386, can_create=legacy_stages_on),
+    "Crystal Cave Cyber Elf Birflow: Destroy 10 Mini-Hottalooks": MMZero3LocationData(region="Z2 Crystal Cave", address=387, can_create=legacy_stages_on),
+    "Crystal Cave Cyber Elf Beehitt: Destroy 3 Pantheon Hoppers": MMZero3LocationData(region="Z2 Crystal Cave", address=388, can_create=legacy_stages_on),
 }
 
 # Cerveau's shop
@@ -436,11 +449,11 @@ for slot_number in range(Data.AP_SHOP_SLOTS_MAX):
     )
 
 # Location groups for `!hint` and tracker filtering.
-location_categories: Dict[str, range] = {
+location_categories: Dict[str, Container[int]] = {
     "Secret Disks": range(1, 181),
-    "Stage Clears": range(181, 197),
+    "Stage Clears": [*range(181, 197), 389],
     "Chips": range(197, 206),
-    "A+ Rank Clears": range(206, 221),
+    "A+ Rank Clears": [*range(206, 221), 390],
     "Subtanks": range(221, 223),
     "Weapons": range(226, 228),
     "1-UPs": range(Data.AP_LOC_EXLIFE_FIRST, Data.AP_LOC_EXLIFE_FIRST + Data.AP_EXLIFE_COUNT),
@@ -450,6 +463,8 @@ location_categories: Dict[str, range] = {
                                           + Data.AP_ITEMSANITY_COUNT),
     "Shop": range(Data.AP_SHOP_LOCATION_FIRST,
                   Data.AP_SHOP_LOCATION_FIRST + Data.AP_SHOP_SLOTS_MAX),
+    "Cyber Elves": range(Data.AP_LOC_IMPORT_ELF_FIRST,
+                         Data.AP_LOC_IMPORT_ELF_FIRST + Data.AP_IMPORT_ELF_COUNT),
 }
 
 

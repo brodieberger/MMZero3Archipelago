@@ -43,6 +43,9 @@ region_data_table: Dict[str, MMZero3RegionData] = {
 
         # Final Level
         "Abandoned Research Laboratory",
+
+        # Legacy stages, with legacy_stages option:
+        "Z2 Crystal Cave",
     ]),
 
     "Resistance Base 1": MMZero3RegionData(),
@@ -76,4 +79,6 @@ region_data_table: Dict[str, MMZero3RegionData] = {
 
     # Final stage
     "Abandoned Research Laboratory": MMZero3RegionData(),
+
+    "Z2 Crystal Cave": MMZero3RegionData(),
 }

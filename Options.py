@@ -162,6 +162,17 @@ class EnemyDiskMarkers(DefaultOnToggle):
     display_name = "Enemy Disk Markers"
 
 
+class LegacyStages(Toggle):
+    """
+    Adds stages from the other Mega Man Zero series games to this seed.
+    WIP: Currently just Crystal Caves from Zero 2.
+
+    You will need to add your Zero 2 ROM to zero2_rom_file under MMZero3_settings in host.yaml,
+    located in your root Archipelago directory.
+    """
+    display_name = "Legacy Stages"
+
+
 class InfiniteLives(Toggle):
     """Get infinite lives."""
     display_name = "Infinite Lives"
@@ -213,6 +224,7 @@ mmzero3_option_groups = [
         Itemsanity,
         ShopSlots,
         ShopPriceScale,
+        LegacyStages,
     ]),
     OptionGroup("Optional Randomization", [
         RandomizeEnemies,
@@ -259,6 +271,7 @@ class MMZero3Options(PerGameCommonOptions):
     start_inventory_from_pool: StartInventoryPool
     shop_slots: ShopSlots
     shop_price_scale: ShopPriceScale
+    legacy_stages: LegacyStages
     trap_percentage: TrapPercentage
     enabled_traps: EnabledTraps
     death_link: DeathLink

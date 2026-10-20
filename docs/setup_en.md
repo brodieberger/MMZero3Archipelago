@@ -9,6 +9,8 @@
 
 ## Optional Software
 
+- A US Mega Man Zero 2 ROM, only if you turn on `legacy_stages` (see below)
+
 - [Mega Man Zero 3 PopTracker pack](https://github.com/ambibii/mmz3-poptracker/releases/latest), for use with
   [PopTracker](https://github.com/black-sliver/PopTracker/releases)
 
@@ -16,6 +18,15 @@
 
 Download `mmzero3.apworld` from the latest release and double-click it. Archipelago will install it into your
 `custom_worlds` folder. You can also copy it there yourself
+
+## Legacy Stages
+
+The `legacy_stages` option adds stages from Mega Man Zero 2. Their art, music and maps are not included in the
+apworld. They are rebuilt from your own Zero 2 ROM when you patch, so you need one:
+
+1. Name your Mega Man Zero 2 (USA) ROM `Mega Man Zero 2 (USA).gba` and put it in your root Archipelago folder (next to
+   `host.yaml`).
+2. Or, if you want it somewhere else, set `zero2_rom_file` under `MMZero3_settings` in `host.yaml` to its path.
 
 ## Generating and Patching a Game
 

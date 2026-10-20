@@ -167,6 +167,7 @@ class MMZero3World(World):
             "extra_life_sanity": self.options.extra_life_sanity.value,
             "death_link": self.options.death_link.value,
             "randomize_enemies": self.options.randomize_enemies.value,
+            "legacy_stages": self.options.legacy_stages.value,
         }
 
     ELF_PRICE_COSTS = (70, 100, 150, 200, 250, 300, 400, 500, 700)
@@ -229,6 +230,9 @@ class MMZero3World(World):
                 self.multiworld.get_entrance(f"To {stage_name}", self.player),
                 lambda state, item=f"{stage_name} Access": state.has(item, self.player),
             )
+
+        set_rule(self.multiworld.get_entrance("To Z2 Crystal Cave", self.player),
+                 lambda state: state.has("Z2 Crystal Cave Access", self.player))
 
         # Cerveau's shop.
         for slot in range(self.options.shop_slots.value):
