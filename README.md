@@ -119,9 +119,6 @@ Cerveau now has a shop, visit it by pressing L or R on his secret disk analysis 
 - `shop_slots` / `shop_price_scale`:  
   How many slots Cerveau's shop has (default 16, max 48) and how expensive they are, as a percentage.
 
-- `legacy_stages`:  
-  Adds stages from other Zero games, currently only Zero 2's Crystal Cave. Needs a Zero 2 ROM.
-
 - `start_inventory_from_pool`:  
   Starting inventory but the items don't appear in the pool.
 
