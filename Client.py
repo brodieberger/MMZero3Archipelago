@@ -7,7 +7,7 @@ import worlds._bizhawk as bizhawk
 from worlds._bizhawk.client import BizHawkClient
 
 from .data import Data
-from .Items import item_table, progressive_weapon_names, weapon_chains, weapon_names
+from .Items import item_table, progressive_weapon_names, rom_weapon_names, weapon_chains
 from .Locations import location_data_table
 
 if TYPE_CHECKING:
@@ -37,7 +37,7 @@ FINAL_STAGE_LOCATION = location_data_table["Complete Abandoned Research Laborato
 STORY_PROGRESS_ITEM_CODE = item_table["Story Progress"]
 PROGRESSIVE_WEAPONS = {
     item_table[progressive]: (index, len(weapon_chains[weapon]))
-    for index, (weapon, progressive) in enumerate(zip(weapon_names, progressive_weapon_names))
+    for index, (weapon, progressive) in enumerate(zip(rom_weapon_names, progressive_weapon_names))
 }
 
 
@@ -269,7 +269,7 @@ class MMZero3Client(BizHawkClient):
             weapon_index, max_level = PROGRESSIVE_WEAPONS[ap_item_code]
             level = self.copies_received(ctx, item_index)
 
-            if weapon_names[weapon_index] in self.starting_weapons:
+            if rom_weapon_names[weapon_index] in self.starting_weapons:
                 level += 1
 
             if level > max_level:

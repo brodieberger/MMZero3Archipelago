@@ -165,7 +165,7 @@ class EnemyDiskMarkers(DefaultOnToggle):
 class LegacyStages(Toggle):
     """
     Adds stages from the other Mega Man Zero series games to this seed.
-    WIP: Currently just Crystal Caves from Zero 2.
+    WIP: Sand Wilderness, Forest of Dysis, Residential Area, Crystal Cave, Neo Arcadia Temple, Temple of Flame and Temple of Ice so far.
 
     You will need to add your Zero 2 ROM to zero2_rom_file under MMZero3_settings in host.yaml,
     located in your root Archipelago directory.

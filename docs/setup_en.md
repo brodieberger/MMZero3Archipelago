@@ -21,6 +21,8 @@ Download `mmzero3.apworld` from the latest release and double-click it. Archipel
 
 ## Legacy Stages
 
+### CURRENTLY NOT IMPLEMENTED
+
 The `legacy_stages` option adds stages from Mega Man Zero 2. Their art, music and maps are not included in the
 apworld. They are rebuilt from your own Zero 2 ROM when you patch, so you need one:
 

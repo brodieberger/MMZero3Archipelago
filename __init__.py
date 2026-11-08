@@ -6,7 +6,7 @@ from Options import OptionError
 from worlds.AutoWorld import WebWorld, World
 from worlds.generic.Rules import add_rule, set_rule, forbid_item, add_item_rule
 from .Items import (MMZero3Item, STORY_LATE, STORY_MID, item_data_table, item_name_groups,
-                    item_table, stage_access_names, stage_names, weapon_ability_level,
+                    item_table, legacy_stage_names, stage_access_names, stage_names, weapon_ability_level,
                     weapon_names)
 from .Locations import (MMZero3Location, location_data_table, location_name_groups, location_table,
                         locked_locations, shop_location_names)
@@ -73,6 +73,7 @@ class MMZero3World(World):
         if passthrough:
             self.starting_weapons = set(passthrough["starting_weapons"])
             self.options.randomize_enemies.value = passthrough.get("randomize_enemies", 0)
+            self.options.required_secret_disks.value = passthrough["required_secret_disks"]
         else:
             self.starting_weapons = set(self.options.starting_weapons.value)
 
@@ -231,8 +232,11 @@ class MMZero3World(World):
                 lambda state, item=f"{stage_name} Access": state.has(item, self.player),
             )
 
-        set_rule(self.multiworld.get_entrance("To Z2 Crystal Cave", self.player),
-                 lambda state: state.has("Z2 Crystal Cave Access", self.player))
+        for stage_name in legacy_stage_names:
+            set_rule(
+                self.multiworld.get_entrance(f"To {stage_name}", self.player),
+                lambda state, item=f"{stage_name} Access": state.has(item, self.player),
+            )
 
         # Cerveau's shop.
         for slot in range(self.options.shop_slots.value):
@@ -248,10 +252,11 @@ class MMZero3World(World):
         set_rule(self.multiworld.get_entrance("To Resistance Base 3", self.player),
                  lambda state: state.has("Story Progress", self.player, STORY_LATE))
 
-        # The final stage. Needs every access item
+        # The final stage. Needs every access item and the required disks (from options)
         set_rule(
             self.multiworld.get_entrance("To Abandoned Research Laboratory", self.player),
-            lambda state: state.has_all(stage_access_names, self.player),
+            lambda state: state.has_all(stage_access_names, self.player)
+            and state.has_group("Secret Disks", self.player, self.options.required_secret_disks.value),
         )
         # Since its lame that important items could spawn here, prevent progressive items
         for location in self.multiworld.get_region("Abandoned Research Laboratory", self.player).locations:

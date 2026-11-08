@@ -45,7 +45,13 @@ region_data_table: Dict[str, MMZero3RegionData] = {
         "Abandoned Research Laboratory",
 
         # Legacy stages, with legacy_stages option:
+        "Z2 Sand Wilderness",
+        "Z2 Forest of Dysis",
+        "Z2 Residential Area",
         "Z2 Crystal Cave",
+        "Z2 Neo Arcadia Temple",
+        "Z2 Temple of Flame",
+        "Z2 Temple of Ice",
     ]),
 
     "Resistance Base 1": MMZero3RegionData(),
@@ -80,5 +86,11 @@ region_data_table: Dict[str, MMZero3RegionData] = {
     # Final stage
     "Abandoned Research Laboratory": MMZero3RegionData(),
 
+    "Z2 Sand Wilderness": MMZero3RegionData(),
+    "Z2 Forest of Dysis": MMZero3RegionData(),
+    "Z2 Residential Area": MMZero3RegionData(),
     "Z2 Crystal Cave": MMZero3RegionData(),
+    "Z2 Neo Arcadia Temple": MMZero3RegionData(),
+    "Z2 Temple of Flame": MMZero3RegionData(),
+    "Z2 Temple of Ice": MMZero3RegionData(),
 }

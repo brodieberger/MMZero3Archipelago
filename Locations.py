@@ -253,7 +253,6 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Complete Sunken Library": MMZero3LocationData(region="Sunken Library", address=193),
     "Complete Giant Elevator": MMZero3LocationData(region="Giant Elevator", address=194),
     "Complete Sub Arcadia": MMZero3LocationData(region="Sub Arcadia", address=195),
-    "Complete Z2 Crystal Cave": MMZero3LocationData(region="Z2 Crystal Cave", address=389, can_create=legacy_stages_on),
 
     "Complete Abandoned Research Laboratory": MMZero3LocationData(
         region="Abandoned Research Laboratory",
@@ -288,7 +287,6 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "A+ Rank Clear: Sunken Library": MMZero3LocationData(region="Sunken Library", address=218),
     "A+ Rank Clear: Giant Elevator": MMZero3LocationData(region="Giant Elevator", address=219),
     "A+ Rank Clear: Sub Arcadia": MMZero3LocationData(region="Sub Arcadia", address=220),
-    "A+ Rank Clear: Z2 Crystal Cave": MMZero3LocationData(region="Z2 Crystal Cave", address=390, can_create=legacy_stages_on),
 
     # Sub Tanks
     "Old Residential Subtank: Top Left Past Bombers": MMZero3LocationData(region="Old Residential", address=221),
@@ -420,13 +418,56 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Sub Arcadia E-Crystal: Pit Near Start": MMZero3LocationData(region="Sub Arcadia", address=381, can_create=itemsanity_on),
     "Sub Arcadia Energy: Final Descent Near Top": MMZero3LocationData(region="Sub Arcadia", address=382, can_create=itemsanity_on),
 
-    # Legacy stages
-    "Crystal Cave Cyber Elf (4) Itemass: Behind Golem Type E": MMZero3LocationData(region="Z2 Crystal Cave", address=383, can_create=legacy_stages_on),
-    "Crystal Cave Cyber Elf (1) Charnue: Hidden Passage in Chasm": MMZero3LocationData(region="Z2 Crystal Cave", address=384, can_create=legacy_stages_on),
-    "Crystal Cave Cyber Elf (3) Clocsule: Ledge Above Spikes": MMZero3LocationData(region="Z2 Crystal Cave", address=385, can_create=legacy_stages_on),
-    "Crystal Cave Cyber Elf (2) Miloppe: Top of the Cliff": MMZero3LocationData(region="Z2 Crystal Cave", address=386, can_create=legacy_stages_on),
-    "Crystal Cave Cyber Elf Birflow: Destroy 10 Mini-Hottalooks": MMZero3LocationData(region="Z2 Crystal Cave", address=387, can_create=legacy_stages_on),
-    "Crystal Cave Cyber Elf Beehitt: Destroy 3 Pantheon Hoppers": MMZero3LocationData(region="Z2 Crystal Cave", address=388, can_create=legacy_stages_on),
+    # Legacy stages:
+    # TODO: Refine location names
+    "Complete Z2 Sand Wilderness": MMZero3LocationData(region="Z2 Sand Wilderness", address=400, can_create=legacy_stages_on),
+    "A+ Rank Clear: Z2 Sand Wilderness": MMZero3LocationData(region="Z2 Sand Wilderness", address=401, can_create=legacy_stages_on),
+    "Sand Wilderness Cyber Elf: Rock Alcove Before the Boss": MMZero3LocationData(region="Z2 Sand Wilderness", address=402, can_create=legacy_stages_on),
+    "Sand Wilderness Cyber Elf: Destroy 3 Spiked Towers": MMZero3LocationData(region="Z2 Sand Wilderness", address=403, can_create=legacy_stages_on),
+    "Sand Wilderness Cyber Elf: Destroy 4 Spiked Balls": MMZero3LocationData(region="Z2 Sand Wilderness", address=404, can_create=legacy_stages_on),
+    "Sand Wilderness Cyber Elf: Destroy 5 Robot Vultures": MMZero3LocationData(region="Z2 Sand Wilderness", address=405, can_create=legacy_stages_on),
+
+    "Complete Z2 Forest of Dysis": MMZero3LocationData(region="Z2 Forest of Dysis", address=464, can_create=legacy_stages_on),
+    "A+ Rank Clear: Z2 Forest of Dysis": MMZero3LocationData(region="Z2 Forest of Dysis", address=465, can_create=legacy_stages_on),
+    "Forest of Dysis Cyber Elf: Forest Ledge": MMZero3LocationData(region="Z2 Forest of Dysis", address=466, can_create=legacy_stages_on),
+    "Forest of Dysis Cyber Elf: Forest Treetop": MMZero3LocationData(region="Z2 Forest of Dysis", address=467, can_create=legacy_stages_on),
+    "Forest of Dysis Cyber Elf: Ruins Ceiling": MMZero3LocationData(region="Z2 Forest of Dysis", address=468, can_create=legacy_stages_on),
+    "Forest of Dysis Cyber Elf: Destroy 10 Bees": MMZero3LocationData(region="Z2 Forest of Dysis", address=469, can_create=legacy_stages_on),
+    "Forest of Dysis Cyber Elf: Destroy 3 Bee Carriers": MMZero3LocationData(region="Z2 Forest of Dysis", address=470, can_create=legacy_stages_on),
+    "Forest of Dysis Cyber Elf: Destroy 4 Moles": MMZero3LocationData(region="Z2 Forest of Dysis", address=471, can_create=legacy_stages_on),
+    "Forest of Dysis Cyber Elf: Destroy 3 Spiders": MMZero3LocationData(region="Z2 Forest of Dysis", address=472, can_create=legacy_stages_on),
+
+    "Complete Z2 Residential Area": MMZero3LocationData(region="Z2 Residential Area", address=480, can_create=legacy_stages_on),
+    "A+ Rank Clear: Z2 Residential Area": MMZero3LocationData(region="Z2 Residential Area", address=481, can_create=legacy_stages_on),
+    "Residential Area Cyber Elf: First Upper Ledge": MMZero3LocationData(region="Z2 Residential Area", address=482, can_create=legacy_stages_on),
+    "Residential Area Cyber Elf: Second Upper Ledge": MMZero3LocationData(region="Z2 Residential Area", address=483, can_create=legacy_stages_on),
+
+    "Complete Z2 Crystal Cave": MMZero3LocationData(region="Z2 Crystal Cave", address=544, can_create=legacy_stages_on),
+    "A+ Rank Clear: Z2 Crystal Cave": MMZero3LocationData(region="Z2 Crystal Cave", address=545, can_create=legacy_stages_on),
+    "Crystal Cave Cyber Elf (4) Itemass: Behind Golem Type E": MMZero3LocationData(region="Z2 Crystal Cave", address=546, can_create=legacy_stages_on),
+    "Crystal Cave Cyber Elf (1) Charnue: Hidden Passage in Chasm": MMZero3LocationData(region="Z2 Crystal Cave", address=547, can_create=legacy_stages_on),
+    "Crystal Cave Cyber Elf (3) Clocsule: Ledge Above Spikes": MMZero3LocationData(region="Z2 Crystal Cave", address=548, can_create=legacy_stages_on),
+    "Crystal Cave Cyber Elf (2) Miloppe: Top of the Cliff": MMZero3LocationData(region="Z2 Crystal Cave", address=549, can_create=legacy_stages_on),
+    "Crystal Cave Cyber Elf Birflow: Destroy 12 Mini-Hottalooks": MMZero3LocationData(region="Z2 Crystal Cave", address=550, can_create=legacy_stages_on),
+    "Crystal Cave Cyber Elf Beehitt: Destroy 3 Pantheon Hoppers": MMZero3LocationData(region="Z2 Crystal Cave", address=551, can_create=legacy_stages_on),
+
+    "Complete Z2 Neo Arcadia Temple": MMZero3LocationData(region="Z2 Neo Arcadia Temple", address=576, can_create=legacy_stages_on),
+    "A+ Rank Clear: Z2 Neo Arcadia Temple": MMZero3LocationData(region="Z2 Neo Arcadia Temple", address=577, can_create=legacy_stages_on),
+    "Neo Arcadia Temple Cyber Elf: Early Upper Alcove": MMZero3LocationData(region="Z2 Neo Arcadia Temple", address=578, can_create=legacy_stages_on),
+    "Neo Arcadia Temple Cyber Elf: Late Upper Alcove": MMZero3LocationData(region="Z2 Neo Arcadia Temple", address=579, can_create=legacy_stages_on),
+    "Neo Arcadia Temple Cyber Elf: Destroy 3 Ring Cannons": MMZero3LocationData(region="Z2 Neo Arcadia Temple", address=580, can_create=legacy_stages_on),
+
+    "Complete Z2 Temple of Flame": MMZero3LocationData(region="Z2 Temple of Flame", address=592, can_create=legacy_stages_on),
+    "A+ Rank Clear: Z2 Temple of Flame": MMZero3LocationData(region="Z2 Temple of Flame", address=593, can_create=legacy_stages_on),
+    "Temple of Flame Cyber Elf: Ledge on the Way Down": MMZero3LocationData(region="Z2 Temple of Flame", address=594, can_create=legacy_stages_on),
+    "Temple of Flame Cyber Elf: Ledge Over the Lava Corridor": MMZero3LocationData(region="Z2 Temple of Flame", address=595, can_create=legacy_stages_on),
+    "Temple of Flame Cyber Elf: Destroy 5 Wall Shells": MMZero3LocationData(region="Z2 Temple of Flame", address=596, can_create=legacy_stages_on),
+
+    "Complete Z2 Temple of Ice": MMZero3LocationData(region="Z2 Temple of Ice", address=608, can_create=legacy_stages_on),
+    "A+ Rank Clear: Z2 Temple of Ice": MMZero3LocationData(region="Z2 Temple of Ice", address=609, can_create=legacy_stages_on),
+    "Temple of Ice Cyber Elf: Over the Flooded Hall": MMZero3LocationData(region="Z2 Temple of Ice", address=610, can_create=legacy_stages_on),
+    "Temple of Ice Cyber Elf: Top of the Tower": MMZero3LocationData(region="Z2 Temple of Ice", address=611, can_create=legacy_stages_on),
+    "Temple of Ice Cyber Elf: Ledge Beside the Shaft": MMZero3LocationData(region="Z2 Temple of Ice", address=612, can_create=legacy_stages_on),
 }
 
 # Cerveau's shop
@@ -451,9 +492,7 @@ for slot_number in range(Data.AP_SHOP_SLOTS_MAX):
 # Location groups for `!hint` and tracker filtering.
 location_categories: Dict[str, Container[int]] = {
     "Secret Disks": range(1, 181),
-    "Stage Clears": [*range(181, 197), 389],
     "Chips": range(197, 206),
-    "A+ Rank Clears": [*range(206, 221), 390],
     "Subtanks": range(221, 223),
     "Weapons": range(226, 228),
     "1-UPs": range(Data.AP_LOC_EXLIFE_FIRST, Data.AP_LOC_EXLIFE_FIRST + Data.AP_EXLIFE_COUNT),
@@ -463,8 +502,6 @@ location_categories: Dict[str, Container[int]] = {
                                           + Data.AP_ITEMSANITY_COUNT),
     "Shop": range(Data.AP_SHOP_LOCATION_FIRST,
                   Data.AP_SHOP_LOCATION_FIRST + Data.AP_SHOP_SLOTS_MAX),
-    "Cyber Elves": range(Data.AP_LOC_IMPORT_ELF_FIRST,
-                         Data.AP_LOC_IMPORT_ELF_FIRST + Data.AP_IMPORT_ELF_COUNT),
 }
 
 
@@ -477,6 +514,13 @@ def build_location_name_groups() -> Dict[str, Set[str]]:
         # but I still feel like a player asking resistance base is asking for all 3 together.
         stage = "Resistance Base" if data.region.startswith("Resistance Base") else data.region
         groups.setdefault(stage, set()).add(name)
+
+        if name.startswith("Complete "):
+            groups.setdefault("Stage Clears", set()).add(name)
+        if name.startswith("A+ Rank Clear: "):
+            groups.setdefault("A+ Rank Clears", set()).add(name)
+        if "Cyber Elf" in name:
+            groups.setdefault("Cyber Elves", set()).add(name)
 
         if data.address is None:
             continue
