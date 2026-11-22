@@ -244,6 +244,11 @@ def stage_points(stage_id: int) -> list:
             mark_of.update((index, row_index + 1) for index in group)
     for point in points:
         point["mark"] = mark_of.get(point["index"], 0)
+    for row_index, (enemy_id, group) in drop_groups.items():
+        if enemy_id == DEATHLOCK:
+            for point in points:
+                if point["index"] in group and point["free"]:
+                    point["mark"] = row_index + 1
     return points
 
 
@@ -304,7 +309,7 @@ def randomize_stage(stage_id: int, rng, used: Dict[int, int], difficulty: float,
     vanilla_rows = stage["preload_rows"]
     made_here = set(stage["made_here"])
     points = stage_points(stage_id)
-    marked = sorted({point["mark"] - 1 for point in points if point["mark"]})
+    marked = sorted({point["mark"] - 1 for point in points if point["mark"] and point["enemy_id"] != DEATHLOCK})
 
     placed_here = {point["enemy_id"] for point in points}
     # the sprite sheets from the vanilla game, normal modes only so that mettaur and virus mode enemis can spawn

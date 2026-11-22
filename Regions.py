@@ -44,14 +44,26 @@ region_data_table: Dict[str, MMZero3RegionData] = {
         # Final Level
         "Abandoned Research Laboratory",
 
+        # Zero 2's forms, can be earned in any stage when a zero 2 stage exists in the seed.
+        "Zero 2 Forms",
+
         # Legacy stages, with legacy_stages option:
         "Z2 Sand Wilderness",
+        "Z2 Computer Zone",
+        "Z2 Train",
+        "Z2 Power Room",
         "Z2 Forest of Dysis",
         "Z2 Residential Area",
+        "Z2 Bombardment Aircraft",
+        "Z2 Forest of Notus",
+        "Z2 Computer Zone 2",
         "Z2 Crystal Cave",
+        "Z2 Shuttle Factory",
         "Z2 Neo Arcadia Temple",
         "Z2 Temple of Flame",
         "Z2 Temple of Ice",
+        "Z2 Temple of Wind",
+        "Z2 Yggdrasil",
     ]),
 
     "Resistance Base 1": MMZero3RegionData(),
@@ -86,11 +98,22 @@ region_data_table: Dict[str, MMZero3RegionData] = {
     # Final stage
     "Abandoned Research Laboratory": MMZero3RegionData(),
 
+    "Zero 2 Forms": MMZero3RegionData(),
+
     "Z2 Sand Wilderness": MMZero3RegionData(),
+    "Z2 Computer Zone": MMZero3RegionData(),
+    "Z2 Train": MMZero3RegionData(),
+    "Z2 Power Room": MMZero3RegionData(),
     "Z2 Forest of Dysis": MMZero3RegionData(),
     "Z2 Residential Area": MMZero3RegionData(),
+    "Z2 Bombardment Aircraft": MMZero3RegionData(),
+    "Z2 Forest of Notus": MMZero3RegionData(),
+    "Z2 Computer Zone 2": MMZero3RegionData(),
     "Z2 Crystal Cave": MMZero3RegionData(),
+    "Z2 Shuttle Factory": MMZero3RegionData(),
     "Z2 Neo Arcadia Temple": MMZero3RegionData(),
     "Z2 Temple of Flame": MMZero3RegionData(),
     "Z2 Temple of Ice": MMZero3RegionData(),
+    "Z2 Temple of Wind": MMZero3RegionData(),
+    "Z2 Yggdrasil": MMZero3RegionData(),
 }

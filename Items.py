@@ -28,8 +28,8 @@ stage_names = [
 ]
 
 # Stages from other Zero games, legacy_stages.
-legacy_stage_names = ["Z2 Sand Wilderness", "Z2 Forest of Dysis", "Z2 Residential Area", "Z2 Crystal Cave",
-                      "Z2 Neo Arcadia Temple", "Z2 Temple of Flame", "Z2 Temple of Ice"]
+legacy_stage_names = ["Z2 Sand Wilderness", "Z2 Computer Zone", "Z2 Train", "Z2 Power Room", "Z2 Forest of Dysis", "Z2 Residential Area",
+                      "Z2 Bombardment Aircraft", "Z2 Forest of Notus", "Z2 Computer Zone 2", "Z2 Crystal Cave", "Z2 Shuttle Factory", "Z2 Neo Arcadia Temple", "Z2 Temple of Flame", "Z2 Temple of Ice", "Z2 Temple of Wind", "Z2 Yggdrasil"]
 
 # Zero 2's stages in game order.
 zero2_stages = ["Z2 Sand Wilderness", "Z2 Computer Zone", "Z2 Train", "Z2 Power Room", "Z2 Forest of Dysis",
@@ -50,6 +50,21 @@ weapon_chains: Dict[str, List[str]] = {
 }
 def weapon_ability_level(weapon: str, ability: str) -> int:
     return weapon_chains[weapon].index(ability) + 1
+
+
+def disk_cut_tier(disk: int) -> Optional[int]:
+    """For when secret disks need to be cut from the pool. Gives tier, lowest taken away first"""
+    if 7 <= disk <= 20 or disk == 116 or 165 <= disk <= 176:   # text
+        return 0
+    if 141 <= disk <= 164 or 177 <= disk <= 180:                 # cosmetic skins
+        return 1
+    if 111 <= disk <= 140 and disk != 120:                       # base decorations and NPCs
+        return 2
+    if 95 <= disk <= 110:                                        # E-Crystals
+        return 3
+    if 28 <= disk <= 43 or 74 <= disk <= 86:                     # cyber elves
+        return 4
+    return None
 
 
 item_data_table: Dict[str, MMZero3ItemData] = {
@@ -253,6 +268,7 @@ item_data_table: Dict[str, MMZero3ItemData] = {
         f"{stage} Access": MMZero3ItemData(
             code=180 + idx + 1,
             type=ItemClassification.progression,
+            can_create=lambda world, stage=stage: stage in world.stages(),
         )
         for idx, stage in enumerate(stage_names)
     },
@@ -260,7 +276,7 @@ item_data_table: Dict[str, MMZero3ItemData] = {
         f"{stage} Access": MMZero3ItemData(
             code=Data.AP_ITEM_IMPORT_ACCESS_FIRST + zero2_stages.index(stage),
             type=ItemClassification.progression,
-            can_create=lambda world: world.options.legacy_stages.value,
+            can_create=lambda world, stage=stage: stage in world.stages(),
         )
         for stage in legacy_stage_names
     },

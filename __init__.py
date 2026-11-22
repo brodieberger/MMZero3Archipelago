@@ -1,17 +1,18 @@
+import logging
 import math
-from typing import List, Dict, Any, ClassVar
+from typing import List, Dict, Any, ClassVar, Optional
 
 from BaseClasses import Region, Tutorial
 from Options import OptionError
 from worlds.AutoWorld import WebWorld, World
-from worlds.generic.Rules import add_rule, set_rule, forbid_item, add_item_rule
-from .Items import (MMZero3Item, STORY_LATE, STORY_MID, item_data_table, item_name_groups,
-                    item_table, legacy_stage_names, stage_access_names, stage_names, weapon_ability_level,
-                    weapon_names)
-from .Locations import (MMZero3Location, location_data_table, location_name_groups, location_table,
-                        locked_locations, shop_location_names)
-from .Options import MMZero3Options, mmzero3_option_groups
+from worlds.generic.Rules import add_rule
+from .Items import (MMZero3Item, disk_cut_tier, item_data_table, item_name_groups, item_table, legacy_stage_names,
+                    stage_names, weapon_names)
+from .Locations import MMZero3Location, location_data_table, location_name_groups, location_table, locked_locations
+from .Options import LegacyStages, MMZero3Options, mmzero3_option_groups
+from .Presets import mmzero3_options_presets
 from .Regions import region_data_table
+from .Rules import set_rules
 from .Rom import MMZero3ProcedurePatch, MMZero3Settings, write_tokens
 from .data import Data
 from .randomizers import EnemyRando, Palettes
@@ -26,6 +27,7 @@ class MMZero3WebWorld(WebWorld):
     theme = "ice"
     bug_report_page = "https://github.com/brodieberger/MMZero3Archipelago/issues"
     option_groups = mmzero3_option_groups
+    options_presets = mmzero3_options_presets
     setup_en = Tutorial(
         "Multiworld Setup Guide",
         "A guide to setting up the Mega Man Zero 3 Randomizer connected to an Archipelago Multiworld.",
@@ -56,6 +58,9 @@ class MMZero3World(World):
 
 
     starting_weapons: set
+    slot_stages: List[str]
+    required_disk_count: int
+    required_stage_count: int
 
     def generate_early(self) -> None:
         self.roll_shop_prices()
@@ -73,20 +78,83 @@ class MMZero3World(World):
         if passthrough:
             self.starting_weapons = set(passthrough["starting_weapons"])
             self.options.randomize_enemies.value = passthrough.get("randomize_enemies", 0)
-            self.options.required_secret_disks.value = passthrough["required_secret_disks"]
+            self.slot_stages = passthrough["slot_stages"]
+            self.required_disk_count = passthrough["required_disk_count"]
+            self.required_stage_count = passthrough["required_stage_count"]
         else:
             self.starting_weapons = set(self.options.starting_weapons.value)
 
             if not self.starting_weapons:
                 self.starting_weapons = {self.random.choice(weapon_names)}
+            self.slot_stages = self.roll_slot_stages()
+            self.required_disk_count = self.disks_in_seed() * self.options.required_secret_disks.value // 100
+            self.required_stage_count = len(self.stages()) * self.options.required_stage_clears.value // 100
 
         # If it is your only weapon, add another Shield Boomerang so you can actually attack.
         if self.starting_weapons == {"Shield Boomerang"}:
             self.multiworld.push_precollected(self.create_item("Progressive Shield Boomerang"))
 
         # Force the first stage access item to be early local
-        first_stage_access = self.random.choice(stage_access_names)
+        first_stage_access = self.random.choice([f"{stage} Access" for stage in self.slot_stages])
         self.multiworld.local_early_items[self.player][first_stage_access] = 1
+
+    def roll_slot_stages(self) -> List[str]:
+        """Zero 3's 15 stage slots in order, each holding its own stage or, with shuffle, a Zero 2 one."""
+        stages = list(stage_names)
+        if self.options.legacy_stages != LegacyStages.option_shuffle:
+            return stages
+        count = self.options.legacy_shuffle_count.value
+        if count:
+            slots = self.random.sample(range(len(stages)), count)
+        else:
+            slots = []
+            while not slots:
+                slots = [slot for slot in range(len(stages)) if self.random.random() < 0.5]
+        for slot, stage in zip(slots, self.random.sample(legacy_stage_names, len(slots))):
+            stages[slot] = stage
+        return stages
+
+    def stages(self) -> List[str]:
+        """Every stage in the seed but the final one."""
+        if self.options.legacy_stages == LegacyStages.option_all:
+            return self.slot_stages + legacy_stage_names
+        return self.slot_stages
+
+    def location_region(self, name: str) -> Optional[str]:
+        """The region a location is in this seed, None if the seed does not have it.
+
+        A boss's chip stays with its slot when a Zero 2 stage takes the slot.
+        """
+        data = location_data_table[name]
+        if not data.can_create(self):
+            return None
+        if data.region in stage_names and data.region not in self.slot_stages:
+            if name.startswith("Collect "):
+                return self.slot_stages[stage_names.index(data.region)]
+            return None
+        if data.region in legacy_stage_names and data.region not in self.stages():
+            return None
+        return data.region
+
+    def free_location_count(self) -> int:
+        return sum(1 for name, data in location_data_table.items()
+                   if not data.locked_item and self.location_region(name))
+
+    def pool_names(self) -> List[str]:
+        """Every item the pool always holds, a name per copy: all but the plain disks and the filler."""
+        locked_item_names = {data.locked_item for data in locked_locations.values() if data.locked_item}
+        return [name for name, item in item_data_table.items()
+                if item.code and item.can_create(self) and name not in locked_item_names
+                and not (name.startswith("Disk ") and disk_cut_tier(int(name[5:8])) is not None)
+                for _ in range(item.count(self))]
+
+    def disks_in_seed(self) -> int:
+        """180 Secret Disks, less the plain ones a full pool has no room for when cut_secret_disks allows it."""
+        if not self.options.cut_secret_disks:
+            return 180
+        plain = sum(1 for disk in range(1, 181) if disk_cut_tier(disk) is not None)
+        room = self.free_location_count() - len(self.pool_names())
+        return 180 - max(0, plain - room)
 
     def starting_level(self, weapon: str) -> int:
         """How far up its chain a weapon starts. 0 means the player does not own it.
@@ -103,50 +171,49 @@ class MMZero3World(World):
         return MMZero3Item(name, item_data_table[name].type, item_data_table[name].code, self.player)
 
     def create_items(self) -> None:
-        item_pool: List[MMZero3Item] = []
+        names = self.pool_names()
+        free = self.free_location_count()
 
-        locked_item_names = {data.locked_item for data in locked_locations.values() if data.locked_item}
-
-        for name, item in item_data_table.items():
-            if item.code and item.can_create(self) and name not in locked_item_names:
-                item_pool.extend(self.create_item(name) for _ in range(item.count(self)))
-
-        self.multiworld.itempool += item_pool
-
-        # Count only the free (non-locked) locations that are actually created
-        free_location_count = len([
-            loc for loc in location_data_table.values()
-            if loc.can_create(self) and not loc.locked_item
-        ])
-
-        filler_count = free_location_count - len(item_pool)
-        if filler_count < 0:
+        # Plain disks in the order they leave a full pool, shuffled within each tier
+        plain = [name for name in item_data_table
+                 if name.startswith("Disk ") and disk_cut_tier(int(name[5:8])) is not None]
+        self.random.shuffle(plain)
+        plain.sort(key=lambda name: disk_cut_tier(int(name[5:8])))
+        cut = 180 - self.disks_in_seed()
+        if cut:
+            logging.warning(f"Mega Man Zero 3 ({self.player_name}): the item pool is full, so {cut} plain Secret "
+                            f"Disks are left out. More shop_slots, itemsanity or extra_life_sanity bring them back.")
+        names += plain[cut:]
+        if len(names) > free:
             raise OptionError(
-                f"Mega Man Zero 3 ({self.player_name}): {len(item_pool)} items for "
-                f"{free_location_count} locations. Turn on extra_life_sanity or itemsanity, "
-                f"or stock more shop_slots.")
-        for _ in range(filler_count):
+                f"Mega Man Zero 3 ({self.player_name}): {len(names)} items for {free} locations, "
+                f"{len(names) - free} short. Turn on itemsanity or extra_life_sanity, stock more shop_slots, "
+                f"shuffle in fewer Zero 2 stages, or turn on cut_secret_disks.")
+
+        self.multiworld.itempool += [self.create_item(name) for name in names]
+        for _ in range(free - len(names)):
             self.multiworld.itempool.append(self.create_item(self.get_filler_item_name()))
 
     def create_regions(self) -> None:
-        # Create regions.
-        for region_name in region_data_table.keys():
-            region = Region(region_name, self.player, self.multiworld)
-            self.multiworld.regions.append(region)
+        stages = set(self.stages())
+        names = [name for name in region_data_table
+                 if name not in stage_names and name not in legacy_stage_names or name in stages]
+        for region_name in names:
+            self.multiworld.regions.append(Region(region_name, self.player, self.multiworld))
 
-        # Create locations.
-        for region_name, region_data in region_data_table.items():
+        for region_name in names:
             region = self.get_region(region_name)
             region.add_locations({
                 location_name: location_data.address for location_name, location_data in location_data_table.items()
-                if location_data.region == region_name and location_data.can_create(self)
+                if self.location_region(location_name) == region_name
             }, MMZero3Location)
-            region.add_exits({target: f"To {target}" for target in region_data_table[region_name].connecting_regions})
+            region.add_exits({target: f"To {target}" for target in region_data_table[region_name].connecting_regions
+                              if target in names})
 
         # Place locked locations.
         for location_name, location_data in locked_locations.items():
             # Ignore locations we never created.
-            if not location_data.can_create(self):
+            if not self.location_region(location_name):
                 continue
 
             locked_item = self.create_item(location_data_table[location_name].locked_item)
@@ -161,6 +228,10 @@ class MMZero3World(World):
     def fill_slot_data(self) -> Dict[str, Any]:
         return {
             "required_secret_disks": self.options.required_secret_disks.value,
+            "required_disk_count": self.required_disk_count,
+            "required_stage_clears": self.options.required_stage_clears.value,
+            "required_stage_count": self.required_stage_count,
+            "slot_stages": self.slot_stages,
             "ex_skill_rank": self.options.ex_skill_rank.value,
             "final_stage_rank": self.options.final_stage_rank.value,
             "starting_weapons": sorted(self.starting_weapons),
@@ -188,8 +259,8 @@ class MMZero3World(World):
             self.shop_prices.append(price)
 
     def add_location_rule(self, loc_name: str, rule) -> None:
-        """add_rule, but skips a location disabled by seed's options."""
-        if location_data_table[loc_name].can_create(self):
+        """add_rule, but skips a location this seed does not have."""
+        if self.location_region(loc_name):
             add_rule(self.multiworld.get_location(loc_name, self.player), rule)
 
     def roll_palettes(self) -> None:
@@ -202,153 +273,8 @@ class MMZero3World(World):
             self.stage_palettes[stage_id] = self.random.choice(choices)
 
     def set_rules(self) -> None:
-        def has_weapon_at(state, weapon: str, ability: str) -> bool:
-            copies_needed = weapon_ability_level(weapon, ability)
-            if weapon in self.starting_weapons:
-                copies_needed -= 1
-            return state.has(f"Progressive {weapon}", self.player, copies_needed)
+        set_rules(self)
 
-        # Breaking blocks, moving platforms, and the rod jump.
-        def has_rod(state):
-            return has_weapon_at(state, "Recoil Rod", "Charged Rod")
-
-        def has_mobility(state):
-            return state.has("Double Jump Foot Chip", self.player) or has_rod(state)
-
-        def has_flame(state):
-            if not state.has("Flame Body Chip", self.player):
-                return False
-            return (has_weapon_at(state, "Buster", "Full Charge")
-                    or has_weapon_at(state, "Z-Saber", "Charged Slash")
-                    or has_weapon_at(state, "Recoil Rod", "Charged Rod")
-                    or has_weapon_at(state, "Shield Boomerang", "Charged Throw")
-                    or (state.has("EX Skill: Split Heavens", self.player)
-                        and has_weapon_at(state, "Z-Saber", "Owns")))
-
-        # Access items.
-        for stage_name in stage_names:
-            set_rule(
-                self.multiworld.get_entrance(f"To {stage_name}", self.player),
-                lambda state, item=f"{stage_name} Access": state.has(item, self.player),
-            )
-
-        for stage_name in legacy_stage_names:
-            set_rule(
-                self.multiworld.get_entrance(f"To {stage_name}", self.player),
-                lambda state, item=f"{stage_name} Access": state.has(item, self.player),
-            )
-
-        # Cerveau's shop.
-        for slot in range(self.options.shop_slots.value):
-            set_rule(
-                self.multiworld.get_location(shop_location_names[slot], self.player),
-                lambda state: state.has_any(stage_access_names, self.player),
-            )
-
-        # The base's later mission sets.
-        set_rule(self.multiworld.get_entrance("To Resistance Base 2", self.player),
-                 lambda state: state.has("Story Progress", self.player, STORY_MID))
-
-        set_rule(self.multiworld.get_entrance("To Resistance Base 3", self.player),
-                 lambda state: state.has("Story Progress", self.player, STORY_LATE))
-
-        # The final stage. Needs every access item and the required disks (from options)
-        set_rule(
-            self.multiworld.get_entrance("To Abandoned Research Laboratory", self.player),
-            lambda state: state.has_all(stage_access_names, self.player)
-            and state.has_group("Secret Disks", self.player, self.options.required_secret_disks.value),
-        )
-        # Since its lame that important items could spawn here, prevent progressive items
-        for location in self.multiworld.get_region("Abandoned Research Laboratory", self.player).locations:
-            add_item_rule(location, lambda item: not item.advancement)
-
-        # Location rules: Recoil Rod required
-        for loc_name in [
-            "Aegis Volcano Base (4) 114: Push 1st Container",
-            "Oceanic Highway Ruins (1) 005: 1st Pit Breakable",
-            "Weapons Repair Factory (2) 115: Hit 3rd Hammer",
-            "Old Residential (1) 039: 1st Door",
-            "Old Residential (3) 112: Floor Breakables",
-            "Old Residential Energy (6): Breakable Blocks by Bombers",
-            "Forest of Anatre (8) 040: Breakables Below Boss Room",
-            "Giant Elevator (2) 041: 1st Passage High Ledges",
-            "Giant Elevator (6) 027: 1st Descent Bottom Left Breakable",
-            "Aegis Volcano Base E-Crystal (2): Push 1st Container",
-            "Aegis Volcano Base E-Crystal (3): Push 1st Container",
-            "Oceanic Highway Ruins E-Crystal (1): 1st Pit Breakable",
-            "Oceanic Highway Ruins E-Crystal (2): 1st Pit Breakable",
-            "Weapons Repair Factory E-Crystal (1): Hit 3rd Hammer",
-            "Weapons Repair Factory E-Crystal (2): Hit 3rd Hammer",
-            "Forest of Anatre Energy (3): Breakables Below Boss Room",
-        ]:
-            self.add_location_rule(loc_name, has_rod)
-
-        # Location rules: Mobility required (Double Jump or Recoil Rod)
-        for loc_name in [
-            "Aegis Volcano Base (3) 026: Platform Above First Room",
-            "Aegis Volcano Base (5) 073: Platform After Pushed Container",
-            "Old Residential Subtank: Top Left Past Bombers",
-            "Forest of Anatre (7) 076: Above 9th Button",
-            "Giant Elevator 1-UP: 1st Passage High Ledges",
-            "Aegis Volcano Base Energy: Platform Above First Room",
-            "Old Residential E-Crystal (13): Top Left Past Bombers",
-        ]:
-            self.add_location_rule(loc_name, has_mobility)
-
-        # Location rules: Flame Body Chip required
-        for loc_name in [
-            "Old Residential (4) 074: Left Fork Door",
-            "Forest of Anatre (1) 063: Treetops Above Start",
-            "Forest of Anatre (2) 002: Ledge Above 1st Door",
-            "Old Residential 1-UP (1): Right of Fork",
-            "Old Residential 1-UP (2): Left Fork Door",
-            "Forest of Anatre 1-UP: In Tree Near Start",
-            "Old Residential E-Crystal (1): Stump Door",
-            "Old Residential Energy (1): Stump Door",
-            "Old Residential E-Crystal (4): Door after Cutscene",
-            "Old Residential E-Crystal (5): Door after Cutscene",
-            "Old Residential E-Crystal (6): Door after Cutscene",
-            "Forest of Anatre Energy (1): Treetops Above Generator Cannon",
-        ]:
-            self.add_location_rule(loc_name, has_flame)
-
-        # Flame Body Chip + Recoil Rod
-        self.add_location_rule("Old Residential (2) 001: Stump Door",
-                               lambda state: has_flame(state) and has_rod(state))
-
-        # Mobility OR Splash Jump Foot Chip
-        for loc_name in [
-            "Frontline Ice Base (1) 066: Top Route Tower",
-            "Frontline Ice Base Energy: Top Route Tower",
-        ]:
-            self.add_location_rule(
-                loc_name,
-                lambda state: state.has("Disk 005: Splash Jump Foot Chip", self.player) or has_mobility(state))
-
-        # Technically reachable without
-        self.add_location_rule("Missile Factory Energy (2): Missile Top Right",
-                               lambda state: state.has("Double Jump Foot Chip", self.player))
-
-        # Double Mobility: Double Jump Foot Chip + Recoil Rod
-        self.add_location_rule("Giant Elevator (1) 045: 1st Passage High Ledges",
-                               lambda state: state.has("Double Jump Foot Chip", self.player) and has_rod(state))
-
-        # You need to pogo off enemies for these ones.
-        if self.options.randomize_enemies:
-            for loc_name in [
-                "Old Residential Subtank: Top Left Past Bombers",
-                "Old Residential E-Crystal (13): Top Left Past Bombers",
-            ]:
-                self.add_location_rule(
-                    loc_name, lambda state: state.has("Double Jump Foot Chip", self.player) and has_rod(state))
-
-        # Collectable 1-UP spawns in the new room
-        self.add_location_rule("Resistance Base 1-UP: In Locked Room by Andrew",
-                               lambda state: state.has("Disk 120: New Room Near Andrew", self.player))
-
-        # Completion condition
-        self.multiworld.completion_condition[self.player] = lambda state: state.has("Victory", self.player)
-        
     def generate_output(self, output_directory: str) -> None:
         patch = MMZero3ProcedurePatch(player=self.player, player_name=self.player_name)
         patch.write_file("basepatch.bsdiff4", pkgutil.get_data(__name__, "data/basepatch.bsdiff4"))

@@ -12,6 +12,7 @@ from worlds.Files import APPatchExtension, APProcedurePatch, APTokenMixin, APTok
 
 from .data import Data
 from .randomizers import EnemyRando, Palettes
+from .Items import legacy_stage_names
 from .Locations import shop_location_names
 
 # Zero 2 Data locations to copy from player's ROM.
@@ -173,7 +174,7 @@ class MMZero3PatchExtensions(APPatchExtension):
     @staticmethod
     def fill_legacy_stages(caller: APProcedurePatch, rom: bytes) -> bytes:
         """
-        Art, stage layout bytes, and sound effects from Zero 2 ROM, provided by the player.
+        Art, stage layout bytes, and sound effects from Zero 2 ROM.
         Also handles compressed assets.
         """
         at, _ = Data.SEED_CONFIG_FIELDS["legacyStages"]
@@ -288,20 +289,28 @@ def write_tokens(world: "MMZero3World", patch: MMZero3ProcedurePatch) -> None:
         u8  finalStageRank;
         u8  enemyDiskMarkers;
         u8  legacyStages;
-        u8  unused[2];
+        u8  attackMode;
+        u8  randomEnemies;
+        u8  doubleTapDash;
+        u8  airSpinSlash;
+        u8  slotImport[15];
+        u8  requiredStages;
     };
 
-    Theres also gApShopPrices, one u16 per shop slot: 
-    what that slot costs, or 0 for a slot this seed does not stock
+    slotImport is the legacy stage in each Zero 3 stage's slot.
 
-    And gApShopItems, one record a slot saying what is in it.
+    Theres also gApShopPrices, one u16 for each shop slot: 
+    Represents the price of that slot, or 0 for a slot this seed does not let you purchase from.
+
+    And gApShopItems, one record for each shop slot, saying what is in it.
     """
     starting_weapons = 0
     for name in world.starting_weapons:
         starting_weapons |= 1 << WEAPON_BITS[name]
 
     values = {
-        "requiredDisks": world.options.required_secret_disks.value,
+        "requiredDisks": world.required_disk_count,
+        "requiredStages": world.required_stage_count,
         "startingWeapons": starting_weapons,
         "exSkillRank": world.options.ex_skill_rank.value,
         "itemsanity": 1 if world.options.itemsanity.value else 0,
@@ -313,13 +322,21 @@ def write_tokens(world: "MMZero3World", patch: MMZero3ProcedurePatch) -> None:
         "infiniteLives": 1 if world.options.infinite_lives.value else 0,
         "finalStageRank": world.options.final_stage_rank.value,
         "enemyDiskMarkers": 1 if world.options.enemy_disk_markers.value else 0,
-        "legacyStages": 1 if world.options.legacy_stages.value else 0,
-        "unused": 0,
+        "legacyStages": world.options.legacy_stages.value,
+        "attackMode": 1 if world.options.attack_mode_b.value else 0,
+        "doubleTapDash": 1 if world.options.double_tap_dash.value else 0,
+        "airSpinSlash": world.options.air_spin_slash.value,
+        "randomEnemies": 1 if world.enemies else 0,
+        "slotImport": bytes(legacy_stage_names.index(stage) if stage in legacy_stage_names else Data.AP_SLOT_OWN
+                            for stage in world.slot_stages),
     }
 
     seed_config = bytearray(Data.SEED_CONFIG_SIZE)
     for name, (offset, size) in Data.SEED_CONFIG_FIELDS.items():
-        seed_config[offset:offset + size] = values[name].to_bytes(size, "little")
+        value = values[name]
+        if isinstance(value, int):
+            value = value.to_bytes(size, "little")
+        seed_config[offset:offset + size] = value
 
     patch.write_token(APTokenTypes.WRITE, Data.SEED_CONFIG_ROM_OFFSET, bytes(seed_config))
 
