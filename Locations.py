@@ -440,6 +440,7 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Computer Zone Cyber Elf Fubuffa: 4th Bulldozer Kill": MMZero3LocationData(region="Z2 Computer Zone", address=422, can_create=legacy_stages_on),
     "Computer Zone Cyber Elf Atti: 4th Pipe Crawler Kill": MMZero3LocationData(region="Z2 Computer Zone", address=423, can_create=legacy_stages_on),
     "Computer Zone Cyber Elf Hafmardo: Frost Golem Kill": MMZero3LocationData(region="Z2 Computer Zone", address=424, can_create=legacy_stages_on),
+    
     "Complete Z2 Train": MMZero3LocationData(region="Z2 Train", address=432, can_create=legacy_stages_on),
     "A+ Rank Clear: Z2 Train": MMZero3LocationData(region="Z2 Train", address=433, can_create=legacy_stages_on),
     "Train Cyber Elf Emick: Front of Train": MMZero3LocationData(region="Z2 Train", address=434, can_create=legacy_stages_on),
@@ -471,8 +472,10 @@ location_data_table: Dict[str, MMZero3LocationData] = {
 
     "Complete Z2 Residential Area": MMZero3LocationData(region="Z2 Residential Area", address=480, can_create=legacy_stages_on),
     "A+ Rank Clear: Z2 Residential Area": MMZero3LocationData(region="Z2 Residential Area", address=481, can_create=legacy_stages_on),
-    "Residential Area Cyber Elf Estan: First Upper Ledge": MMZero3LocationData(region="Z2 Residential Area", address=482, can_create=legacy_stages_on),
-    "Residential Area Cyber Elf Rireff: Second Upper Ledge": MMZero3LocationData(region="Z2 Residential Area", address=483, can_create=legacy_stages_on),
+    "Residential Area Cyber Elf Rireff: First Upper Ledge": MMZero3LocationData(region="Z2 Residential Area", address=482, can_create=legacy_stages_on),
+    "Residential Area Cyber Elf Estan: Second Upper Ledge": MMZero3LocationData(region="Z2 Residential Area", address=483, can_create=legacy_stages_on),
+    "Residential Area Cyber Elf Bircarry: 5th Gli-Eye Kill": MMZero3LocationData(region="Z2 Residential Area", address=484, can_create=legacy_stages_on),
+    "Residential Area Cyber Elf Beebite: 8th Pantheon Guardian Kill": MMZero3LocationData(region="Z2 Residential Area", address=485, can_create=legacy_stages_on),
 
     "Complete Z2 Bombardment Aircraft": MMZero3LocationData(region="Z2 Bombardment Aircraft", address=496, can_create=legacy_stages_on),
     "A+ Rank Clear: Z2 Bombardment Aircraft": MMZero3LocationData(region="Z2 Bombardment Aircraft", address=497, can_create=legacy_stages_on),
