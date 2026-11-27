@@ -236,6 +236,12 @@ def stage_points(stage_id: int) -> list:
             drop_groups[row_index] = (enemy_id, {
                 point["index"] for point in points
                 if point["enemy_id"] == enemy_id and (work0 == 0xFFFF or point["work0"] == work0)})
+    # A row that only spawned enemies can satisfy (the Generator Cannon's own spawns) keeps whatever makes them
+    for enemy_id, group in drop_groups.values():
+        if not group:
+            for point in points:
+                if enemy_id in D.SPECIES[point["enemy_id"]]["makes"]:
+                    point["free"] = False
     # disk spawn points get the AP logo and count kills by the spawn spot instead of by enemy type
     mark_of = {}
     for row_index, (_enemy_id, group) in drop_groups.items():

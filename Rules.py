@@ -159,6 +159,24 @@ def set_rules(world: "MMZero3World") -> None:
     ]:
         world.add_location_rule(loc_name, lambda state: has_rod(state) or has_weapon_at(state, "Chain Rod", "Owns"))
 
+    # Elf boxes behind blocks the Chain Rod can pull
+    for loc_name in [
+        "Residential Area Cyber Elf Rireff: First Upper Ledge",
+        "Residential Area Cyber Elf Estan: Second Upper Ledge",
+    ]:
+        world.add_location_rule(loc_name, lambda state: has_weapon_at(state, "Chain Rod", "Owns"))
+
+    for loc_name in [
+        "Forest of Dysis Subtank: Inside Spike Pit",
+        "Forest of Notus Cyber Elf Mitick: Above Breakable Block",
+    ]:
+        world.add_location_rule(loc_name, lambda state: has_mobility(state)
+                                or has_weapon_at(state, "Chain Rod", "Owns")
+                                or state.has("Disk 048: Putite (Non-Lethal Spikes)", player))
+
+    world.add_location_rule("Yggdrasil 1-UP: Above Spikes",
+                            lambda state: state.has("Double Jump Foot Chip", player)
+                            or has_weapon_at(state, "Chain Rod", "Owns"))
     # You need to pogo off enemies for these ones.
     if world.options.randomize_enemies:
         for loc_name in [

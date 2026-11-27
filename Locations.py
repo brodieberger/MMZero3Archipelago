@@ -457,7 +457,7 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     "Power Room Cyber Elf Beelanch: First Reactor's Drop": MMZero3LocationData(region="Z2 Power Room", address=454, can_create=legacy_stages_on),
     "Power Room Cyber Elf Bomphew: 4th Mine Kill": MMZero3LocationData(region="Z2 Power Room", address=455, can_create=legacy_stages_on),
     "Power Room Cyber Elf Beestin: 7th Copter Kill": MMZero3LocationData(region="Z2 Power Room", address=456, can_create=legacy_stages_on),
-    "Power Room Cyber Elf Dable: Destroy Drone Generator": MMZero3LocationData(region="Z2 Power Room", address=457, can_create=legacy_stages_on),
+    "Power Room Cyber Elf Dable: Destroy U4": MMZero3LocationData(region="Z2 Power Room", address=457, can_create=legacy_stages_on),
 
     "Complete Z2 Forest of Dysis": MMZero3LocationData(region="Z2 Forest of Dysis", address=464, can_create=legacy_stages_on),
     "A+ Rank Clear: Z2 Forest of Dysis": MMZero3LocationData(region="Z2 Forest of Dysis", address=465, can_create=legacy_stages_on),
@@ -594,6 +594,14 @@ location_data_table: Dict[str, MMZero3LocationData] = {
     # Legacy stages' sub tanks
     "Forest of Dysis Subtank: Inside Spike Pit": MMZero3LocationData(region="Z2 Forest of Dysis", address=695, can_create=legacy_stages_on),
     "Forest of Notus Subtank: Past Spike Pit": MMZero3LocationData(region="Z2 Forest of Notus", address=696, can_create=legacy_stages_on),
+
+    # Yggdrasil's refights
+    "Yggdrasil Refight: Hyleg Ourobockle": MMZero3LocationData(region="Z2 Yggdrasil", address=697, can_create=legacy_stages_on),
+    "Yggdrasil Refight: Poler Kamrous": MMZero3LocationData(region="Z2 Yggdrasil", address=698, can_create=legacy_stages_on),
+    "Yggdrasil Refight: Phoenix Magnion": MMZero3LocationData(region="Z2 Yggdrasil", address=699, can_create=legacy_stages_on),
+    "Yggdrasil Refight: Panter Flauclaws": MMZero3LocationData(region="Z2 Yggdrasil", address=700, can_create=legacy_stages_on),
+    "Yggdrasil Refight: Anchus Brothers": MMZero3LocationData(region="Z2 Yggdrasil", address=701, can_create=legacy_stages_on),
+    "Yggdrasil Refight: Burble Hekelot": MMZero3LocationData(region="Z2 Yggdrasil", address=702, can_create=legacy_stages_on),
 }
 
 # Cerveau's shop
@@ -634,6 +642,7 @@ location_categories: Dict[str, Container[int]] = {
               *range(Data.AP_LOC_IMPORT_EXLIFE_FIRST, Data.AP_LOC_IMPORT_EXLIFE_FIRST + Data.AP_IMPORT_EXLIFE_COUNT)],
     "Minibosses": [*range(242, 253), *range(Data.AP_LOC_IMPORT_MINIBOSS_FIRST,
                                             Data.AP_LOC_IMPORT_MINIBOSS_FIRST + Data.AP_IMPORT_MINIBOSS_COUNT)],
+    "Refights": range(697, 703),
     "Itemsanity": range(Data.AP_LOC_ITEMSANITY_FIRST,
                                           Data.AP_LOC_ITEMSANITY_FIRST
                                           + Data.AP_ITEMSANITY_COUNT),
